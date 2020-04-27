@@ -21,6 +21,7 @@ window.Vue = require('vue');
 
 Vue.component('nav-bar', require('./pages/IndexPage/navBar.vue').default);
 Vue.component('index-page', require('./pages/IndexPage/index.vue').default);
+//Vue.component('index-page-old', require('./V01/pages/IndexPage/index.vue').default);
 
 Vue.component('user-page', require('./pages/UserPage/index.vue').default);
 Vue.component('profile-page', require('./pages/ProfilePage/index.vue').default);
@@ -34,6 +35,12 @@ Vue.component('group-page', require('./pages/GroupPage/index.vue').default);
  */
 
 Vue.prototype.$bus = new Vue({});
+
+/*
+Vue.prototype.$today = new Date().toJSON().slice(0,10).replace(/-/g,'/');
+Vue.prototype.$today = new Date();
+*/
+
 
 const app = new Vue({
     el: '#app',

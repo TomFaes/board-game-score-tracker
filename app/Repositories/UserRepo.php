@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserRepo extends Repository implements Contracts\IUser
 {
@@ -55,7 +56,7 @@ class UserRepo extends Repository implements Contracts\IUser
         $user = new User();
         //default role is User
         $user->role = 'User';
-        $user->password = Hash::make(str_random(16));
+        $user->password = Hash::make(Str::random(16));
         $user = $this->setUser($user, $data);
         $user->save();
         return $user;
@@ -70,7 +71,7 @@ class UserRepo extends Repository implements Contracts\IUser
         $newUser->firstname = $socialUser['given_name'];
         $newUser->name = $socialUser['family_name'];
         $newUser->email = $socialUser['email'];
-        $newUser->password = Hash::make(str_random(16));
+        $newUser->password = Hash::make(Str::random(16));
         $newUser->role = 'User';
         $newUser->save();
         return $newUser;
@@ -92,9 +93,9 @@ class UserRepo extends Repository implements Contracts\IUser
      */
     public function forgetUser($userId){
         $user = $this->getUser($userId);
-        $user->firstname = str_random(10);
-        $user->name = str_random(10);
-        $user->email = str_random(10)."@".str_random(10).".".str_random(10);
+        $user->firstname = Str::random(10);
+        $user->name = Str::random(10);
+        $user->email = Str::random(10)."@".Str::random(10).".".Str::random(10);
         $user->forget_user = 1;
         $user->save();
         return $user;

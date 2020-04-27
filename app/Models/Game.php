@@ -10,7 +10,7 @@ class Game extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'name','players_min', 'players_max', 'base_game_id'
+        'name' ,'players_min', 'players_max', 'base_game_id'
     ];
 
     protected $hidden = [
@@ -48,6 +48,12 @@ class Game extends Model
      */
     public function getDisplayAttribute()
     {
-        return $this->name;
+        return $this->full_name;
+    }
+
+    //Pivot table connection
+    public function playedGameExpansions()
+    {
+        return $this->belongsToMany('App\Models\PlayedGame', 'expansion_played_game');
     }
 }

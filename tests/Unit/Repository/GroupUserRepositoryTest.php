@@ -48,19 +48,19 @@ class GroupUserRepositoryTest extends TestCase
      *
      * @return void
      */
+    public function test_get_all_group_users()
+    {
+        $found = $this->repo->getAllGroupUsers();
+        $this->assertEquals(10, count($found));
+        echo PHP_EOL.'[42m OK  [0m get all group users';
+    }
+
     public function test_get_group_user()
     {
         echo PHP_EOL.PHP_EOL.'[43m GroupUser Repository Test:   [0m';
         $found = $this->repo->getGroupUser($this->testData[0]->id);
         $this->dataTests($found, $this->testData[0]);
         echo PHP_EOL.'[42m OK  [0m get group user';
-    }
-
-    public function test_get_groups()
-    {
-        $found = $this->repo->getAllGroupUsers();
-        $this->assertEquals(10, count($found));
-        echo PHP_EOL.'[42m OK  [0m get all group users';
     }
 
     //getUsersOfGroup
@@ -123,6 +123,14 @@ class GroupUserRepositoryTest extends TestCase
         $this->assertEquals(3, count($found));
 
         echo PHP_EOL.'[42m OK  [0m get groups based on email ';
+    }
+
+    public function test_get_created_games()
+    {
+        echo PHP_EOL.PHP_EOL.'[43m GroupUser Repository Test:   [0m';
+        $found = $this->repo->getCreatedGames($this->testData[0]->id);
+        $this->dataTests($found, $this->testData[0]);
+        echo PHP_EOL.'[42m OK  [0m get created games';
     }
 
     public function test_create_group_user()

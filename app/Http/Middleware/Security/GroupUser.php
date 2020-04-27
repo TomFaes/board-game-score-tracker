@@ -14,33 +14,49 @@ class GroupUser
      */
     public function handle($request, Closure $next, $method = 'API')
     {
+        $statusCode = 200;
         $message = "Group user middleware: You do not have the right to change this group";
         $user = auth()->user();
 
-        $group = app('App\Repositories\Contracts\IGroup');
-        $group = $group->getGroup($request->route('group_id'));
+        $groupRepo = app('App\Repositories\Contracts\IGroup');
+        $group = $groupRepo->getGroup($request->route('group_id'));
 
-        $groupUser = app('App\Repositories\Contracts\IGroupUser');
-        $groupUser = $groupUser->getGroupUser($request->route('id'));
-
+        $groupUserRepo= app('App\Repositories\Contracts\IGroupUser');
+        $groupUser = $groupUserRepo->getGroupUser($request->route('id'));
 
         if(isset($group) === true){
             //check if  logged in user is the admin of the group
             if($group->admin_id == $user->id){
                 //Request method: DELETE
                 if($request->method() == "DELETE"){
-                    if($groupUser->user_id != $group->admin_id){
+                    $getPlayedGames = $groupUserRepo->getCreatedGames($groupUser->id);
+
+                    $playedGameScoreRepo = app('App\Repositories\Contracts\IPlayedGameScore');
+
+                    $gameCreator = count($getPlayedGames->gameCreator);
+                    $playedscores = count($playedGameScoreRepo->getUserPlayedGameScores($groupUser->id));
+
+                    //A user can only be deleted if he hasn't got any played games
+                    if($groupUser->user_id != $group->admin_id  &&  $gameCreator == 0 && $playedscores == 0){
                         return $next($request);
                     }else{
-                        $message = "Group user middleware: The admin cannot be removed from the group";
+                        $statusCode = 403;
+                        if($gameCreator > 0){
+                            $message = "Group user middleware: There are ".$gameCreator." games connected to this user";
+                        }elseif($playedscores > 0){
+                            $message = "Group user middleware: the player has ".$playedscores." connected to his name";
+                        }
+                        else{
+                             $message = "Group user middleware: The admin cannot be removed from the group";
+                        }
                     }
+                }else{
+                    return $next($request);
                 }
-                //Request method: other
-                return $next($request);
             }
         }
         if($method == 'API'){
-            return response()->json($message, 200);
+            return response()->json($message, $statusCode);
         }else{
             return redirect('/')->with('error', $message);
         }

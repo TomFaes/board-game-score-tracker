@@ -1,14 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
+<br>
     <div class="row">
-        <div class="col-0 col-lg-1"></div>
-        <div class="col-0 col-lg-10">
             @auth
-                <index-page></index-page>
+                <index-page :auth="true"></index-page>
+            @else
+                <index-page :auth="false"></index-page>
             @endauth
-            <br>
-        </div>
-        <div class="col-0 col-lg-1"></div>
     </div>
 @endsection

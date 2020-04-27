@@ -2,12 +2,14 @@
 
 namespace App\Repositories;
 
+use App\Http\Middleware\Security\Group;
 use App\Models\GroupGame;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Repositories\Contracts\IGroupGame;
 use Auth;
+use Illuminate\Database\Eloquent\Builder;
 
 class GroupGameRepo extends Repository implements Contracts\IGroupGame
 {
@@ -32,13 +34,15 @@ class GroupGameRepo extends Repository implements Contracts\IGroupGame
     public function getGamesOfGroup($groupId, $itemsPerPage = 0)
     {
         if($itemsPerPage > 0){
-            return GroupGame::with('game', 'group', 'links')->where('group_id', $groupId)->paginate($itemsPerPage);
-       }
-       return GroupGame::with('game', 'group','links')->where('group_id', $groupId)->get();
+            $groupgames = GroupGame::with('game', 'group','links')->where('group_id', $groupId);
+            $groupgames = $groupgames->join('games AS testGame' , 'group_games.game_id', '=', 'testGame.id')->orderBy('testGame.full_name')->select('group_games.*')->paginate($itemsPerPage);;
+             return $groupgames;
+            //return GroupGame::with('game', 'group', 'links')->where('group_id', $groupId)->paginate($itemsPerPage);
+        }
+        $groupgames = GroupGame::with('game', 'group','links')->where('group_id', $groupId)->orderBy('full_name');
+        $groupgames = $groupgames->join('games' , 'group_games.game_id', '=', 'games.id')->orderBy('games.full_name')->select('group_games.*')->get();
+        return $groupgames;
     }
-
-
-
     /***************************************************************************
      Next function will create or update the user object in de database
      **************************************************************************/
@@ -64,6 +68,17 @@ class GroupGameRepo extends Repository implements Contracts\IGroupGame
         $groupGame = $this->setGroupGame($groupGame, $data);
         $groupGame->save();
         return $groupGame;
+    }
+
+
+    public function updateGroupGameIds($gameId, $newGameId)
+    {
+        GroupGame::where('game_id' , '=', $gameId)->update(
+            [
+                'game_id' => $newGameId
+            ]
+        );
+        return 'group games updated';
     }
 
     /**

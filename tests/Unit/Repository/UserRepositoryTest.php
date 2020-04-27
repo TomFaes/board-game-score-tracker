@@ -10,38 +10,64 @@ use App\Repositories\UserRepo;
 
 class UserRepositoryTest extends TestCase
 {
+    protected $testData;
+    protected $data;
+    protected $repo;
+
+    public function setUp() : void
+    {
+        parent::setUp();
+        for($x=0;$x<10;$x++){
+            $this->testData[] =factory(User::class)->create();
+        }
+
+        $this->repo =  new UserRepo();
+
+        //default dataset
+        $this->data = [
+            'name' => 'Firstname',
+            'firstname' => 'Lastname',
+            'email' => 'test@test.be',
+        ];
+    }
+
+    /**
+     * Default data test
+     */
+    protected function dataTests($data, $testData) : void
+    {
+        $this->assertInstanceOf(User::class, $testData);
+        $this->assertEquals($data['name'], $testData->name);
+        $this->assertEquals($data['firstname'], $testData->firstname);
+        $this->assertEquals($data['email'], $testData->email);
+    }
+
     /**
      * A basic Unit test example.
      *
      * @return void
      */
-    public function test_get_user()
+    public function test_get_played_game_scores()
     {
         echo PHP_EOL.PHP_EOL.'[43m User Repository Test:   [0m';
+        $found = $this->repo->getAllUsers();
+        $this->assertEquals(10, count($found));
+        echo PHP_EOL.'[42m OK  [0m get all  users';
+    }
 
-        $user = factory(User::class)->create();
-        $userRepo = new UserRepo();
-        $found = $userRepo->getUser($user->id);
+    public function test_get_user()
+    {
+        $found = $this->repo->getUser($this->testData[0]->id);
 
-        $this->assertInstanceOf(User::class, $found);
-        $this->assertEquals($found->name, $user->name);
-        $this->assertEquals($found->firstname, $user->firstname);
-        $this->assertEquals($found->email, $user->email);
+        $this->dataTests($found, $this->testData[0]);
 
         echo PHP_EOL.'[42m OK  [0m get user';
     }
 
     public function test_existing_user()
     {
-        $user = factory(User::class)->create();
-        $userRepo = new UserRepo();
-        $found = $userRepo->existingUser($user->email);
-
-        $this->assertInstanceOf(User::class, $found);
-        $this->assertEquals($found->name, $user->name);
-        $this->assertEquals($found->firstname, $user->firstname);
-        $this->assertEquals($found->email, $user->email);
-
+        $found = $this->repo->existingUser($this->testData[0]->email);
+        $this->dataTests($found, $this->testData[0]);
         echo PHP_EOL.'[42m OK  [0m get existing user';
     }
 
@@ -53,20 +79,13 @@ class UserRepositoryTest extends TestCase
             'email' => "test@mail.be",
         ];
 
-        $userRepo = new UserRepo();
-        $user = $userRepo->create($data);
-
-        $this->assertInstanceOf(User::class, $user);
-        $this->assertEquals($data['name'], $user->name);
-        $this->assertEquals($data['firstname'], $user->firstname);
-        $this->assertEquals($data['email'], $user->email);
-
+        $user = $this->repo->create($data);
+        $this->dataTests($data, $user);
         echo PHP_EOL.'[42m OK  [0m create user';
     }
 
     public function test_update_user()
     {
-        $newUser = factory(User::class)->create();
 
         $data = [
             'firstname' => "Test first name",
@@ -74,33 +93,24 @@ class UserRepositoryTest extends TestCase
             'email' => "test@mail.be",
         ];
 
-        $userRepo = new UserRepo();
-        $user = $userRepo->update($data, $newUser->id);
-
-        $this->assertInstanceOf(User::class, $user);
-        $this->assertEquals($data['name'], $user->name);
-        $this->assertEquals($data['firstname'], $user->firstname);
-        $this->assertEquals($data['email'], $user->email);
+        $user = $this->repo->update($data, $this->testData[0]->id);
+        $this->dataTests($data, $user);
 
         echo PHP_EOL.'[42m OK  [0m update user';
     }
 
-    public function test_delete_user()
-    {
-        $user = factory(User::class)->create();
-        $userRepo = new UserRepo();
-        $delete = $userRepo->delete($user->id);
-
-        $this->assertTrue($delete);
-        echo PHP_EOL.'[42m OK  [0m delete user test';
-    }
-
     public function test_forget_user(){
-        $user = factory(User::class)->create();
-        $userRepo = new UserRepo();
-        $forgetUser = $userRepo->forgetUser($user->id);
+        $forgetUser = $this->repo->forgetUser($this->testData[0]->id);
 
         $this->assertInstanceOf(User::class, $forgetUser);
         echo PHP_EOL.'[42m OK  [0m forget user test';
+    }
+
+    public function test_delete_user()
+    {
+        $delete = $this->repo->delete($this->testData[0]->id);
+
+        $this->assertTrue($delete);
+        echo PHP_EOL.'[42m OK  [0m delete user test';
     }
 }

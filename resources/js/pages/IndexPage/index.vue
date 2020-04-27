@@ -1,75 +1,125 @@
 <template>
-    <div>
+    <div style="width: 100%">
+
         <div class="container">
-            <div class="row">
-                <unverifiedUser></unverifiedUser>
-            </div>
+            <nav-bar :user=user></nav-bar>
+        </div>
 
+         <!-- view of  the login options-->
+        <div class="container"  v-if="auth == false" >
+            <login v-if="displayNav == 'login' "></login>
+        </div>
+
+         <!-- Message box -->
+        <div class="container">
+            <message-box></message-box>
+        </div>
+
+        <!-- view of all groups-->
+        <div class="container" v-if="user && displayNav == ''">
+            <unverified-user></unverified-user>
+        </div>
+
+        <!-- view of all groups-->
+        <div class="container" v-if="auth == true" v-show="displayNav == ''">
             <div class="row">
-                <div>
-                    <span>
-                            <button class="btn btn-primary" @click.prevent="showCreateGroup()">New group</button>
-                    </span>
-                    <span  v-for="(data, index) in userGroups"  :key="data.id" >
-                        <button class="btn group" @click.prevent="setGroup(index)">{{data.name}}</button>
-                    </span>
+                <div class="col-lg-4 col-md-4 col-sm-0"></div>
+                <div class="col-lg-4 col-md-4 col-sm-12">
+                    <div class="tile blue" @click.prevent="showCreateGroup()">
+                        <div>New group</div>
+                    </div>
                 </div>
+                <div class="col-lg-4 col-md-4 col-sm-0"></div>
             </div>
-            <div class="row">
 
-                <!-- Group Options-->
-                <div v-if="selectedGroup.id > 0">
-                    Selected group: {{ selectedGroup.name }}<br>
+            <!-- Create a new group-->
+            <div v-if="display == 'showCreateGroup'">
+                <h2>Create new group</h2>
+                <div class="row">
+                    <input-group  :submitOption="'Create'"></input-group>
                 </div>
+                <br>
             </div>
 
             <div class="row">
-                <!-- Group edit -->
-                <div v-show="display == 'showCreateGroup'">
-                    <h2>Create new group</h2>
-                    <inputGroup :submitOption="'Create'" ></inputGroup>
+                <div class="col-lg-4 col-md-4 col-sm-12"  v-for="(data, index) in userGroups"  :key="data.id">
+                    <div class="tile orange" @click.prevent="setGroup(index)">
+                        <div>{{data.name}}</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="container" v-if="selectedGroup.id > 0">
-            <ul class="nav nav-tabs nav-justified">
-                <li class="nav-item">
-                    <a class="nav-link" @click.prevent="setActive('home')" :class="{ active: isActive('home') }" href="#home">Score</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" @click.prevent="setActive('games')" :class="{ active: isActive('games') }" href="#games">Games</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" @click.prevent="setActive('users')" :class="{ active: isActive('users') }" href="#users">Users</a>
-                </li>
-                <li class="nav-item" v-if="selectedGroup.typeMember == 'Admin'">
-                    <a class="nav-link" @click.prevent="setActive('edit')" :class="{ active: isActive('edit') }" href="#games">Edit Group</a>
-                </li>
-            </ul>
+         <!-- administration view of the games-->
+        <div class="container">
+             <div v-if="displayNav == 'adminGame'">
+                 <admin-game :user=user></admin-game>
+            </div>
+        </div>
 
-            <div class="tab-content py-3" id="myTabContent">
-                <div class="tab-pane fade" :class="{ 'active show': isActive('home') }" id="home">
-                    The scores of the played games will be showed here.
-                </div>
+        <div class="container">
+            <div v-if="displayNav == 'profile'">
+                <profile-page  ></profile-page>
+            </div>
+        </div>
 
-                <div class="tab-pane fade" :class="{ 'active show': isActive('games') }" id="games">
-                    <group-game-list v-if="selectedGroup.id > 0" :group=selectedGroup></group-game-list>
-                </div>
-
-                <div class="tab-pane fade" :class="{ 'active show': isActive('users') }" id="users">
-                    <group-user-list :groupUsers="selectedGroup.group_users" :group="selectedGroup"></group-user-list>
-                </div>
-
-                <div class="tab-pane fade" :class="{ 'active show': isActive('edit') }" id="edit" v-if="selectedGroup.typeMember == 'Admin'">
-                    <inputGroup v-if="selectedGroup.id > 0" :group=selectedGroup :submitOption="'Update'" :key=selectedGroup.id></inputGroup>
-                    <div class="row">
-                        <div class="col-lg-2 col-md-2"></div>
-                        <div class="col-lg-8 col-md-8">
-                            <button class="btn btn-danger" @click.prevent="deleteGroup"><i class="fas fa-trash fa-2x" ></i></button>
-                        </div>
-                        <div class="col-lg-2 col-md-2"></div>
+        <div class="container">
+             <div class="row" v-show="displayNav == 'Group'">
+                 <h1>{{ selectedGroup.name }}</h1>
+                    <div class="button-row">
+                            <div>
+                                <button class="btn btn-primary" @click.prevent="setDisplayNav()"><i class="fas fa-home fa-1x" ></i></button>
+                                <button class="btn btn-primary" @click.prevent="setDisplay('addPlayedGame')"><i class="fas fa-plus fa-1x" ></i></button>
+                                <button class="btn btn-primary" @click.prevent="setDisplay('playedGames')"><i class="fas fa-list-ul fa-1x" ></i></button>
+                                <button class="btn btn-primary" @click.prevent="setDisplay('groupStats')"><i class="fas fa-chart-pie fa-1x" ></i></button>
+                                <button class="btn btn-primary" @click.prevent="setDisplay('editGroup')" v-if="selectedGroup.typeMember == 'Admin'"><i class="fas fa-pencil-alt fa-1x" ></i></button>
+                                <button class="btn btn-primary" @click.prevent="setDisplay('groupUsers')"><i class="fas fa-users fa-1x" ></i></button>
+                                <button class="btn btn-primary" @click.prevent="setDisplay('groupGames')"><i class="fas fa-dice fa-1x" ></i></button>
+                            </div>
                     </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Group Options-->
+            <div v-if="display == 'addPlayedGame'">
+                <h2>Add a new played game</h2>
+                <div class="row">
+                    <add-played-game :group=selectedGroup :submitOption="'Create'"></add-played-game>
+                </div>
+            </div>
+
+            <div v-if="display == 'playedGames'">
+                <h2>Played Games</h2>
+                <div class="row">
+                    <played-game :group=selectedGroup :user=user ></played-game>
+                </div>
+            </div>
+
+            <div v-if="display == 'groupStats'">
+                <div class="row">
+                    <group-stat :group=selectedGroup></group-stat>
+                </div>
+            </div>
+
+            <div v-if="display == 'editGroup' && selectedGroup.typeMember == 'Admin'">
+                <h2>Edit group</h2>
+                <div class="row">
+                    <input-group v-if="selectedGroup.id > 0" :group=selectedGroup :submitOption="'Update'" :key=selectedGroup.id></input-group>
+                </div>
+            </div>
+
+            <div v-if="display == 'groupUsers'">
+                <h2>Group users</h2>
+                <div class="row">
+                    <group-user-list :group="selectedGroup"></group-user-list>
+                </div>
+            </div>
+
+            <div v-if="display == 'groupGames'">
+                <h2>Group games</h2>
+                <div class="row">
+                    <group-game-list v-if="selectedGroup.id > 0" :group=selectedGroup></group-game-list>
                 </div>
             </div>
         </div>
@@ -78,48 +128,71 @@
 
 <script>
     import apiCall from '../../services/ApiCall.js';
-    import inputGroup from '../GroupPage/input';
-
+    import navBar from '../IndexPage/navBar.vue';
+    import login from '../IndexPage/login.vue';
     import unverifiedUser from '../GroupUserPage/unverifiedUser';
+    import messageBox from '../../components/tools/messageBar.vue';
+    import adminGame from '../GamePage/index.vue';
+    import profilePage from '../ProfilePage/index.vue'
 
+    import inputGroup from '../GroupPage/input';
     import groupGameList from '../GroupGamePage/list.vue';
     import groupUserList from '../GroupUserPage/list.vue';
+    import playedGame from '../PlayedGamePage/index.vue';
+    import groupStat from '../StatisticPage/index.vue';
 
-    import addGames from '../GroupGamePage/addGames.vue';
+    import addPlayedGame from '../PlayedGamePage/input.vue';
 
     export default {
         components: {
-            inputGroup,
+            messageBox,
             unverifiedUser,
+            login,
+            navBar,
+            adminGame,
+            profilePage,
+
+            inputGroup,
             groupGameList,
             groupUserList,
-
-            addGames,
+            playedGame,
+            addPlayedGame,
+            groupStat
         },
+
+        props: {
+            'auth': {},
+         },
 
         data () {
             return {
                 user: {},
+                displayNav: "",
                 display: "",
-                groupIndex: -1,
                 userGroups: {},
                 selectedGroup: {},
-                selectedGroupUser: {},
-                activeItem: 'home'
+                groupIndex: -1,
             }
         },
 
         methods: {
-            isActive (menuItem) {
-                return this.activeItem === menuItem
-            },
-            setActive (menuItem) {
-                this.activeItem = menuItem
+            //Navigation options
+            setDisplay(display = ""){
+                this.display = display;
+                this.$bus.$emit('resetStatsPage', '');
             },
 
-            showCreateGroup(){
+            setDisplayNav(display = ""){
+                if(display == ""){
+                    this.groupIndex = -1;
+                }
+                this.displayNav = display;
+                this.setDisplay();
+            },
+
+             showCreateGroup(){
                 if(this.display == 'showCreateGroup'){
-                    this.hide();
+                    this.setDisplay()
                 }else{
                     this.selectedGroup = {};
                     this.groupIndex = -1;
@@ -127,18 +200,23 @@
                 }
             },
 
-            //can be used for all hide option
-            hide(){
-                this.display = '';
-            },
-
             setGroup(id){
                 this.selectedGroup = this.userGroups[id];
                 this.groupIndex = id;
-                this.display = '';
-                if(this.selectedGroup.typeMember != "Admin" && this.activeItem == "edit"){
-                    this.activeItem = 'home';
-                }
+                this.setDisplayNav("Group");
+                this.setDisplay('playedGames');
+            },
+
+            /**
+             * Api Calls for
+             */
+            getLoggedInUser(){
+                apiCall.getData('profile')
+                .then(response =>{
+                    this.user = response;
+                }).catch(() => {
+                    console.log('handle server error from here');
+                });
             },
 
             getGroups(){
@@ -146,48 +224,55 @@
                 .then(response =>{
                     this.userGroups = response;
                     if(this.groupIndex >= 0){
-                        this.setGroup(this.groupIndex);
-                        if(this.activeItem == "edit"){
-                            this.activeItem = 'home';
-                        }
-
+                        this.selectedGroup = this.userGroups[this.groupIndex];
                     }
                 }).catch(() => {
                     console.log('handle server error from here');
                 });
             },
-
-            deleteGroup(){
-                if(confirm('are you sure you want to delete ' + this.selectedGroup.name + '?')){
-                    apiCall.deleteData('group/' + this.selectedGroup.id)
-                    .then(response =>{
-                        console.log(response);
-                        this.getGroups();
-                        this.selectedGroup = {};
-                        this.groupIndex = -1;
-                    }).catch(error => {
-                        console.log(error);
-                        console.log('handle server error from here');
-                    });
-                }
-
-            }
         },
 
         mounted(){
-            this.getGroups();
-            this.$bus.$on('reloadList', () => {
-                this.hide();
+            if(this.auth == true){
+                this.getLoggedInUser();
+                this.getGroups();
+            }
+
+
+            this.$bus.$on('display', value => {
+                this.setDisplay(value);
+            });
+
+            this.$bus.$on('displayNav', value => {
+                this.setDisplayNav(value);
+            });
+
+            this.$bus.$on('reloadGroups', () => {
                 this.getGroups();
             });
+
+            //this.$bus.$emit('showMessage', 'Welcome back, remove this message after testing', 'orange', '1000' );
         }
     }
 </script>
 
 <style scoped>
+
+button {
+    margin: 5px;
+}
+
+.button-row{
+    width: 100%;
+    text-align: center;
+}
+
 .group {
     background-color: orange;
     margin: 5px;
 }
 
+button{
+    width: 10%;
+}
 </style>

@@ -19,6 +19,7 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \App\Http\Middleware\TrustProxies::class,
+        \App\Http\Middleware\HttpsProtocol::class,
     ];
 
     /**
@@ -69,6 +70,7 @@ class Kernel extends HttpKernel
         'groupuser' => \App\Http\Middleware\Security\GroupUser::class,
         'groupgamelink' => \App\Http\Middleware\Security\GroupGameLink::class,
         'groupgame' => \App\Http\Middleware\Security\GroupGame::class,
+        'playedgame' => \App\Http\Middleware\Security\PlayedGame::class,
 
 
     ];

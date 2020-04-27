@@ -1,39 +1,46 @@
 <template>
     <div>
-        <hr>
-        Profile
-        <hr>
+
+        <div class="row">
+                <h2>Profile</h2>
+        </div>
         <form @submit.prevent="update" method="POST" enctype="multipart/form-data">
             <!-- the form items -->
             <text-input inputName="firstname" inputId="firstname" tekstLabel="firstname: " v-model="fields.firstname" :errors="errors.firstname" :value='fields.firstname'></text-input>
             <text-input inputName="name" inputId="name" tekstLabel="name: " v-model="fields.name" :errors="errors.name" :value='fields.name'></text-input>
             <text-input inputName="email" inputId="email" tekstLabel="email: " v-model="fields.email" :errors="errors.email" :value='fields.email'></text-input>
             <button-input btnClass="btn btn-primary">Save profile</button-input>
-        </form>
 
-        <hr>
-        If you want to remove your account click the delete button, all your data will be randomised and you wont be able to use this account.<br>
-        <button class="btn btn-danger" @click.prevent="removeProfile()">Delete</button>
-        <hr>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-lg-2 col-md-2"></div>
+                    <div class="col-lg-8 col-md-8">
+                        If you want to remove your account click the delete button, all your data will be randomised and you wont be able to use this account again.<br>
+                        <button class="btn btn-danger" @click.prevent="removeProfile()"><i class="fas fa-trash fa-1x" ></i></button>
+                    </div>
+                    <div class="col-lg-2 col-md-2"></div>
+                </div>
+            </div>
+        </form>
     </div>
 </template>
 
 <script>
     import apiCall from '../../services/ApiCall.js';
+    import navBar from '../IndexPage/navBar.vue'
+
     import TextInput from '../../components/ui/form/TextInput.vue';
     import DropdownInput from '../../components/ui/form/DropdownInput.vue';
     import ButtonInput from '../../components/ui/form/ButtonInput.vue';
 
-    import SubmitForm from '../../mixins/SubmitForm.js';
 
     export default {
         components: {
+            navBar,
             TextInput,
             DropdownInput,
             ButtonInput
         },
-
-        mixins: [ SubmitForm],
 
          data () {
             return {
@@ -75,8 +82,16 @@
             update(){
                 this.setFormData();
                 this.action =  'profile',
-                this.updateData();
-                window.location.href = "./";
+
+                apiCall.postData(this.action, this.formData)
+                .then(response =>{
+                    this.message = "You've updated your profile ";
+                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                    this.formData =  new FormData();
+                    window.location.href = "./";
+                }).catch(error => {
+                    this.errors = error;
+                });
             },
 
             removeProfile(){

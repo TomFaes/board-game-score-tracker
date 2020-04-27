@@ -4,7 +4,7 @@
             <div class="col-lg-2 col-md-2"></div>
             <div class="col-lg-8 col-md-8">
                 <label :for=inputName>{{ tekstLabel }}</label>
-                <input type="number" class="form-control" :name=inputName :id=inputId  :value="value" @input="$emit('input', $event.target.value)"/>
+                <input :disabled=disabled type="number" class="form-control" :name=inputName :id=inputId  :value="value" @input="$emit('input', $event.target.value)"/>
                 <div class="text-danger" v-if="errors">{{ errors[0] }}</div>
             </div>
             <div class="col-lg-2 col-md-2"></div>
@@ -19,7 +19,8 @@
             'inputName' : String,
             'inputId' : String,
             'errors' : Array,
-            'value' : {Number, String}
+            'value' : {Number, String},
+            'disabled': Boolean
 
          },
 

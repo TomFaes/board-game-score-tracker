@@ -1,21 +1,39 @@
 <template>
-    <div>
-        <i v-if="group.typeMember == 'Admin'" class="fa fa-user-plus fa-2x" @click.prevent="addGroupUser" ></i><br>
+    <div class="container">
+        <center>
+            <button class="btn btn-primary" v-if="group.typeMember == 'Admin'" @click.prevent="addGroupUser" > <i class="fa fa-user-plus"></i></button><br><br>
+        </center>
 
+        <!-- Add user input -->
         <div v-show="display == 'showAddUserToGroup'">
             <addUserToGroup :submitOption="'Create'" :group=group></addUserToGroup>
         </div>
 
-        <span  v-for="data in groupUsers"  :key="data.id" >
-
-            <span v-if="data.user_id > 0">
-                {{ data.user.firstname }} {{ data.user.name }}<br>
-            </span>
-            <span v-else>
-                {{data.firstname}} {{data.name}} <i v-if="group.typeMember == 'Admin'" class="fa fa-edit" @click.prevent="updateGroupUser(data)" ></i>
-                <i class="fas fa-trash-alt" @click.prevent="deleteGroupUser(data.id)" v-if="group.typeMember == 'Admin'" ></i><br>
-            </span>
-        </span>
+        <!-- list of all users -->
+        <table class="table table-hover table-sm">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Options</th>
+                </tr>
+            </thead>
+            <tbody  v-for="data in groupUsers"  :key="data.id" >
+                    <tr>
+                        <td>
+                            <div v-if="data.user_id > 0 && data.user.verified == 1">
+                                {{ data.user.firstname }} {{ data.user.name }}
+                            </div>
+                            <div v-else>
+                                {{data.firstname}} {{data.name}}
+                            </div>
+                        </td>
+                        <td v-if="group.typeMember == 'Admin'" class="options-column">
+                            <button class="btn btn-primary"  v-if="!data.user_id" @click.prevent="updateGroupUser(data)"> <i class="fa fa-edit" style="heigth:14px; width:14px"></i></button>
+                            <button class="btn btn-danger" @click.prevent="deleteGroupUser(data)" ><i class="fas fa-trash-alt" style="heigth:14px; width:14px" ></i></button>
+                        </td>
+                    </tr>
+            </tbody>
+        </table>
 
         <div v-show="display == 'showEditGroupUser'">
             <addUserToGroup v-if="selectedGroupUser.id > 0" :group=group :groupUser=selectedGroupUser :submitOption="'Update'" :key=selectedGroupUser.id></addUserToGroup>
@@ -26,25 +44,37 @@
 <script>
     import apiCall from '../../services/ApiCall.js';
     import addUserToGroup from '../GroupUserPage/input';
+    import ButtonInput from '../../components/ui/form/ButtonInput.vue';
 
     export default {
         data () {
             return {
                 display: "",
                 selectedGroupUser: 0,
+                'groupUsers': {},
             }
         },
 
         props: {
-            'groupUsers': {},
             'group': {},
          },
 
         components: {
             addUserToGroup,
+            ButtonInput
         },
 
+        watch:{
+            'group'(){
+                this.setGroupUsers();
+            }
+         },
+
         methods: {
+            setGroupUsers(){
+                this.groupUsers = this.group.group_users;
+                this.display = "";
+            },
 
             updateGroupUser(groupUser){
                 if(this.display == 'showEditGroupUser'){
@@ -69,29 +99,26 @@
                 }
             },
 
-            deleteGroupUser(id){
-                apiCall.deleteData('group/' + this.group.id + '/user/' + id)
-                .then(response =>{
-                    this.$bus.$emit('reloadList');
-                }).catch(() => {
-                    console.log('handle server error from here');
-                });
+            deleteGroupUser(data){
+                if(confirm('are you sure you want to remove this user from ' + this.group.name  + '?')){
+                    apiCall.deleteData('group/' + this.group.id + '/user/' + data.id)
+                    .then(response =>{
+                        if(response.status == 403){
+                            this.message = "This user couldn't be delete from this group";
+                        }else{
+                            this.message = data.fullName + " is deleted from this group";
+                            this.$bus.$emit('reloadGroups');
+                        }
+                        this.$bus.$emit('showMessage', this.message,  'red', '2000' );
+                    }).catch(() => {
+                        console.log('handle server error from here');
+                    });
+                }
             }
-
-
-            /*
-            deleteLink(id){
-                apiCall.deleteData('group/game/link/' + id)
-                .then(response =>{
-                      this.$bus.$emit('reloadList');
-                }).catch(() => {
-                    console.log('handle server error from here');
-                });
-            }
-            */
         },
 
         mounted(){
+            this.setGroupUsers();
             this.$bus.$on('reloadList', () => {
                     this.display = "";
             });

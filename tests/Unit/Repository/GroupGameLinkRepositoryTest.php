@@ -46,21 +46,21 @@ class GroupGameLinkRepositoryTest extends TestCase
      *
      * @return void
      */
-    public function test_get_group_game_link()
-    {
-        echo PHP_EOL.PHP_EOL.'[43m GroupGameLink Repository Test:   [0m';
-        $found = $this->repo->getGroupGameLink($this->testData[0]->id);
-        $this->dataTests($this->testData[0], $found);
-        echo PHP_EOL.'[42m OK  [0m get group game link';
-    }
-
     public function test_get_group_game_links()
     {
+        echo PHP_EOL.PHP_EOL.'[43m GroupGameLink Repository Test:   [0m';
         $found = $this->repo->getGroupGameLinks();
 
         $this->assertEquals(10, count($found));
 
         echo PHP_EOL.'[42m OK  [0m get all group game links';
+    }
+
+    public function test_get_group_game_link()
+    {
+        $found = $this->repo->getGroupGameLink($this->testData[0]->id);
+        $this->dataTests($this->testData[0], $found);
+        echo PHP_EOL.'[42m OK  [0m get group game link';
     }
 
     public function test_get_links_of_group_game()
@@ -74,7 +74,6 @@ class GroupGameLinkRepositoryTest extends TestCase
 
     public function test_create_group_game_link()
     {
-
         $testData = $this->repo->create($this->data);
         $this->dataTests($this->data, $testData);
 
@@ -83,7 +82,6 @@ class GroupGameLinkRepositoryTest extends TestCase
 
         echo PHP_EOL.'[42m OK  [0m create group game link';
     }
-
 
     public function test_update_group_game_link()
     {

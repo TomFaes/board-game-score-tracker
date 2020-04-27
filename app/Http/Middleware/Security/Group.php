@@ -18,7 +18,7 @@ class Group
 
         $user = auth()->user();
 
-        //if user is admin he can change all groups
+        //if user is admin he can change all groups except delete
         if($user->role == "Admin"){
             if($request->method() != "DELETE"){
                 return $next($request);
@@ -26,18 +26,22 @@ class Group
         }
 
         if($request->route('id') > 0){
-            $group = app('App\Repositories\Contracts\IGroup');
-            $group = $group->getGroup($request->route('id'));
+            $groupRepo = app('App\Repositories\Contracts\IGroup');
+            $group = $groupRepo->getGroup($request->route('id'));
+            $playedGames = $groupRepo->getPlayedGames($request->route('id'));
 
+            //A group can only be delete if there are no users or group games or played games
             if($group->admin_id == $user->id){
+                /*
                 if($request->method() == "DELETE"){
-                    if(count($group->groupUsers) > 1 ||  count($group->groupGames) > 0){
-                        $message = "There are still ".count($group->groupGames)." games and ".count($group->groupUsers)." users in this group ";
+                    if(count($group->groupUsers) > 1 ||  count($group->groupGames) > 0 || count($playedGames->playedGames)){
+                        $message = "There are still ".count($group->groupGames)." games, ".count($group->groupUsers)." users and/or ".count($playedGames->playedGames)." played games in this group";
                     }else{
                         return $next($request);
                     }
                     return response()->json($message, 200);
                 }
+                */
                 return $next($request);
             }
         }

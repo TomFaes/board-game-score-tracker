@@ -1,29 +1,71 @@
 <template>
-    <div>
-        <hr>
+    <div class="container">
         <form @submit.prevent="submit" method="POST" enctype="multipart/form-data">
             <!-- the form items -->
-            <text-input inputName="name" inputId="name" tekstLabel="name: " v-model="fields.name" :errors="errors.name" :value='fields.name'></text-input>
-            <text-input inputName="description" inputId="description" tekstLabel="description: " v-model="fields.description" :errors="errors.description" :value='fields.description'></text-input>
-            create dropdown with groupmembers to change the admin of the group
-            <button-input btnClass="btn btn-primary">Save group</button-input>
+            <text-input inputName="name" inputId="name" tekstLabel="Name: " v-model="fields.name" :errors="errors.name" :value='fields.name'></text-input>
+            <text-area inputName="description" inputId="description" tekstLabel="Description: " v-model="fields.description" :errors="errors.description" :value='fields.description'></text-area>
+
+            <!-- Admin multiselect -->
+            <div class="row" v-if="submitOption != 'Create'">
+                <div class="col-lg-2 col-md-2 col-sm-0"></div>
+                <div class="col-lg-8 col-md-8 col-sm-12">
+                    <label>Admin: </label>
+                    <multiselect
+                        v-model="selectedUser"
+                        :multiple="false"
+                        :options="multigroupUsers"
+                        :close-on-select="true"
+                        :clear-on-select="true"
+                        placeholder="Select admin"
+                        label="fullName"
+                        track-by="fullName"
+                    >
+                    </multiselect>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-0"></div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-0"></div>
+                <div class="col-lg-8 col-md-8 col-sm-12">
+                    <center>
+                        <button class="btn btn-primary">{{buttonText}}</button>
+                    </center>
+                    <br>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-0"></div>
+            </div>
+
+            <div class="row" v-if="submitOption != 'Create'">
+                <div class="col-lg-2 col-md-2 col-sm-0"></div>
+                <div class="col-lg-8 col-md-8 col-sm-12">
+                    You can delete your group, your group wont be displayed in your list, the games played wont be deleted
+                    <center>
+                        <delete-group :group="group" v-if="submitOption != 'Create'"></delete-group>
+                    </center>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-0"></div>
+            </div>
         </form>
-        <hr>
     </div>
 </template>
 
 <script>
+    import apiCall from '../../services/ApiCall.js';
+
     import TextInput from '../../components/ui/form/TextInput.vue';
-    import ButtonInput from '../../components/ui/form/ButtonInput.vue';
-    import SubmitForm from '../../mixins/SubmitForm.js';
+    import TextArea from '../../components/ui/form/TextAreaInput.vue';
+    import Multiselect from 'vue-multiselect';
+
+    import DeleteGroup from '../GroupPage/delete.vue';
 
     export default {
         components: {
             TextInput,
-            ButtonInput
+            TextArea,
+            DeleteGroup,
+            Multiselect
         },
-
-        mixins: [ SubmitForm],
 
          data () {
             return {
@@ -32,9 +74,14 @@
                     description: '',
                     admin_id: '',
                 },
-                'errors' : [],
+                'errors' : {},
                 'action': '',
+                'response': {},
+                'selectedUser': [],
+                'multigroupUsers': [],
                 'formData': new FormData(),
+                'message': '',
+                'buttonText': "Save group"
             }
         },
 
@@ -51,8 +98,8 @@
                 if(this.fields.description != undefined){
                     this.formData.append('description', this.fields.description);
                 }
-                if(this.fields.admin_id != undefined){
-                    this.formData.set('admin_id', this.fields.admin_id);
+                if(this.selectedUser != undefined){
+                    this.formData.set('admin_id', this.selectedUser.id);
                 }
             },
 
@@ -62,31 +109,73 @@
                 }else if(this.submitOption == 'Update'){
                     this.update();
                 }else{
-                    console.log('geen optie opgegeven');
+                    this.$bus.$emit('showMessage', "No valid save option given",  'red', '2000' );
                 }
+            },
+
+            resetFormData(){
+                this.fields = {}; //Clear input fields.
+                this.errors = {};
+                this.formData =  new FormData();
             },
 
             create(){
                 this.setFormData();
                 this.action = "group";
-                this.submitData();
+
+                apiCall.postData(this.action, this.formData)
+                .then(response =>{
+                    this.$bus.$emit('reloadGroups');
+                    this.$bus.$emit('display');
+                    this.resetFormData();
+                    this.message = "Your group " + this.response.name + " has been created";
+                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                }).catch(error => {
+                    this.errors = error;
+                });
             },
 
             update(){
                 this.setFormData();
-                this.action =  'group/' + this.group.id,
-                this.updateData();
+                this.action =  'group/' + this.group.id;
+
+                apiCall.updateData(this.action, this.formData)
+                .then(response =>{
+                    this.$bus.$emit('reloadGroups');
+                    this.message = "Your group " + this.response.name + " has been changed";
+                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                    this.$bus.$emit('display', 'groupStats');
+                }).catch(error => {
+                        this.errors = error;
+                });
             },
 
             setData(){
                 this.fields.name = this.group.name;
                 this.fields.description = this.group.description;
-                this.fields.admin_id = this.group.admin_id;
+
+                var adminUser = "";
+                var adminId = this.group.admin.id;
+                this.group.group_users.forEach(function(item, index){
+                    if(adminId == item.id){
+                        adminUser = index;
+                    }
+                });
+                this.selectedUser = this.group.group_users[adminUser];
             }
         },
 
         mounted(){
+
+            if(this.submitOption == "Create"){
+                this.buttonText = "Create group";
+            }
             if(this.group != undefined){
+                for(var item in this.group.group_users){
+                    if(this.group.group_users[item]['user_id'] > 0){
+                         this.multigroupUsers.push(this.group.group_users[item]);
+                    }
+                }
                 this.setData();
             }
         }

@@ -81,5 +81,24 @@ Route::resource('group/game/{group_game_id}/link', '\App\Http\Controllers\Group\
     'create', 'edit'
 ]);
 
+Route::post('group/{group_id}/played/{id}', '\App\Http\Controllers\Played\PlayedGamesController@update');
+Route::resource('group/{group_id}/played', '\App\Http\Controllers\Played\PlayedGamesController', ['parameters' => [
+    'played' => 'id'
+]]) ->except([
+    'create', 'edit'
+]);
+
+
+//StatisticsController
+Route::get('stats/group/{group_id}', '\App\Http\Controllers\Statistics\StatisticsController@groupStats');
+Route::get('stats/group/{group_id}/year/{year}', '\App\Http\Controllers\Statistics\StatisticsController@groupYearStats');
+Route::get('stats/group/{group_id}/game/{game_id}', '\App\Http\Controllers\Statistics\StatisticsController@groupGameStats');
+
+
+//Merge game
+Route::post('merge/{id}/game/{mergedId}', '\App\Http\Controllers\Game\MergeGameController@update');
+
+
+
 
 

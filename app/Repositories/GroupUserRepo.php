@@ -40,8 +40,17 @@ class GroupUserRepo extends Repository implements IGroupUser
     public function getGroupsBasedOnEmail($email)
     {
         return GroupUser::with(['group', 'user'])->where('email', $email)->where('verified',0)->where('user_id', null)->OrderBy('name', 'asc', 'firstname', 'asc')->get();
-
     }
+
+    public function getCreatedGames($id){
+        return GroupUser::with('gameCreator')->find($id);
+    }
+
+    /*
+    public function getCreatedGames($groupId, $userId){
+        return GroupUser::with('gameCreator')->where('user_id', $userId)->where('group_id', $groupId)->get();
+    }
+    */
 
      /***************************************************************************
      Next function will create or update the user object in de database

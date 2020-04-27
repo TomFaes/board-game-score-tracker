@@ -66,11 +66,11 @@ class RouteTest extends TestCase
 
         $urls = [
             '/user',
-            '/profile',
-            '/game',
+
 
         ];
         /*
+        '/profile',
 '/group'
         */
 

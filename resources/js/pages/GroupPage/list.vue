@@ -83,6 +83,7 @@
             deleteRow(id){
                 apiCall.deleteData('group/' + id)
                 .then(response =>{
+                    this.response = response;
                      this.loadList();
                 }).catch(() => {
                     console.log('handle server error from here');

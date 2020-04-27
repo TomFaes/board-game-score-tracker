@@ -54,7 +54,7 @@ class GroupGameController extends Controller
 
     public function searchNonGroupGames($groupId, Request $request){
         $groupGames = $this->groupGame->getGroupGameIds($groupId);
-        $games = $this->game->searchGamesNotInGroup($groupGames, $request->search);
+        $games = $this->game->searchGamesNotInGroup($groupGames);
         return response()->json($games, 200);
     }
 }

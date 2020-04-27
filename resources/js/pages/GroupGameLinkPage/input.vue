@@ -5,26 +5,28 @@
             <!-- the form items -->
             <text-input inputName="name" inputId="name" tekstLabel="Name: " v-model="fields.name" :errors="errors.name" :value='fields.name'></text-input>
             <text-input inputName="link" inputId="link" tekstLabel="Link: " v-model="fields.link" :errors="errors.link" :value='fields.link'></text-input>
-            <text-input inputName="description" inputId="description" tekstLabel="Description: " v-model="fields.description" :errors="errors.description" :value='fields.description'></text-input>
-            <button-input btnClass="btn btn-primary">Save Game</button-input>
+            <text-area inputName="description" inputId="description" tekstLabel="Description: " v-model="fields.description" :errors="errors.description" :value='fields.description'></text-area>
+            <center>
+                <button-input btnClass="btn btn-primary">Save link</button-input>
+            </center>
+
         </form>
         <hr>
     </div>
 </template>
 
 <script>
+    import apiCall from '../../services/ApiCall.js';
+    import TextArea from '../../components/ui/form/TextAreaInput.vue';
     import TextInput from '../../components/ui/form/TextInput.vue';
     import ButtonInput from '../../components/ui/form/ButtonInput.vue';
-
-    import SubmitForm from '../../mixins/SubmitForm.js';
 
     export default {
         components: {
             TextInput,
-            ButtonInput
+            TextArea,
+            ButtonInput,
         },
-
-        mixins: [ SubmitForm],
 
          data () {
             return {
@@ -72,15 +74,34 @@
                 this.formData.set('group_game_id', this.group_game.id);
                 this.setFormData();
                 this.action = "group/game/" + this.group_game.id + "/link";
-                this.submitData();
+
+                apiCall.postData(this.action, this.formData)
+                .then(response =>{
+                    this.$bus.$emit('reloadGroupGames');
+                    this.$bus.$emit('hideLinkList');
+                    this.message = "You've added a new link to " + this.group_game.game.name;
+                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                    this.formData =  new FormData();
+                }).catch(error => {
+                    this.errors = error;
+                });
             },
 
             update(){
                 this.formData.set('group_game_id', this.group_game_link.group_game_id);
                 this.setFormData();
-                 this.action = "group/game/" + this.group_game_link.group_game_id + "/link/"+ this.group_game_link.id;
-                //this.action = "group/game/link/" + this.group_game_link.id;
-                this.updateData();
+                this.action = "group/game/" + this.group_game_link.group_game_id + "/link/"+ this.group_game_link.id;
+
+                 apiCall.updateData(this.action, this.formData)
+                .then(response =>{
+                    this.$bus.$emit('reloadGroupGames');
+                    this.$bus.$emit('hideLinkList');
+                    this.message = "You've updated a link from " + this.group_game.game.name;
+                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                    this.formData =  new FormData();
+                }).catch(error => {
+                        this.errors = error;
+                });
             },
 
             setData(){

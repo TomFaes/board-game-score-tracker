@@ -9,6 +9,7 @@ interface IGroupUser {
     public function getGroupsOfUser($userId);
     public function getUnverifiedGroupUsers($userId);
     public function getGroupsBasedOnEmail($email);
+    public function getCreatedGames($id);
 
     public function create(Array $data);
     public function update(Array $data, $id);

@@ -13,6 +13,8 @@
 </template>
 
 <script>
+     import apiCall from '../../services/ApiCall.js';
+
     import TextInput from '../../components/ui/form/TextInput.vue';
     import ButtonInput from '../../components/ui/form/ButtonInput.vue';
     import SubmitForm from '../../mixins/SubmitForm.js';
@@ -75,13 +77,32 @@
             create(){
                 this.setFormData();
                 this.action = 'group/' + this.group.id + '/user';
-                this.submitData();
+
+                apiCall.postData(this.action, this.formData)
+                .then(response =>{
+                    this.$bus.$emit('reloadGroups');
+                    this.message = "You've added " + this.fields.firstname + " " + this.fields.name + " to " + this.group.name;
+                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                    this.formData =  new FormData();
+                     this.fields = {}; //Clear input fields.
+                }).catch(error => {
+                    this.errors = error;
+                });
             },
 
             update(){
                 this.setFormData();
                 this.action = 'group/' + this.group.id + '/user/' + this.groupUser.id;
-                this.updateData();
+
+                apiCall.updateData(this.action, this.formData)
+                .then(response =>{
+                    this.$bus.$emit('reloadGroups');
+                    this.message = "You've updated the user " + this.fields.firstname + " " + this.fields.name + " for " + this.group.name;
+                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                    this.formData =  new FormData();
+                }).catch(error => {
+                        this.errors = error;
+                });
             },
 
             setData(){

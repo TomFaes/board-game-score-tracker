@@ -1,27 +1,39 @@
 <template>
     <div>
-        <hr>
-        <table class="table table-hover table-sm">
+        <table class="table table-hover table-sm" v-if="dataList">
             <thead>
                 <tr>
-                    <th v-for="header in headers"  :key="header.id">{{ header.header }}</th>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Year</th>
+                    <th class="d-none d-sm-table-cell">Approved by admin</th>
+                    <th class="d-none d-sm-table-cell">Min</th>
+                    <th class="d-none d-sm-table-cell">Max</th>
+                    <th>Options</th>
                 </tr>
             </thead>
             <tbody  v-for="data in dataList.data"  :key="data.id" >
-                    <tr>
-                        <td v-for="field in fields"  :key="field.field">{{ data[field.field] }}</td>
-                        <td ><span v-if="data.base_game">{{ data.base_game.name}}</span></td>
-                        <td>
-                            <button class="btn btn-primary" v-if="updateField != data.id" @click.prevent="updateRow(data.id)">Update</button>
-                            <button class="btn btn-primary" v-if="updateField == data.id" @click.prevent="hideUpdate">Hide update</button>
-                            <button class="btn btn-danger" @click.prevent="deleteRow(data.id)">Delete</button>
-                        </td>
-                    </tr>
-                    <tr v-if="updateField == data.id">
-                        <td colspan="100%">
-                            <inputForm  v-if="updateField == data.id" :game=data :basegame=basegame :submitOption="'Update'"></inputForm>
-                        </td>
-                    </tr>
+                <tr>
+                    <td>{{ data.id }}</td>
+                    <td>{{ data.full_name }}</td>
+                    <td>{{ data.year }}</td>
+                    <td class="d-none d-sm-table-cell">{{ data.approved_by_admin }}</td>
+                    <td class="d-none d-sm-table-cell">{{ data.players_min }}</td>
+                    <td class="d-none d-sm-table-cell">{{ data.players_max }}</td>
+                    <td class="options-column">
+                        <button class="btn btn-primary" @click.prevent="editGame(data.id)"><i class="fas fa-pencil-alt fa-1x" ></i></button>
+                        <button class="btn btn-primary" @click.prevent="mergeGame(data.id)"><img :src="'images/layout/merge_icon.png'" style="heigth:16px; width:16px"  ></button>
+                        <button class="btn btn-danger" @click.prevent="deleteRow(data.id)"><i class="fas fa-trash fa-1x" ></i></button>
+                    </td>
+                </tr>
+                <tr v-if="selectedId == data.id">
+                    <td colspan="100%">
+                        <inputForm  v-if="display == 'editGame'" :game=data :basegame=basegame :submitOption="'Update'"></inputForm>
+                        <span v-if="display == 'mergeGame'">
+                            <merge-game :gameId="data.id" ></merge-game>
+                        </span>
+                    </td>
+                </tr>
             </tbody>
         </table>
          <vue-pagination  :pagination="dataList" @paginate="loadList()" :offset="4"></vue-pagination>
@@ -35,6 +47,7 @@
     import ButtonInput from '../../components/ui/form/ButtonInput.vue';
 
     import inputForm from '../GamePage/input';
+    import mergeGame from '../GamePage/merge.vue'
 
     export default {
         data () {
@@ -48,32 +61,35 @@
                     { 'header': 'Approved by admin'},
                     { 'header': 'Min'},
                     { 'header': 'Max'},
-                    { 'header': 'Base game'},
+                    { 'header': 'Options'},
                 ],
                 fields: [
                     { 'field': 'id'},
-                    { 'field': 'name'},
+                    { 'field': 'full_name'},
                     { 'field': 'year'},
                     { 'field': 'approved_by_admin'},
                     { 'field': 'players_min'},
                     { 'field': 'players_max'},
                 ],
-                'updateField' : 0,
+                'selectedId': 0,
+                'display': '',
             }
         },
 
         components: {
             VuePagination,
             inputForm,
+            mergeGame,
             ButtonInput
         },
 
         methods: {
             loadList(){
-                apiCall.getData('game?page=' + this.dataList.current_page)
+                apiCall.getData('game?page=' + this.dataList.current_page + '&page_items=40')
                 .then(response =>{
                     this.dataList = response;
                     this.updateField = '';
+                    this.display = '';
                 }).catch(() => {
                     console.log('handle server error from here');
                 });
@@ -84,6 +100,27 @@
                 }).catch(() => {
                     console.log('handle server error from here');
                 });
+            },
+
+            editGame(id){
+                if(this.selectedId == id && this.display == 'editGame'){
+                    this.selectedId = "";
+                    this.display = '';
+
+                }else{
+                    this.selectedId = id;
+                    this.display = 'editGame';
+                }
+            },
+
+            mergeGame(id){
+                if(this.selectedId == id && this.display == 'mergeGame'){
+                    this.selectedId = "";
+                    this.display = '';
+                }else{
+                    this.selectedId = id;
+                    this.display = 'mergeGame';
+                }
             },
 
             updateRow(id){
@@ -106,9 +143,9 @@
 
         mounted(){
             this.loadList();
-            this.$bus.$on('reloadList', () => {
+            this.$bus.$on('reloadGameList', () => {
                     this.loadList();
-            });
+            })
         }
     }
 </script>

@@ -46,7 +46,6 @@ class GameRepositoryTest extends TestCase
     public function test_get_games()
     {
         $found = $this->repo->getGames();
-
         $this->assertEquals(10, count($found));
 
         echo PHP_EOL.'[42m OK  [0m get all games';
@@ -64,9 +63,7 @@ class GameRepositoryTest extends TestCase
         $this->repo->update($data, 6);
 
         $this->setApproved();
-
         $found = $this->repo->getBaseGames();
-
         $this->assertEquals(7, count($found));
 
         echo PHP_EOL.'[42m OK  [0m get base games';
@@ -85,47 +82,33 @@ class GameRepositoryTest extends TestCase
         $this->setApproved();
 
         $found = $this->repo->getExpansionGames(1);
-
         $this->assertEquals(3, count($found));
-
         echo PHP_EOL.'[42m OK  [0m get expansion games';
     }
 
     public function test_approved_games()
     {
-        //set some games to base game to a value
-        $data = [
-            'approved_by_admin' => 1,
-        ];
         $this->repo->approveGame($this->repo->getGame(4));
         $this->repo->approveGame($this->repo->getGame(5));
         $this->repo->approveGame($this->repo->getGame(6));
 
         $found = $this->repo->getApprovedGames();
-
         $this->assertEquals(3, count($found));
-
         echo PHP_EOL.'[42m OK  [0m get approved games';
     }
 
     public function test_unapproved_games()
     {
-        //set some games to base game to a value
-        $data = [
-            'approved_by_admin' => 1,
-        ];
         $this->repo->approveGame($this->repo->getGame(4));
         $this->repo->approveGame($this->repo->getGame(5));
         $this->repo->approveGame($this->repo->getGame(6));
 
         $found = $this->repo->getUnapprovedGames();
-
         $this->assertEquals(7, count($found));
-
         echo PHP_EOL.'[42m OK  [0m get unapproved games';
     }
 
-    public function test_games_not_in_array()
+    public function test_games_not_in_group()
     {
         //set some games to base game to a value
         $data[0] = [1];
@@ -136,8 +119,6 @@ class GameRepositoryTest extends TestCase
         $this->assertEquals(7, count($found));
         echo PHP_EOL.'[42m OK  [0m get all games not in an array of games';
     }
-
-
 
     public function test_create_game()
     {

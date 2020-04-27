@@ -14,7 +14,11 @@ interface IGame {
     public function create(Array $data);
     public function approveGame(Game $game);
     public function update(Array $data, $gameId);
+    public function updateBaseGameId($gameId, $newGameId);
     public function delete($gameId);
 
-    public function searchGamesNotInGroup($arrayGameIds = "", $searchString = "");
+    public function searchGamesNotInGroup($arrayGameIds = "");
+
+    public function updateExpansion($id, $mergeId);
+
 }

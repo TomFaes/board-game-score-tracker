@@ -7,6 +7,8 @@ export default {
             errors: {},
             'formData': new FormData(),
             action: '',
+            reload:'',
+            response: {},
          }
     },
 
@@ -14,8 +16,10 @@ export default {
         submitData(){
             apiCall.postData(this.action, this.formData)
             .then(response =>{
-                this.$bus.$emit('reloadList');
-                //this.$bus.$emit('resetDisplay');
+                this.response = response;
+                if(this.reload != ""){
+                    this.$bus.$emit(this.reload);
+                }
                 this.fields = {}; //Clear input fields.
                 this.errors = {};
                 this.formData =  new FormData();
@@ -27,7 +31,10 @@ export default {
         updateData(){
             apiCall.updateData(this.action, this.formData)
             .then(response =>{
-                this.$bus.$emit('reloadList');
+                this.response = response;
+                if(this.reload != ""){
+                    this.$bus.$emit(this.reload);
+                }
                 this.errors = {};
                 this.formData =  new FormData();
             }).catch(error => {

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Auth;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -33,7 +34,26 @@ class Group extends Model
 
     public function groupGames()
     {
-        return $this->hasMany('App\Models\GroupGame', 'group_id', 'id')->with('game');
+        $groupgames = $this->hasMany('App\Models\GroupGame', 'group_id', 'id')->with('game', 'game.expansions');
+        $groupgames = $groupgames->join('games' , 'group_games.game_id', '=', 'games.id')->orderBy('games.full_name');
+        return $groupgames;
+    }
+
+    public function baseGroupGames(){
+        $groupgames =  $this->hasMany('App\Models\GroupGame', 'group_id', 'id')->whereHas('game', function(Builder $query){
+                $query->where('base_game_id', '=', null);
+            }
+        )
+        ->with('game', 'game.expansions');
+
+        $groupgames = $groupgames->join('games' , 'group_games.game_id', '=', 'games.id')
+        ->orderBy('games.full_name');
+        return $groupgames;
+    }
+
+    public function playedGames()
+    {
+        return $this->hasMany('App\Models\PlayedGame', 'group_id', 'id');
     }
 
     protected $appends = ['display' , 'typeMember'];

@@ -4,7 +4,7 @@
             <div class="col-lg-2 col-md-2"></div>
             <div class="col-lg-8 col-md-8">
                 <label :for=inputName>{{ tekstLabel }}</label>
-                <input type="file" class="form-control" :name=inputName :id=inputId  :value="value" @input="$emit('input', $event.target.value)" @change="loadTextFromFile"/>
+                <input :disabled=disabled type="file" class="form-control" :name=inputName :id=inputId  :value="value" @input="$emit('input', $event.target.value)" @change="loadTextFromFile"/>
                 <div class="text-danger" v-if="errors">{{ errors[0] }}</div>
             </div>
             <div class="col-lg-2 col-md-2"></div>
@@ -21,7 +21,8 @@
             'inputName' : String,
             'inputId' : String,
             'errors' : Array,
-            'value' : String
+            'value' : String,
+            'disabled': Boolean
          },
 
         data() {

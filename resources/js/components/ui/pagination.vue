@@ -1,6 +1,6 @@
 <template>
     <div>
-        <ul class="pagination">
+        <ul class="pagination justify-content-center">
             <li class="page-item">
             <a class="page-link" href="javascript:void(0)" aria-label="Previous" v-on:click.prevent="changePage(pagination.current_page - 1)">
                 <span aria-hidden="true">&laquo;</span>
@@ -58,6 +58,7 @@
       changePage(page) {
         this.pagination.current_page = page;
         this.$emit('paginate');
+        window.scrollTo(0,0);
       }
     }
   }

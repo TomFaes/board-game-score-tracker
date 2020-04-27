@@ -40,6 +40,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->bind('path.public', function()
+        {
+            return base_path('public_html');
+        });
+        
         if ($this->app->environment() !== 'production') {
             $this->app->register(IdeHelperServiceProvider::class);
         }
@@ -53,6 +58,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind('App\Repositories\Contracts\IGroupUser', 'App\Repositories\GroupUserRepo');
         $this->app->bind('App\Repositories\Contracts\IGroupGame', 'App\Repositories\GroupGameRepo');
         $this->app->bind('App\Repositories\Contracts\IGroupGameLink', 'App\Repositories\GroupGameLinkRepo');
+        $this->app->bind('App\Repositories\Contracts\IPlayedGame', 'App\Repositories\PlayedGameRepo');
+        $this->app->bind('App\Repositories\Contracts\IPlayedGameScore', 'App\Repositories\PlayedGameScoreRepo');
 
     }
 }

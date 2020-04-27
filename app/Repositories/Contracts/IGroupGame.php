@@ -10,5 +10,6 @@ interface IGroupGame {
 
 
     public function create(Array $data);
+    public function updateGroupGameIds($gameId, $newGameId);
     public function delete($Id);
 }

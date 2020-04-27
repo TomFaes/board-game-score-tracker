@@ -42,6 +42,7 @@ class AuthenticationController extends Controller
             //if user doesn't exist create one
             if($user == null){
                 $user = $this->user->createSocialUser($socialUser);
+
             }
 
             //if the user exist or is created login

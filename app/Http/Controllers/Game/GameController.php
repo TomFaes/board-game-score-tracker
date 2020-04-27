@@ -26,11 +26,12 @@ class GameController extends Controller
         $this->gameValidation = $gameValidation;
         $this->game = $game;
     }
-
+/*
     public function view()
     {
         return view('game.index');
     }
+    */
     /**
      * Display a listing of the resource.
      *
@@ -38,7 +39,8 @@ class GameController extends Controller
      */
     public function index(Request $request)
     {
-        return response()->json($this->game->getGames(20), 200);
+        $pageItems = isset($request->page_items) === true ? $request->page_items : 0;
+        return response()->json($this->game->getGames($pageItems), 200);
     }
 
     /**

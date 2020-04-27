@@ -7,8 +7,15 @@ use App\Models\Group;
 use App\Models\GroupGame;
 use App\Models\GroupGameLink;
 use App\Repositories\GroupGameLinkRepo;
+use App\Repositories\GroupGameRepo;
+use App\Repositories\PlayedGameRepo;
+use App\Repositories\PlayedGameScoreRepo;
+use App\Services\GameService\MergeGameService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
+use App\Services\StatisticsService\StatisticsFactory;
+use Illuminate\Container\Container;
 
 class HomeController extends Controller
 {
@@ -20,7 +27,7 @@ class HomeController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('admin:Admin, View',['only' => ['view']]);
+        $this->middleware('admin:Admin, View',['only' => ['view', 'view01']]);
     }
 
     /**
@@ -33,50 +40,54 @@ class HomeController extends Controller
         return view('home');
     }
 
+    public function view01()
+    {
+        return view('view01');
+    }
+
     /**
      * for testing only
      */
     public function view()
      {
-
         if(Auth::user()->id != 1){
             return "No acces to this page";
         }
-         echo Auth::user()->id."<hr>";
-         echo "Dit is een test pagina voor admins<hr>";
+        $data = array();
+        echo "<pre>";
 
-         $groupgameLink = new GroupGameLinkRepo();
-         dd($groupgameLink->getLinksOfGroupGame(1)->toArray());
+        //$mergeService = new MergeGameService();
+        //$container = Container::getInstance();
+        //$mergeService = $container->make(MergeGameService::class);
+        //$mergeService->mergeGame(2, 1);
 
-         $gameLink = GroupGameLink::with(['groupGame'])->get();
-         dd($gameLink->toArray());
+        echo "</pre>";
+        //$repo = new GroupGameRepo();
+        //$data = $repo->getGamesOfGroup(1, 20);
+
+
+/*
+
+        $statisticsGenerator = StatisticsFactory::generate("GroupStatistics");
+        $repo = new PlayedGameRepo();
+
+
+        $playedGames = $repo->getStatPlayedGroupYearGames(2);
 
 
 
-         //$games = GroupGame::leftJoin('games', 'group_games.game_id', '!=', 'games.id')->with('game')->get();
+
+        $data = $statisticsGenerator->getAll($playedGames);
+*/
 
         /*
-        echo"<hr>";
-        echo "game: ".$games->name;
-        echo "<br>group id: ".$games->groups[0]->group_id;
-*/
+public function getAll($playedGames);
+    public function getScores($playedGames);
+    public function getPositions($playedGames);
+    public function getVictories($playedGames);
+        */
 
-         echo"<hr>";
-/*
-         echo "<pre>";
-         print_r($games->toArray());
-         echo "</pre>";
-         */
-         dd($games);
-
-
-
-         /*
-         $repo = new \App\Repositories\GroupGameRepo();
-         dd($repo->getGroupGame(1));
-*/
-
-
+        return response()->json($data, 200);
 
      }
 

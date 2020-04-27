@@ -32,4 +32,25 @@ class GroupUser extends Model
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->select(['id', 'firstname', 'name'])->withDefault();
     }
+
+     /**
+     * Return the group
+     */
+    public function gameCreator()
+    {
+        return $this->hasMany('App\Models\PlayedGame', 'creator_id', 'user_id');
+    }
+
+    protected $appends = ['fullName'];
+
+    /**
+     * Returns a name for dropdowns
+     */
+    public function getfullNameAttribute()
+    {
+        if($this->user->id > 0 && $this->verified == 1){
+            return $this->user->firstname." ".$this->user->name;
+        }
+        return $this->firstname." ".$this->name;
+    }
 }

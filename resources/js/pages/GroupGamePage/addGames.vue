@@ -1,92 +1,99 @@
 <template>
     <div>
-        <div class="row">
-            <div class="col-lg-6">
-                <input type="text" class="form-control " @input="isTyping = true" v-model="searchQuery" placeholder="Search game to add to group(min 3 chars)">
-            </div>
-        </div>
+        <div class="row" >
+           <div class="col-lg-2 col-md-2 col-sm-0"></div>
+            <div class="col-lg-8 col-md-8 col-sm-12">
+                <multiselect
+                    v-model="value"
+                    :options="nonGroupGames"
+                    :options-limit="20"
+                    :close-on-select="false"
+                    :clear-on-select="false"
+                    :hide-selected="false"
+                    :preserve-search="true"
+                    placeholder="Add the selected game"
+                    label="full_name"
 
-        <div class="row">
-            <div align="center" v-if="isLoading">
-                <span>Searching...</span>
+                    track-by="full_name"
+                    @select="addGame"
+                >
+                    <template slot="noResult"><strong>Your game wasn't found, at the bottom of the game list is a option to add a new game to the site</strong></template>
+                </multiselect>
             </div>
-            <ul class="list-group">
-                <li v-if="dataList.length > 0" class="list-group-item" @click="closeList">Close list</li>
-                <li class="list-group-item" v-for="(item,i) in dataList" :key="item.id">
-                    <i class="fa fa-plus-circle" aria-hidden="true" @click.prevent="addGame(i)"> {{ item.name }}</i>
-                </li>
-            </ul>
+            <div class="col-2"></div>
         </div>
     </div>
 </template>
 
 <script>
     import apiCall from '../../services/ApiCall.js';
-    import SubmitForm from '../../mixins/SubmitForm.js';
+
+
+    //https://vue-multiselect.js.org/v1/index.html#props
+    import Multiselect from 'vue-multiselect';
 
     export default {
-
-        mixins: [ SubmitForm],
+        components: {
+            Multiselect,
+        },
 
          data () {
             return {
-                dataList: [],
-                result: [],
-                searchQuery: "",
-                isTyping: false,
-                searchResult: [],
-                isLoading: false,
                 'action': '',
                 'formData': new FormData(),
+               'value': '',
             }
          },
 
          props: {
             'group': {},
+            'nonGroupGames': {},
          },
 
-         watch: {
-            searchQuery: _.debounce(function() {
-                this.isTyping = false;
-            }, 1000),
-            isTyping: function(value) {
-                if (!value && this.searchQuery.length > 2) {
-                    this.loadList(this.searchQuery);
-                }
-            }
-        },
-
         methods: {
-            loadList(){
-                this.isLoading = true;
-                apiCall.getData('group/' + this.group.id + '/search-non-group-games?search=' + this.searchQuery)
+            test(){
+                console.log("TEST");
+            },
+
+            addGame(selectedGame){
+                this.formData.set('group_id', this.group.id);
+                this.formData.set('game_id', selectedGame.id);
+                this.action = "group/" + this.group.id + "/group-game";
+
+                apiCall.postData(this.action, this.formData)
                 .then(response =>{
-                    this.dataList = response;
-                    this.isLoading = false;
-                }).catch(() => {
-                    console.log('handle server error from here');
+                    this.$bus.$emit('reloadGroupGames');
+                    this.$bus.$emit('reloadGroups');
+                    this.message = "You've added " + selectedGame.full_name+ " to " + this.group.name;
+                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                    this.formData =  new FormData();
+
+                    this.removeGameFromMultiselect(selectedGame);
+                    this.value='';
+                }).catch(error => {
+                    this.errors = error;
                 });
             },
 
-            addGame(index){
-                this.formData.set('group_id', this.group.id);
-                this.formData.set('game_id', this.dataList[index]['id']);
+            removeGameFromMultiselect(selectedGame){
+                var gameToRemove = "";
 
-                this.action = "group/" + this.group.id + "/group-game";
-                this.submitData();
-
-                this.dataList.splice(index, 1);
-            },
-
-            closeList(){
-                this.dataList = [];
-                this.searchQuery = "";
+                    this.nonGroupGames.forEach(function(item, index){
+                        if(selectedGame['id'] == item.id){
+                            gameToRemove = index;
+                        }
+                    });
+                    this.nonGroupGames.splice(gameToRemove, 1);
             }
         },
+
+        mounted(){
+
+        }
     }
 </script>
 
-<style scoped>
+<style src="vue-multiselect/dist/vue-multiselect.min.css">
 
 </style>
 

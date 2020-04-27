@@ -29,7 +29,7 @@ class GroupRepo extends Repository implements Contracts\IGroup
      */
     public function getGroup($id)
     {
-        return Group::with(['groupUsers', 'admin', 'groupGames'])->find($id);
+        return Group::with(['groupUsers', 'admin', 'groupGames', 'baseGroupGames'])->find($id);
     }
 
      /**
@@ -41,13 +41,19 @@ class GroupRepo extends Repository implements Contracts\IGroup
         if($itemsPerPage > 0){
             return Group::whereHas('groupUsers', function ($query) use ($userId){
                 $query->where('user_id', '=', $userId)->where('verified', 1);
-            })->orWhere('admin_id', $userId)->with(['groupUsers','admin', 'groupGames'])->paginate($itemsPerPage);
-            //return Group::OrderBy('name', 'asc')->where('admin_id', $userId)->with(['groupUsers','admin'])->paginate($itemsPerPage);
+            })->orWhere('admin_id', $userId)->with(['groupUsers','admin', 'groupGames', 'baseGroupGames'])->paginate($itemsPerPage);
         }
-        //return Group::OrderBy('name', 'asc')->where('admin_id', $userId)->with(['groupUsers','admin'])->get();
         return Group::whereHas('groupUsers', function ($query) use ($userId){
             $query->where('user_id', '=', $userId)->where('verified', 1);
-        })->orWhere('admin_id', $userId)->with(['groupUsers','admin', 'groupGames'])->get();
+        })->orWhere('admin_id', $userId)->with(['groupUsers','admin', 'groupGames', 'baseGroupGames'])->get();
+    }
+
+     /**
+     * get all played games in this group
+     * @return Object
+     */
+    public function getPlayedGames($id){
+        return Group::with('playedGames')->find($id);
     }
 
     /***************************************************************************
