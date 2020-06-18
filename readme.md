@@ -21,4 +21,10 @@ Version 1:
     - create group users
     - group statistics
     - played games
+Version 1.01:
+    - update packages to the latest version
+    - create roadmap view
+    - Choose favorite group
+    - add cookie consent
+
 

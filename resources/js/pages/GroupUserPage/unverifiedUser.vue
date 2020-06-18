@@ -1,19 +1,19 @@
 <template>
     <div class="row" v-if="dataList.length > 0">
-        <div class="col-12">
+        <div class="col-lg-2 col-md-2 col-sm-0"></div>
+        <div class="col-lg-8 col-md-8 col-sm-12">
             <center>
-                Your account has been added to {{ dataList.length }} group(s)
-                <ul v-for="data in dataList"  :key="data.id">
-                    <li>
-                        {{ data.group['name'] }}
-                        <button class="btn btn-primary" @click.prevent="approveVerifyUser(data.id)"><i class="fas fa-check"></i></button>
-                        <button class="btn btn-danger" @click.prevent="disapproveVerifyUser(data.id)"><i class="fas fa-trash-alt" style="heigth:14px; width:14px" ></i></button>
-
-
-                    </li>
-                </ul>
+                Your account has been added to {{ dataList.length }} group(s)<br>
+                    <ul v-for="data in dataList"  :key="data.id" style="display: inline-block; text-align: left;">
+                        <li>
+                            {{ data.group['name'] }}
+                            <button class="btn btn-primary" @click.prevent="approveVerifyUser(data.id)"><i class="fas fa-check"></i></button>
+                            <button class="btn btn-danger" @click.prevent="disapproveVerifyUser(data.id)"><i class="fas fa-trash-alt" style="heigth:14px; width:14px" ></i></button>
+                        </li>
+                    </ul>
             </center>
         </div>
+        <div class="col-lg-2 col-md-2 col-sm-0"></div>
     </div>
 </template>
 
@@ -53,8 +53,7 @@
             },
 
             disapproveVerifyUser(id){
-                 console.log("verifie user disapprovedfor id " + id);
-                apiCall.deleteData('unverified-group-user/' + id)
+                apiCall.postData('unverified-group-user/' + id + '/delete')
                 .then(response =>{
                     this.loadList();
                 }).catch(() => {

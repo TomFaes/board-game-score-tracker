@@ -7,6 +7,7 @@ use App\Models\Group;
 use App\Models\GroupGame;
 use App\Models\GroupGameLink;
 use App\Repositories\GroupGameLinkRepo;
+use App\Repositories\UserRepo;
 use App\Repositories\GroupGameRepo;
 use App\Repositories\PlayedGameRepo;
 use App\Repositories\PlayedGameScoreRepo;
@@ -55,6 +56,9 @@ class HomeController extends Controller
         }
         $data = array();
         echo "<pre>";
+
+        $user = new UserRepo();
+        $user->changeFavoriteGroup(1, 1);
 
         //$mergeService = new MergeGameService();
         //$container = Container::getInstance();

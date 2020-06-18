@@ -21,7 +21,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'firstname', 'name', 'email', 'password', 'role'
+        'firstname', 'name', 'email', 'password', 'role', 'favorite_group_id'
     ];
 
     /**
@@ -32,5 +32,10 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token', 'created_at', 'updated_at', 'deleted_at', 'email_verified_at', 'last_login', 'forget_user'
     ];
+
+    public function group()
+    {
+        return $this->belongsTo('App\Models\Group', 'favorite_group_id', 'id')->withDefault();
+    }
 }
 

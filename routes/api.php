@@ -25,6 +25,8 @@ Route::get('profile', '\App\Http\Controllers\User\ProfileController@index');
 Route::post('profile', '\App\Http\Controllers\User\ProfileController@update');
 Route::delete('profile', '\App\Http\Controllers\User\ProfileController@destroy');
 
+Route::post('group/{group_id}/changeFavoriteGroup', '\App\Http\Controllers\User\FavoriteUserGroupController@update');
+
 /**
  * All routes for a game
  */
@@ -34,6 +36,7 @@ Route::resource('game', '\App\Http\Controllers\Game\GameController', ['parameter
 ]])->except([
     'create', 'edit'
 ]);
+
 
 Route::get('/basegame', '\App\Http\Controllers\Game\BaseGameController@index');
 
@@ -101,4 +104,14 @@ Route::post('merge/{id}/game/{mergedId}', '\App\Http\Controllers\Game\MergeGameC
 
 
 
+//delete method doesn't work on 000webhost
 
+Route::post('user/{id}/delete', '\App\Http\Controllers\User\UserController@destroy');
+Route::post('profile/delete', '\App\Http\Controllers\User\ProfileController@destroy');
+Route::post('game/{id}/delete', '\App\Http\Controllers\Game\GameController@destroy');
+Route::post('group/{group_id}/group-game/{id}/delete', '\App\Http\Controllers\Group\GroupGameController@destroy');
+Route::post('group/game/{group_game_id}/link/{id}/delete', '\App\Http\Controllers\Group\GroupGameLinkController@destroy');
+Route::post('group/{id}/delete', '\App\Http\Controllers\Group\GroupController@destroy');
+Route::post('group/{group_id}/user/{id}/delete', '\App\Http\Controllers\Group\GroupUsersController@destroy');
+Route::post('group/{group_id}/played/{id}/delete', '\App\Http\Controllers\Played\PlayedGamesController@destroy');
+Route::post('unverified-group-user/{id}/delete', '\App\Http\Controllers\Group\UnverifiedGroupUsersController@destroy');

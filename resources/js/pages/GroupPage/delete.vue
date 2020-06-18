@@ -22,7 +22,7 @@
         methods: {
            deleteRow(){
                if(confirm('are you sure you want to delete this group ' + this.group.name + '?')){
-                    apiCall.deleteData('group/' + this.group.id)
+                    apiCall.postData('group/' + this.group.id + '/delete')
                     .then(response =>{
                         this.$bus.$emit('reloadGroups');
                         this.$bus.$emit('displayNav', "" );

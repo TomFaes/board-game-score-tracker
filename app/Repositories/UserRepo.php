@@ -101,6 +101,19 @@ class UserRepo extends Repository implements Contracts\IUser
         return $user;
     }
 
+    public function changeFavoriteGroup($userId, $groupId){
+        $user = $this->getUser($userId);
+
+        if($groupId == $user->favorite_group_id){
+            $user->favorite_group_id = null;
+        }else{
+            $user->favorite_group_id = $groupId;
+        }
+
+        $user->save();
+        return $user;
+    }
+
     /**
      * method is not used for now
      */

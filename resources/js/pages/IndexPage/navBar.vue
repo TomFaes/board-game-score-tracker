@@ -12,9 +12,14 @@
                     <li class="nav-item" data-toggle="collapse" data-target=".navbar-collapse.show" v-if="user.role == 'Admin'" >
                         <span class="nav-link js-scroll-trigger item-link"  @click="displayGameIndex">Add game</span>
                     </li>
+                    <li class="nav-item" data-toggle="collapse" data-target=".navbar-collapse.show">
+                        <span class="nav-link js-scroll-trigger item-link"  @click="displayRoadMap"><i class="fa fa-road fa-2x"></i></span>
+                    </li>
+
                     <li class="nav-item"  data-toggle="collapse" data-target=".navbar-collapse.show" v-if="user.id > 0">
                          <span class="nav-link js-scroll-trigger item-link"  @click="displayProfile"><i class="fa fa-user fa-2x"></i></span>
                     </li>
+
                     <li class="nav-item"  data-toggle="collapse" data-target=".navbar-collapse.show" v-if="user.id > 0">
                           <a class="nav-link js-scroll-trigger" href="logout">Logout</a>
                     </li>
@@ -61,7 +66,15 @@
 
             displayLogin(){
                  this.$bus.$emit('displayNav', 'login');
+            },
+
+            displayRoadMap(){
+                this.$bus.$emit('displayNav', 'RoadMap');
             }
+
+
+
+
 
 
         },

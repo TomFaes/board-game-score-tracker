@@ -134,7 +134,7 @@
             },
 
             deleteGame(groupGame){
-                apiCall.deleteData('group/' + this.group.id + '/group-game/' + groupGame.id)
+                 apiCall.postData('group/' + this.group.id + '/group-game/' + groupGame.id + '/delete')
                 .then(response =>{
                     this.loadList();
                     this.loadNonGroupGames();
