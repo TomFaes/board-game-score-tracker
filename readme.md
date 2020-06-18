@@ -13,18 +13,18 @@ if the score tracker is up and running we might dream about future plans. The li
   -	?
 
 ## Versions
-Version 1: 
-    - create/Login to an account
-    - create/edit groups
-    - create group games
-    - create group game links
-    - create group users
-    - group statistics
-    - played games
-Version 1.01:
-    - update packages to the latest version
-    - create roadmap view
-    - Choose favorite group
-    - add cookie consent
+Version 1: <br>
+    - create/Login to an account<br>
+    - create/edit groups<br>
+    - create group games<br>
+    - create group game links<br>
+    - create group users<br>
+    - group statistics<br>
+    - played games<br>
+Version 1.01:<br>
+    - update packages to the latest version<br>
+    - create roadmap view<br>
+    - Choose favorite group<br>
+    - add cookie consent<br>
 
 
