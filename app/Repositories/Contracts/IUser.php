@@ -10,6 +10,7 @@ interface IUser {
     public function update(Array $data, $userId);
     public function delete($userId);
 
+    public function changeFavoriteGroup($userId, $groupId);
     public function createSocialUser($socialUser);
     public function existingUser(string $socialUserEmail);
 }

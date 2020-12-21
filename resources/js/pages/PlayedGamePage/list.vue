@@ -140,8 +140,7 @@
 
             deletePlayedGame(data){
                 if(confirm('are you sure you want to delete this result of ' + data.game.name + '?')){
-                    apiCall.getData('group/' + this.group.id + '/played?page=' + this.dataList.current_page)
-                    apiCall.deleteData('group/' + this.group.id + '/played/' + data.id)
+                    apiCall.postData('group/' + this.group.id + '/played/' + data.id + '/delete')
                     .then(response =>{
                         this.loadList();
                     }).catch(() => {

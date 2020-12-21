@@ -96,7 +96,7 @@
 
             removeProfile(){
                 if(confirm('are you sure?')){
-                    apiCall.deleteData('profile')
+                    apiCall.postData('profile/delete')
                     .then(response =>{
                         window.location.href = "./logout";
                     }).catch(() => {

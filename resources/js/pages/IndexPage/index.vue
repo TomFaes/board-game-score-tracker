@@ -10,13 +10,16 @@
             <login v-if="displayNav == 'login' "></login>
         </div>
 
+         <!-- view of  the login options-->
+        <road-map v-if="displayNav == 'RoadMap' "></road-map>
+
          <!-- Message box -->
         <div class="container">
             <message-box></message-box>
         </div>
 
         <!-- view of all groups-->
-        <div class="container" v-if="user && displayNav == ''">
+        <div class="container" v-if="auth == true && displayNav == ''">
             <unverified-user></unverified-user>
         </div>
 
@@ -65,17 +68,20 @@
 
         <div class="container">
              <div class="row" v-show="displayNav == 'Group'">
-                 <h1>{{ selectedGroup.name }}</h1>
-                    <div class="button-row">
-                            <div>
-                                <button class="btn btn-primary" @click.prevent="setDisplayNav()"><i class="fas fa-home fa-1x" ></i></button>
-                                <button class="btn btn-primary" @click.prevent="setDisplay('addPlayedGame')"><i class="fas fa-plus fa-1x" ></i></button>
-                                <button class="btn btn-primary" @click.prevent="setDisplay('playedGames')"><i class="fas fa-list-ul fa-1x" ></i></button>
-                                <button class="btn btn-primary" @click.prevent="setDisplay('groupStats')"><i class="fas fa-chart-pie fa-1x" ></i></button>
-                                <button class="btn btn-primary" @click.prevent="setDisplay('editGroup')" v-if="selectedGroup.typeMember == 'Admin'"><i class="fas fa-pencil-alt fa-1x" ></i></button>
-                                <button class="btn btn-primary" @click.prevent="setDisplay('groupUsers')"><i class="fas fa-users fa-1x" ></i></button>
-                                <button class="btn btn-primary" @click.prevent="setDisplay('groupGames')"><i class="fas fa-dice fa-1x" ></i></button>
-                            </div>
+                 <h1>{{ selectedGroup.name }}
+                     <i class="fas fa-star" style="color:yellow;" @click.prevent="changeFavorite()" v-if="selectedGroup.id == user.favorite_group_id"></i>
+                     <i class="far fa-star" @click.prevent="changeFavorite()" v-else></i>
+                </h1>
+                <div class="button-row">
+                        <div>
+                            <button class="btn btn-primary" @click.prevent="setDisplayNav()"><i class="fas fa-home fa-1x" ></i></button>
+                            <button class="btn btn-primary" @click.prevent="setDisplay('addPlayedGame')"><i class="fas fa-plus fa-1x" ></i></button>
+                            <button class="btn btn-primary" @click.prevent="setDisplay('playedGames')"><i class="fas fa-list-ul fa-1x" ></i></button>
+                            <button class="btn btn-primary" @click.prevent="setDisplay('groupStats')"><i class="fas fa-chart-pie fa-1x" ></i></button>
+                            <button class="btn btn-primary" @click.prevent="setDisplay('editGroup')" v-if="selectedGroup.typeMember == 'Admin'"><i class="fas fa-pencil-alt fa-1x" ></i></button>
+                            <button class="btn btn-primary" @click.prevent="setDisplay('groupUsers')"><i class="fas fa-users fa-1x" ></i></button>
+                            <button class="btn btn-primary" @click.prevent="setDisplay('groupGames')"><i class="fas fa-dice fa-1x" ></i></button>
+                        </div>
                     </div>
             </div>
         </div>
@@ -130,6 +136,9 @@
     import apiCall from '../../services/ApiCall.js';
     import navBar from '../IndexPage/navBar.vue';
     import login from '../IndexPage/login.vue';
+    import roadMap from '../RoadmapPage/index.vue';
+
+
     import unverifiedUser from '../GroupUserPage/unverifiedUser';
     import messageBox from '../../components/tools/messageBar.vue';
     import adminGame from '../GamePage/index.vue';
@@ -148,6 +157,7 @@
             messageBox,
             unverifiedUser,
             login,
+            roadMap,
             navBar,
             adminGame,
             profilePage,
@@ -214,8 +224,9 @@
                 apiCall.getData('profile')
                 .then(response =>{
                     this.user = response;
+                    this.loadFavoriteGroup(this.user.favorite_group_id);
                 }).catch(() => {
-                    console.log('handle server error from here');
+                    console.log('getLoggedInUser: handle server error from here');
                 });
             },
 
@@ -230,14 +241,36 @@
                     console.log('handle server error from here');
                 });
             },
+
+            changeFavorite(){
+                apiCall.updateData( 'group/' + this.selectedGroup.id + "/changeFavoriteGroup")
+                .then(response =>{
+                    this.user.favorite_group_id = response.favorite_group_id;
+                }).catch(() => {
+                    console.log('handle server error from here');
+                });
+            },
+
+            loadFavoriteGroup(groupId){
+                if(groupId > 0){
+                     apiCall.getData('group/' + groupId)
+                    .then(response =>{
+                        this.selectedGroup = response;
+                        this.setDisplayNav('Group');
+                        this.setDisplay('playedGames');
+                    }).catch(() => {
+                        console.log('loadFavoriteGroup: handle server error from here');
+                    });
+                }
+            }
         },
 
         mounted(){
             if(this.auth == true){
                 this.getLoggedInUser();
                 this.getGroups();
-            }
 
+            }
 
             this.$bus.$on('display', value => {
                 this.setDisplay(value);

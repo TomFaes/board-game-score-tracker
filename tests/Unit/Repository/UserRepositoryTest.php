@@ -106,6 +106,15 @@ class UserRepositoryTest extends TestCase
         echo PHP_EOL.'[42m OK  [0m forget user test';
     }
 
+
+    public function test_change_favorite_group(){
+        $found = $this->repo->getUser($this->testData[0]->id);
+        $user = $this->repo->changeFavoriteGroup($found->id, 1);
+
+        $this->assertEquals($user->favorite_group_id, 1);
+        echo PHP_EOL.'[42m OK  [0m change favorite group id';
+    }
+
     public function test_delete_user()
     {
         $delete = $this->repo->delete($this->testData[0]->id);

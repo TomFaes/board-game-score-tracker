@@ -132,12 +132,14 @@
             },
 
             deleteRow(id){
-                apiCall.deleteData('game/' + id)
-                .then(response =>{
-                     this.loadList();
-                }).catch(() => {
-                    console.log('handle server error from here');
-                });
+                if(confirm('are you sure you want to delete this game?')){
+                    apiCall.postData('game/' + id + '/delete')
+                    .then(response =>{
+                        this.loadList();
+                    }).catch(() => {
+                        console.log('handle server error from here');
+                    });
+                }
             }
         },
 

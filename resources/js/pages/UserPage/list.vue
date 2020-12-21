@@ -13,7 +13,7 @@
                         <td>
                             <button class="btn btn-primary" v-if="updateField != data.id" @click.prevent="updateRow(data.id)">Update</button>
                             <button class="btn btn-primary" v-if="updateField == data.id" @click.prevent="hideUpdate">Hide update</button>
-                            <button class="btn btn-danger" @click.prevent="deleteRow(data.id)">Delete</button>
+                            <button class="btn btn-danger" @click.prevent="deleteRow(data)">Delete</button>
                         </td>
                     </tr>
                     <tr v-if="updateField == data.id">
@@ -84,13 +84,17 @@
                 this.updateField = 0;
             },
 
-            deleteRow(id){
-                apiCall.deleteData('user/' + id)
-                .then(response =>{
-                     this.loadList();
-                }).catch(() => {
-                    console.log('handle server error from here');
-                });
+            deleteRow(data){
+                console.log(data);
+                if(confirm('are you sure you want to remove ' + data.firstname + ' ' + data.name + '?')){
+                    apiCall.postData('user/' + data.id + '/delete')
+                    .then(response =>{
+                        console.log("delete user");
+                        this.loadList();
+                    }).catch(() => {
+                        console.log('handle server error from here');
+                    });
+                }
             }
         },
 

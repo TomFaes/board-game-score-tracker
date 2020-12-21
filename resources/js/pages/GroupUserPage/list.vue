@@ -101,7 +101,7 @@
 
             deleteGroupUser(data){
                 if(confirm('are you sure you want to remove this user from ' + this.group.name  + '?')){
-                    apiCall.deleteData('group/' + this.group.id + '/user/' + data.id)
+                    apiCall.postData('group/' + this.group.id + '/user/' + data.id + '/delete')
                     .then(response =>{
                         if(response.status == 403){
                             this.message = "This user couldn't be delete from this group";

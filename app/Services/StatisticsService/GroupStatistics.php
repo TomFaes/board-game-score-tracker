@@ -40,11 +40,16 @@ class GroupStatistics implements IStatistic
                 $data['data'][$i]['users'][$id]['score'] = $score->score;
 
                 $data['total']['place'][$id] += $score->place;
-            }
 
-            $winnerId =  $playedGame->winner_id;
-            $data['data'][$i]['users'][$winnerId]['victory']++;
-            $data['total']['victory'][$winnerId]++;
+                if( $score->place == 1){
+                    $data['data'][$i]['users'][$id]['victory']++;
+                    $data['total']['victory'][$id]++;
+                }
+            }
+            //in this case only 1 person could be the winner
+            //$winnerId =  $playedGame->winner_id;
+            //$data['data'][$i]['users'][$winnerId]['victory']++;
+            //$data['total']['victory'][$winnerId]++;
         }
         return $data;
     }
