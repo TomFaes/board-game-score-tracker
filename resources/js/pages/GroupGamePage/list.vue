@@ -19,9 +19,13 @@
                             {{ data.game.full_name }}
                         </td>
                         <td class="options-column">
-                            <button class="btn btn-info" @click.prevent="showLink(data.id)" v-if="data.links.length > 0"><img :src="'images/layout/link_icon.png'"  style="heigth:14px; width:14px"></button>
+                            <button class="btn btn-info" @click.prevent="showLink(data.id)" v-if="data.links.length > 0"><img :src="getImageUrl('images/layout/link_icon.png')"  style="heigth:14px; width:14px"></button>
                             <button class="btn btn-danger" @click.prevent="deleteGame(data)" v-if="group.typeMember == 'Admin' && data.links.length == 0"><i class="fas fa-trash fa-1x" ></i></button>
-                            <button class="btn btn-info" @click.prevent="addLink(data.id)" v-if="group.typeMember == 'Admin'"><img :src="'images/layout/add_link_icon.png'" style="heigth:14px; width:14px"></button>
+                            <button class="btn btn-info" @click.prevent="addLink(data.id)" v-if="group.typeMember == 'Admin'"><img :src="getImageUrl('images/layout/add_link_icon.png')" style="heigth:14px; width:14px"></button>
+
+
+
+                            
                         </td>
                     </tr>
                     <tr v-if="selectedGroupGameLinkCreate == data.id">
@@ -143,6 +147,14 @@
                 }).catch(() => {
                     console.log('handle server error from here');
                 });
+            },
+
+            getImageUrl(urlName){
+                var localPath = "";
+                if(process.env.NODE_ENV == 'development'){
+                    localPath = "/boardgametracker/public_html"
+                }
+                return localPath + '/' + urlName;
             }
         },
 

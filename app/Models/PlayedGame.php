@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PlayedGame extends Model
 {
     use SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
         'group_id', 'game_id', 'winner_id', 'date', 'time_played', ' remarks', 'creator_id'

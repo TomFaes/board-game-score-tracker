@@ -17,7 +17,7 @@
                     <th>Options</th>
                 </tr>
             </thead>
-            <tbody  v-for="data in groupUsers"  :key="data.id" >
+            <tbody  v-for="data in group.group_users"  :key="data.id" >
                     <tr>
                         <td>
                             <div v-if="data.user_id > 0 && data.user.verified == 1">
@@ -43,7 +43,7 @@
 
 <script>
     import apiCall from '../../services/ApiCall.js';
-    import addUserToGroup from '../GroupUserPage/input';
+    import addUserToGroup from '../GroupUserPage/input.vue';
     import ButtonInput from '../../components/ui/form/ButtonInput.vue';
 
     export default {
@@ -55,20 +55,16 @@
             }
         },
 
-        props: {
-            'group': {},
-         },
-
         components: {
             addUserToGroup,
             ButtonInput
         },
 
-        watch:{
-            'group'(){
-                this.setGroupUsers();
-            }
-         },
+        computed: {
+            group(){
+                return this.$store.state.selectedGroup;
+            },
+        },
 
         methods: {
             setGroupUsers(){
@@ -110,6 +106,7 @@
                             this.$bus.$emit('reloadGroups');
                         }
                         this.$bus.$emit('showMessage', this.message,  'red', '2000' );
+                        this.$store.dispatch('getSelectedGroup', {id: this.group.id});
                     }).catch(() => {
                         console.log('handle server error from here');
                     });
@@ -120,7 +117,7 @@
         mounted(){
             this.setGroupUsers();
             this.$bus.$on('reloadList', () => {
-                    this.display = "";
+                this.display = "";
             });
         }
     }

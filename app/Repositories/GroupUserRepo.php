@@ -22,16 +22,6 @@ class GroupUserRepo extends Repository implements IGroupUser
         return GroupUser::with(['group', 'user'])->find($id);
     }
 
-    public function getUsersOfGroup($groupId)
-    {
-        return GroupUser::with(['group', 'user'])->where('group_id', $groupId)->OrderBy('name', 'asc', 'firstname', 'asc')->get();
-    }
-
-    public function getGroupsOfUser($userId)
-    {
-        return GroupUser::with(['group', 'user'])->where('user_id', $userId)->where('verified',1)->OrderBy('name', 'asc', 'firstname', 'asc')->get();
-    }
-
     public function getUnverifiedGroupUsers($userId)
     {
         return GroupUser::with(['group', 'user'])->where('user_id', $userId)->where('verified',0)->OrderBy('name', 'asc', 'firstname', 'asc')->get();
@@ -42,15 +32,10 @@ class GroupUserRepo extends Repository implements IGroupUser
         return GroupUser::with(['group', 'user'])->where('email', $email)->where('verified',0)->where('user_id', null)->OrderBy('name', 'asc', 'firstname', 'asc')->get();
     }
 
+    //get a groupuser with all the games he has created.
     public function getCreatedGames($id){
         return GroupUser::with('gameCreator')->find($id);
     }
-
-    /*
-    public function getCreatedGames($groupId, $userId){
-        return GroupUser::with('gameCreator')->where('user_id', $userId)->where('group_id', $groupId)->get();
-    }
-    */
 
      /***************************************************************************
      Next function will create or update the user object in de database

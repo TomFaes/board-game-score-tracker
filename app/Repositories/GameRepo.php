@@ -21,7 +21,7 @@ class GameRepo extends Repository implements Contracts\IGame
     {
         return Game::with(['expansions', 'baseGame'])->find($id);
     }
-    
+
     /**
      * Get all the games
      *
@@ -48,7 +48,7 @@ class GameRepo extends Repository implements Contracts\IGame
         return Game::with(['expansions', 'baseGame'])->OrderBy('name', 'asc')->where('base_game_id', null)->where('approved_by_admin', 1)->get();
     }
 
-    
+
 
     /**
      * Get all the expansion games
@@ -61,19 +61,6 @@ class GameRepo extends Repository implements Contracts\IGame
             return Game::with(['expansions', 'baseGame'])->where('base_game_id', $gameId)->where('approved_by_admin', 1)->paginate($itemsPerPage);
         }
         return Game::with(['expansions', 'baseGame'])->where('base_game_id', $gameId)->where('approved_by_admin', 1)->get();
-    }
-
-    /**
-     * Get all the approved games
-     *
-     * @return Object
-     */
-    public function getApprovedGames($itemsPerPage = 0)
-    {
-        if ($itemsPerPage > 0) {
-            return Game::with(['expansions', 'baseGame'])->where('approved_by_admin', 1)->OrderBy('name', 'asc')->paginate($itemsPerPage);
-        }
-        return Game::with(['expansions', 'baseGame'])->where('approved_by_admin', 1)->OrderBy('name', 'asc')->get();
     }
 
     /**
@@ -180,17 +167,16 @@ class GameRepo extends Repository implements Contracts\IGame
 
     public function updateBaseGameId($gameId, $newGameId)
     {
-        Game::where('base_game_id' , '=', $gameId)->update(
+       return Game::where('base_game_id' , '=', $gameId)->update(
             [
                 'base_game_id' => $newGameId
             ]
         );
-        return 'Base games updated';
     }
 
     public function updateExpansion($id, $newGameId)
     {
-        DB::statement('update expansion_played_game SET game_id ='.$newGameId. ' WHERE game_id = '.$id);
+        return DB::statement('update expansion_played_game SET game_id ='.$newGameId. ' WHERE game_id = '.$id);
         return 'expansions updated';
     }
 

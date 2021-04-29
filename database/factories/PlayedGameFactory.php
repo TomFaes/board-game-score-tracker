@@ -1,20 +1,56 @@
 <?php
+namespace Database\Factories;
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
+
+use App\Models\Game;
+use App\Models\Group;
+use App\Models\GroupUser;
 use App\Models\PlayedGame;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Faker\Generator as Faker;
 
+class PlayedGameFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = PlayedGame::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'group_id' => Group::all()->random()->id,
+            'game_id' => Game::all()->random()->id,
+            'winner_id' => GroupUser::all()->random()->id,
+            'creator_id' => User::all()->random()->id,
+            'date' => $this->faker->dateTimeThisCentury->format('Y-m-d'),
+            'time_played' => '01:00:00',
+            'remarks' => $this->faker->text,
+        ];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
 /*
-|--------------------------------------------------------------------------
-| Model Factories
-|--------------------------------------------------------------------------
-|
-| This directory should contain each of the model factory definitions for
-| your application. Factories provide a convenient way to generate new
-| model instances for testing / seeding your application's database.
-|
-*/
 
 $factory->define(PlayedGame::class, function (Faker $faker) {
     return [
@@ -24,3 +60,4 @@ $factory->define(PlayedGame::class, function (Faker $faker) {
         'remarks' => $faker->name,
     ];
 });
+*/

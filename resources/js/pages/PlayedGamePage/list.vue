@@ -64,7 +64,6 @@
     export default {
         data () {
             return {
-                'dataList' : { },
                 'selectedPlayedGameId': "",
                 fields: [
                     { 'field': 'date'},
@@ -84,10 +83,20 @@
         },
 
         watch:{
-            'group'(){
+            group(){
                 this.loadList();
             }
          },
+
+          computed: {
+            dataList(){
+                return this.$store.state.playedGames;
+            },
+
+            
+        },
+
+        
 
         components: {
             EditPlayedGame,
@@ -98,12 +107,8 @@
 
         methods: {
             loadList(){
-                apiCall.getData('group/' + this.group.id + '/played?page=' + this.dataList.current_page)
-                .then(response =>{
-                    this.dataList = response;
-                }).catch(() => {
-                    console.log('handle server error from here');
-                });
+                this.$store.dispatch('getPlayedGames', {id: this.group.id, current_page: this.dataList.current_page ?? '1'});
+                return;
             },
 
             viewPlayedGame(id){
@@ -151,12 +156,20 @@
         },
 
         mounted(){
-            this.loadList();
+            
+            //this.loadList();
             this.$bus.$on('reloadPlayedGameList', () => {
                 this.selectedPlayedGameId = "";
                 this.loadList();
             });
+        },
+
+        created(){
+            if(this.group.id != undefined && this.dataList.data == undefined){
+                this.loadList();
+            }
         }
+
     }
 </script>
 

@@ -1,8 +1,16 @@
+import axios from 'axios';
+
+//create a variable local path, in production there will be antohter path
+var localPath = "";
+if(process.env.NODE_ENV == 'development'){
+    localPath= "/boardgametracker/public_html"
+}
+
 export default {
     getData(action) {
         return axios({
             method: 'get',
-            url : 'api/' + action
+            url : localPath +  '/api/' + action,
         })
         .then(function (response) {
             return response.data;
@@ -15,7 +23,7 @@ export default {
     postData(action, fields){
         return axios({
             method: 'POST',
-            url : 'api/' + action,
+            url : localPath +  '/api/' + action,
             data: fields,
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -34,7 +42,7 @@ export default {
     updateData(action, fields){
         return axios({
             method: 'POST',
-            url : 'api/' + action,
+            url : localPath +  '/api/' + action,
             data: fields,
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -53,7 +61,7 @@ export default {
     deleteData(action, id){
         return axios({
             method: 'DELETE',
-            url : 'api/' + action,
+            url : localPath +  '/api/' + action,
             data: id,
         })
         .then(function (response) {

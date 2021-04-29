@@ -5,7 +5,6 @@ namespace App\Repositories\Contracts;
 interface IPlayedGameScore {
     public function getPlayedGameScores();
     public function getPlayedGameScore($id);
-    public function getScorePlayedGame($playedGameId);
     public function getUserPlayedGameScores($userId);
 
     public function create(Array $data);

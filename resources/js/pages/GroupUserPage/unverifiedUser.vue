@@ -1,5 +1,6 @@
 <template>
     <div class="row" v-if="dataList.length > 0">
+        A
         <div class="col-lg-2 col-md-2 col-sm-0"></div>
         <div class="col-lg-8 col-md-8 col-sm-12">
             <center>

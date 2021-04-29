@@ -5,43 +5,28 @@
  */
 
 require('./bootstrap');
+require('vue-multiselect/dist/vue-multiselect.min.css');
+
+import Vue from 'vue';
+import router from './services/router';
+import store from '../js/services/store';
+
+import globalLayout from '../js/components/global/globalLayout.vue';
+import globalInput from '../js/components/global/globalInput.vue'
 
 window.Vue = require('vue');
 
-/**
- * The following block of code may be used to automatically register your
- * Vue components. It will recursively scan this directory for the Vue
- * components and automatically register them with their "basename".
- *
- * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
- */
-
-// const files = require.context('./', true, /\.vue$/i);
-// files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
-
-Vue.component('nav-bar', require('./pages/IndexPage/navBar.vue').default);
+//load de index page
 Vue.component('index-page', require('./pages/IndexPage/index.vue').default);
-//Vue.component('index-page-old', require('./V01/pages/IndexPage/index.vue').default);
 
-Vue.component('user-page', require('./pages/UserPage/index.vue').default);
-Vue.component('profile-page', require('./pages/ProfilePage/index.vue').default);
-Vue.component('game-page', require('./pages/GamePage/index.vue').default);
-Vue.component('group-page', require('./pages/GroupPage/index.vue').default);
-
-/**
- * Next, we will create a fresh Vue application instance and attach it to
- * the page. Then, you may begin adding components to this application
- * or customize the JavaScript scaffolding to fit your unique needs.
- */
+//Global components
+Vue.component('global-layout', globalLayout);
+Vue.component('global-input', globalInput);
 
 Vue.prototype.$bus = new Vue({});
 
-/*
-Vue.prototype.$today = new Date().toJSON().slice(0,10).replace(/-/g,'/');
-Vue.prototype.$today = new Date();
-*/
-
-
 const app = new Vue({
-    el: '#app',
+  router,
+  store,
+  el: '#app'
 });

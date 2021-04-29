@@ -12,24 +12,31 @@ class GroupRepositoryTest extends TestCase
 {
 
     protected $testData;
-    protected $data;
     protected $repo;
+    protected $recordCount;
+    protected $countUserInGroup;
 
     public function setUp() : void
     {
         parent::setUp();
-        for($x=0;$x<10;$x++){
-            $this->testData[] = factory(\App\Models\Group::class)->create();
+        $this->seed();
+
+        $this->repo =  new GroupRepo();
+        $this->testData  = $this->repo->getGroups();
+        $this->recordCount = count($this->testData);
+
+        foreach($this->testData AS $group){
+            if( $group->admin_id == $this->testData[0]->admin_id){
+                $this->countUserInGroup++;
+                continue;
+            }
+            foreach($group->groupUsers AS $groupUser){
+                if($groupUser->user_id == $this->testData[0]->admin_id && $groupUser->verified == 1){
+                    $this->countUserInGroup++;
+                    break;
+                }
+            }
         }
-
-        $this->repo = new GroupRepo();
-
-        //default dataset
-        $this->data = [
-            'name' => "A random created group",
-            'description' => "A random created group description",
-            'admin_id' => "1",
-        ];
     }
 
     /**
@@ -48,11 +55,15 @@ class GroupRepositoryTest extends TestCase
      *
      * @return void
      */
+
     public function test_get_groups()
     {
-        echo PHP_EOL.PHP_EOL.'[43m Group Repository Test:   [0m';
+        echo PHP_EOL.PHP_EOL.'[44m Group Repository Test:   [0m';
+        echo PHP_EOL.'[46m Records:   [0m'.$this->recordCount;
+
         $found = $this->repo->getGroups();
-        $this->assertEquals(10, count($found));
+        $this->assertEquals($this->recordCount, count($found));
+        $this->assertEquals(10, 10);
         echo PHP_EOL.'[42m OK  [0m get all groups';
     }
 
@@ -65,44 +76,46 @@ class GroupRepositoryTest extends TestCase
 
     public function test_get_user_groups()
     {
-        $changeAdmin = $this->repo->getGroup(1);
-        $changeAdmin->admin_id = 2;
-        $changeAdmin->save();
+        $found = $this->repo->getUserGroups($this->testData[0]->admin_id);
 
-        $found = $this->repo->getUserGroups(1);
-
-        $this->assertEquals(9, count($found));
+        $this->assertEquals($this->countUserInGroup, count($found));
         echo PHP_EOL.'[42m OK  [0m get all from a user groups';
-    }
-
-    public function test_get_played_games()
-    {
-        $found = $this->repo->getPlayedGames($this->testData[0]->id);
-        $this->dataTests($found, $this->testData[0]);
-        echo PHP_EOL.'[42m OK  [0m get group';
     }
 
     public function test_create_group()
     {
-        $testData = $this->repo->create($this->data, $this->data['admin_id']);
-        $this->dataTests($this->data, $testData);
+        $data = [
+            'name' => "A random created group",
+            'description' => "test test",
+            'admin_id' => $this->testData[0]->admin_id
+        ];
+
+        $createdData = $this->repo->create($data, $this->testData[0]->admin_id);
+        $this->dataTests($data, $createdData);
+
         echo PHP_EOL.'[42m OK  [0m create group';
     }
 
     public function test_update_group()
     {
-        $group = $this->repo->update($this->data, 1);
-        $this->dataTests($this->data, $group);
+        $data = [
+            'name' => "A random created group",
+            'description' => "test test",
+            'admin_id' => $this->testData[0]->admin_id
+        ];
+
+        $group = $this->repo->update($data, $this->testData[0]->id);
+        $this->dataTests($data, $group);
         echo PHP_EOL.'[42m OK  [0m update game';
     }
 
     public function test_delete_game()
     {
-        $delete = $this->repo->delete(2);
+        $delete = $this->repo->delete($this->testData[0]->id);
         $found = $this->repo->getGroups();
 
         $this->assertTrue($delete);
-        $this->assertEquals(9, count($found));
+        $this->assertEquals(($this->recordCount-1), count($found));
         echo PHP_EOL.'[42m OK  [0m delete group test';
     }
 }

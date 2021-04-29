@@ -1,8 +1,10 @@
 <?php
+namespace Database\Factories;
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
-
+use App\Models\GroupGame;
 use App\Models\GroupGameLink;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Faker\Generator as Faker;
 
@@ -16,11 +18,28 @@ use Faker\Generator as Faker;
 | model instances for testing / seeding your application's database.
 |
 */
-$factory->define(GroupGameLink::class, function (Faker $faker) {
-    return [
-        'group_game_id' => 1,
-        'name' => $faker->name,
-        'link' => $faker->name,
-        'description' => $faker->name,
-    ];
-});
+
+class GroupGameLinkFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = GroupGameLink::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'group_game_id' => GroupGame::all()->random()->id,
+            'name' => $this->faker->name,
+            'link' => 'www.google.com',
+            'description' => $this->faker->text,
+        ];
+    }
+}

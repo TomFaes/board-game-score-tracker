@@ -17,10 +17,7 @@ class GroupGameRepo extends Repository implements Contracts\IGroupGame
     {
         return GroupGame::all();
     }
-    /**
-     * Get a game group
-     * @return Object
-     */
+   
     public function getGroupGame($id)
     {
         return GroupGame::with('game', 'group', 'links')->find($id);
@@ -69,7 +66,6 @@ class GroupGameRepo extends Repository implements Contracts\IGroupGame
         $groupGame->save();
         return $groupGame;
     }
-
 
     public function updateGroupGameIds($gameId, $newGameId)
     {

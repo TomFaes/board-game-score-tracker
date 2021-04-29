@@ -8,7 +8,6 @@ interface IGame {
     public function getBaseGames($itemsPerPage = 0);
     public function getGame($id);
     public function getExpansionGames($gameId);
-    public function getApprovedGames($itemsPerPage = 0);
     public function getUnapprovedGames($itemsPerPage = 0);
 
     public function create(Array $data);

@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PlayedGameScore extends Model
 {
+    use HasFactory;
+    
     protected $fillable = [
         'played_game_id', 'group_user_id', 'score', 'place', ' remarks', 'creator_id'
     ];

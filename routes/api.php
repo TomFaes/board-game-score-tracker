@@ -2,116 +2,85 @@
 
 use Illuminate\Http\Request;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\User\ProfileController;
+use App\Http\Controllers\User\FavoriteUserGroupController;
 
-/**
- * All routes for a user
- */
-Route::post('user/{id}', '\App\Http\Controllers\User\UserController@update');
-Route::resource('user', '\App\Http\Controllers\User\UserController')->except([
-    'create', 'edit'
-]);
+use App\Http\Controllers\Game\GameController;
+use App\Http\Controllers\Game\BaseGameController;
+use App\Http\Controllers\Game\MergeGameController;
+use App\Http\Controllers\Game\UnapprovedGameController;
 
-Route::get('profile', '\App\Http\Controllers\User\ProfileController@index');
-Route::post('profile', '\App\Http\Controllers\User\ProfileController@update');
-Route::delete('profile', '\App\Http\Controllers\User\ProfileController@destroy');
+use App\Http\Controllers\Group\GroupController;
+use App\Http\Controllers\Group\GroupGameController;
+use App\Http\Controllers\Group\GroupUsersController;
+use App\Http\Controllers\Group\UserGroupsController;
+use App\Http\Controllers\Group\GroupGameLinkController;
+use App\Http\Controllers\Group\UnverifiedGroupUsersController;
 
-Route::post('group/{group_id}/changeFavoriteGroup', '\App\Http\Controllers\User\FavoriteUserGroupController@update');
+use App\Http\Controllers\Played\PlayedGamesController;
 
-/**
- * All routes for a game
- */
-Route::post('game/{id}', '\App\Http\Controllers\Game\GameController@update');
-Route::resource('game', '\App\Http\Controllers\Game\GameController', ['parameters' => [
-    'game' => 'id'
-]])->except([
-    'create', 'edit'
-]);
+use App\Http\Controllers\Statistics\StatisticsController;
 
+//All routes for profiles
+Route::get('profile', [ProfileController::class, 'index']);
+Route::post('profile', [ProfileController::class, 'update']);
 
-Route::get('/basegame', '\App\Http\Controllers\Game\BaseGameController@index');
+// All routes for a game
+Route::get('game', [GameController::class, 'index']);
+Route::post('game', [GameController::class, 'store']);
+Route::post('game/{id}', [GameController::class, 'update']);
 
-Route::get('unapprovedgames/{id}', '\App\Http\Controllers\Game\UnapprovedGameController@update');
-Route::get('/unapprovedgames', '\App\Http\Controllers\Game\UnapprovedGameController@index');
+Route::get('basegame', [BaseGameController::class, 'index']);
 
-Route::get('/approvedgames', '\App\Http\Controllers\Game\ApprovedGameController@index');
+Route::post('unapprovedgames/{id}', [UnapprovedGameController::class, 'update']);
+Route::get('unapprovedgames', [UnapprovedGameController::class, 'index']);
 
-/**
- * All routes for a Groups
- */
-Route::post('group/{id}', '\App\Http\Controllers\Group\GroupController@update');
-Route::resource('group', '\App\Http\Controllers\Group\GroupController',  ['parameters' => [
-    'group' => 'id'
-]])->except([
-    'create', 'edit'
-]);
-Route::get('user-group', '\App\Http\Controllers\Group\UserGroupsController@index');
+// All routes for a Groups
+Route::get('group', [GroupController::class, 'index']);
+Route::post('group', [GroupController::class, 'store']);
+Route::get('group/{id}', [GroupController::class, 'show']);
+Route::post('group/{id}', [GroupController::class, 'update']);
 
+Route::get('user-group', [UserGroupsController::class, 'index']);
 
-Route::post('group/{group_id}/user/{id}', '\App\Http\Controllers\Group\GroupUsersController@update');
-Route::resource('group/{group_id}/user', '\App\Http\Controllers\Group\GroupUsersController', ['parameters' => [
-    'user' => 'id'
-]]) ->except([
-    'index', 'create', 'edit'
-]);
+Route::post('group/{group_id}/user', [GroupUsersController::class, 'store']);
+Route::post('group/{group_id}/user/{id}', [GroupUsersController::class, 'update']);
+
+Route::post('group/{group_id}/changeFavoriteGroup', [FavoriteUserGroupController::class, 'update']);
 
 //UnverifiedGroupUsersController
-Route::post('unverified-group-user/{id}', '\App\Http\Controllers\Group\UnverifiedGroupUsersController@update');
-Route::resource('unverified-group-user', '\App\Http\Controllers\Group\UnverifiedGroupUsersController')->except([
-    'create', 'edit', 'store'
-]);
+Route::get('unverified-group-user', [UnverifiedGroupUsersController::class, 'index']);
+Route::post('unverified-group-user/{id}', [UnverifiedGroupUsersController::class, 'update']);
 
 //GroupGameController
-Route::get('group/{group_id}/search-non-group-games', '\App\Http\Controllers\Group\GroupGameController@searchNonGroupGames');
-Route::resource('group/{group_id}/group-game', '\App\Http\Controllers\Group\GroupGameController')->except([
-    'show', 'create', 'edit', 'update'
-]);
+Route::get('group/{group_id}/search-non-group-games', [GroupGameController::class, 'searchNonGroupGames']);
+Route::get('group/{group_id}/group-game', [GroupGameController::class, 'index']);
+Route::post('group/{group_id}/group-game', [GroupGameController::class, 'store']);
 
 //GroupGameLinkController
-Route::post('group/game/{group_game_id}/link/{id}', '\App\Http\Controllers\Group\GroupGameLinkController@update');
-Route::resource('group/game/{group_game_id}/link', '\App\Http\Controllers\Group\GroupGameLinkController', ['parameters' => [
-    'link' => 'id'
-]])->except([
-    'create', 'edit'
-]);
+Route::post('group/game/{group_game_id}/link', [GroupGameLinkController::class, 'store']);
+Route::post('group/game/{group_game_id}/link/{id}', [GroupGameLinkController::class, 'update']);
 
-Route::post('group/{group_id}/played/{id}', '\App\Http\Controllers\Played\PlayedGamesController@update');
-Route::resource('group/{group_id}/played', '\App\Http\Controllers\Played\PlayedGamesController', ['parameters' => [
-    'played' => 'id'
-]]) ->except([
-    'create', 'edit'
-]);
-
+//PlayedGamesController
+Route::get('group/{group_id}/played', [PlayedGamesController::class, 'index']);
+Route::post('group/{group_id}/played', [PlayedGamesController::class, 'store']);
+Route::post('group/{group_id}/played/{id}', [PlayedGamesController::class, 'update']);
 
 //StatisticsController
-Route::get('stats/group/{group_id}', '\App\Http\Controllers\Statistics\StatisticsController@groupStats');
-Route::get('stats/group/{group_id}/year/{year}', '\App\Http\Controllers\Statistics\StatisticsController@groupYearStats');
-Route::get('stats/group/{group_id}/game/{game_id}', '\App\Http\Controllers\Statistics\StatisticsController@groupGameStats');
-
+Route::get('stats/group/{group_id}', [StatisticsController::class, 'groupStats']);
+Route::get('stats/group/{group_id}/year/{year}', [StatisticsController::class, 'groupYearStats']);
+Route::get('stats/group/{group_id}/game/{game_id}', [StatisticsController::class, 'groupGameStats']);
 
 //Merge game
-Route::post('merge/{id}/game/{mergedId}', '\App\Http\Controllers\Game\MergeGameController@update');
-
-
-
+Route::post('merge/{id}/game/{mergedId}', [MergeGameController::class, 'update']);
 
 //delete method doesn't work on 000webhost
-
-Route::post('user/{id}/delete', '\App\Http\Controllers\User\UserController@destroy');
-Route::post('profile/delete', '\App\Http\Controllers\User\ProfileController@destroy');
-Route::post('game/{id}/delete', '\App\Http\Controllers\Game\GameController@destroy');
-Route::post('group/{group_id}/group-game/{id}/delete', '\App\Http\Controllers\Group\GroupGameController@destroy');
-Route::post('group/game/{group_game_id}/link/{id}/delete', '\App\Http\Controllers\Group\GroupGameLinkController@destroy');
-Route::post('group/{id}/delete', '\App\Http\Controllers\Group\GroupController@destroy');
-Route::post('group/{group_id}/user/{id}/delete', '\App\Http\Controllers\Group\GroupUsersController@destroy');
-Route::post('group/{group_id}/played/{id}/delete', '\App\Http\Controllers\Played\PlayedGamesController@destroy');
-Route::post('unverified-group-user/{id}/delete', '\App\Http\Controllers\Group\UnverifiedGroupUsersController@destroy');
+Route::post('profile/delete', [ProfileController::class, 'destroy']);
+Route::post('game/{id}/delete', [GameController::class, 'destroy']);
+Route::post('group/{id}/delete', [GroupController::class, 'destroy']);
+Route::post('group/{group_id}/user/{id}/delete', [GroupUsersController::class, 'destroy']);
+Route::post('group/{group_id}/group-game/{id}/delete', [GroupGameController::class, 'destroy']);
+Route::post('group/game/{group_game_id}/link/{id}/delete', [GroupGameLinkController::class, 'destroy']);
+Route::post('group/{group_id}/played/{id}/delete', [PlayedGamesController::class, 'destroy']);
+Route::post('unverified-group-user/{id}/delete', [UnverifiedGroupUsersController::class, 'destroy']);

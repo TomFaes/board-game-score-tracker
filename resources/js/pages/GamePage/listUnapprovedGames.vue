@@ -99,7 +99,7 @@
             },
 
             ApproveGame(id){
-                apiCall.getData('unapprovedgames/' + id)
+                apiCall.postData('unapprovedgames/' + id)
                 .then(response =>{
                      this.loadList();
                      this.$bus.$emit('reloadList');

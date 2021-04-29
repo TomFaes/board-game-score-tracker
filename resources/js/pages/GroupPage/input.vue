@@ -6,7 +6,7 @@
             <text-area inputName="description" inputId="description" tekstLabel="Description: " v-model="fields.description" :errors="errors.description" :value='fields.description'></text-area>
 
             <!-- Admin multiselect -->
-            <div class="row" v-if="submitOption != 'Create'">
+            <div class="row" v-if="this.group != undefined">
                 <div class="col-lg-2 col-md-2 col-sm-0"></div>
                 <div class="col-lg-8 col-md-8 col-sm-12">
                     <label>Admin: </label>
@@ -36,12 +36,16 @@
                 <div class="col-lg-2 col-md-2 col-sm-0"></div>
             </div>
 
-            <div class="row" v-if="submitOption != 'Create'">
+            <div class="row" v-if="this.group != undefined">
                 <div class="col-lg-2 col-md-2 col-sm-0"></div>
                 <div class="col-lg-8 col-md-8 col-sm-12">
                     You can delete your group, your group wont be displayed in your list, the games played wont be deleted
                     <center>
-                        <delete-group :group="group" v-if="submitOption != 'Create'"></delete-group>
+                        <button class="btn btn-danger" @click.prevent="deleteGroup"><i class="fas fa-trash fa-1x" ></i></button>
+
+                        <!--
+                        <delete-group :group="group"></delete-group>
+                        -->
                     </center>
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-0"></div>
@@ -81,16 +85,36 @@
                 'multigroupUsers': [],
                 'formData': new FormData(),
                 'message': '',
-                'buttonText': "Save group"
+                'buttonText': "Save group",
             }
         },
 
         props: {
-            'group': {},
-            'submitOption': ""
+            'group': {}, 
+         },
+
+
+        watch:{
+            group(){
+                this.loadList();
+            }
          },
 
         methods: {
+            loadList(){
+                if(this.group != undefined){
+                     if(this.group.id != undefined){
+                        for(var item in this.group.group_users){
+                            if(this.group.group_users[item]['user_id'] > 0){
+                                this.multigroupUsers.push(this.group.group_users[item]);
+                            }
+                        }
+                        this.setData();
+                    }
+                }
+            },
+
+
             setFormData(){
                 if(this.fields.name != undefined){
                     this.formData.set('name', this.fields.name);
@@ -99,18 +123,16 @@
                     this.formData.append('description', this.fields.description);
                 }
                 if(this.selectedUser != undefined){
-                    this.formData.set('admin_id', this.selectedUser.id);
+                    this.formData.set('admin_id', this.selectedUser.user_id);
                 }
             },
 
             submit(){
-                if(this.submitOption == 'Create'){
+                if(this.group == undefined){
                     this.create();
-                }else if(this.submitOption == 'Update'){
-                    this.update();
-                }else{
-                    this.$bus.$emit('showMessage', "No valid save option given",  'red', '2000' );
+                    return
                 }
+                this.update();
             },
 
             resetFormData(){
@@ -125,11 +147,13 @@
 
                 apiCall.postData(this.action, this.formData)
                 .then(response =>{
-                    this.$bus.$emit('reloadGroups');
-                    this.$bus.$emit('display');
+                    //this.$bus.$emit('reloadGroups');
+                    //this.$bus.$emit('display');
                     this.resetFormData();
                     this.message = "Your group " + this.response.name + " has been created";
                     this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                    this.$store.dispatch('getUserGroups');
+                    this.$router.push({name: "home"});
                 }).catch(error => {
                     this.errors = error;
                 });
@@ -141,13 +165,30 @@
 
                 apiCall.updateData(this.action, this.formData)
                 .then(response =>{
-                    this.$bus.$emit('reloadGroups');
                     this.message = "Your group " + this.response.name + " has been changed";
                     this.$bus.$emit('showMessage', this.message,  'green', '2000' );
-                    this.$bus.$emit('display', 'groupStats');
+                    //console.log(this.group.id)
+                    this.$store.dispatch('getSelectedGroup', {id: this.group.id});
+                    this.$router.push({name: "allPlayedGames", params: { id: this.group.id },});
                 }).catch(error => {
                         this.errors = error;
                 });
+            },
+
+            deleteGroup(){
+                if(confirm('are you sure you want to delete this group ' + this.group.name + '?')){
+                    apiCall.postData('group/' + this.group.id + '/delete')
+                    .then(response =>{
+                        this.message = "Your group " + this.group.name + " has been deleted";
+                        this.$bus.$emit('showMessage', this.message,  'red', '2000' );
+
+                        this.$store.commit('setSelectedGroup' , '{}');
+                        this.$store.dispatch('getUserGroups');
+                        this.$router.push({name: "home"});
+                    }).catch(() => {
+                        console.log('handle server error from here');
+                    });
+                }
             },
 
             setData(){
@@ -157,7 +198,7 @@
                 var adminUser = "";
                 var adminId = this.group.admin.id;
                 this.group.group_users.forEach(function(item, index){
-                    if(adminId == item.id){
+                    if(adminId == item.user_id){
                         adminUser = index;
                     }
                 });
@@ -166,18 +207,18 @@
         },
 
         mounted(){
-
-            if(this.submitOption == "Create"){
+            if(this.group == undefined){
                 this.buttonText = "Create group";
             }
+        },
+
+        created(){
             if(this.group != undefined){
-                for(var item in this.group.group_users){
-                    if(this.group.group_users[item]['user_id'] > 0){
-                         this.multigroupUsers.push(this.group.group_users[item]);
-                    }
+                if(this.group.id != undefined){
+                    this.loadList();
                 }
-                this.setData();
             }
+            
         }
     }
 </script>

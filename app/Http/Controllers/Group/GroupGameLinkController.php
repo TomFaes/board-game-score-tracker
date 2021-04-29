@@ -19,16 +19,6 @@ class GroupGameLinkController extends Controller
         $this->groupGameLink = $groupGameLink;
         $this->groupGameLinkValidation = $groupGameLinkValidation;
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index($group_game_id)
-    {
-        $groupGamesLink = $this->groupGameLink->getLinksOfGroupGame($group_game_id);
-        return response()->json($groupGamesLink, 200);
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -41,18 +31,6 @@ class GroupGameLinkController extends Controller
         $this->groupGameLinkValidation->validateGroupGameLink($request);
         $groupGameLink = $this->groupGameLink->create($request->all());
         return response()->json($groupGameLink, 200);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\GroupGameLink  $groupGameLink
-     * @return \Illuminate\Http\Response
-     */
-    public function show($groupGameId, $id)
-    {
-        $groupGamesLink = $this->groupGameLink->getGroupGameLink($id);
-        return response()->json($groupGamesLink, 200);
     }
 
     /**

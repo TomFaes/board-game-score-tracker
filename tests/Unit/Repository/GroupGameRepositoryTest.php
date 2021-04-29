@@ -5,44 +5,34 @@ namespace Tests\Unit\Repository;
 use Tests\TestCase;
 
 use App\Models\GroupGame;
+use App\Models\Game;
 use App\Repositories\GroupGameRepo;
 use phpseclib\Crypt\Random;
 
 class GroupGameRepositoryTest extends TestCase
 {
-
     protected $testData;
-    protected $data;
     protected $repo;
-    protected $countGroupIdOne;
+    protected $recordCount;
+    protected $countGamesInGroup;
+    protected $listOfGames;
 
     public function setUp() : void
     {
         parent::setUp();
+        $this->seed();
         $this->repo = new GroupGameRepo();
 
-        for($x=0;$x<10;$x++){
-            $this->testGames[] = factory(\App\Models\Game::class)->create();
-        }
+        $this->testData  = GroupGame::all();
+        $this->recordCount = count($this->testData);
 
-        for($x=0;$x<10;$x++){
-            $this->testGroups[] = factory(\App\Models\Group::class)->create();
-        }
+        $this->listOfGames = Game::all();
 
-        //default dataset
-        $this->data = [
-            'group_id' => 1,
-            'game_id' => 1,
-        ];
-        $this->countGroupIdOne = 0;
-        for($x=0;$x<10;$x++) {
-            $this->testGroupsGames[] = factory(\App\Models\GroupGame::class)->create();
-
-            if($this->testGroupsGames[$x]['group_id'] == 1){
-                $this->countGroupIdOne++;
+        foreach($this->testData AS $groupgame){
+            if($groupgame['group_id'] == $this->testData[0]->group_id){
+                $this->countGamesInGroup++;
             }
         }
-        $this->testData = $this->repo->getGroupGames();
     }
 
     /**
@@ -55,17 +45,13 @@ class GroupGameRepositoryTest extends TestCase
         $this->assertEquals($data['game_id'], $testData->game_id);
     }
 
-    /**
-     * A basic Unit test example.
-     *
-     * @return void
-     */
     public function test_get_group_games()
     {
-        echo PHP_EOL.PHP_EOL.'[43m GroupGame Repository Test:   [0m';
+        echo PHP_EOL.PHP_EOL.'[44m GroupGame Repository Test:   [0m';
+        echo PHP_EOL.'[46m Records:   [0m'.$this->recordCount;
 
         $found = $this->repo->getGroupGames();
-        $this->assertEquals(10, count($found));
+        $this->assertEquals($this->recordCount, count($found));
 
         echo PHP_EOL.'[42m OK  [0m get all group games';
     }
@@ -79,52 +65,46 @@ class GroupGameRepositoryTest extends TestCase
 
     public function test_get_group_game_ids()
     {
-        $found = $this->repo->getGroupGameIds(1);
-        $this->assertEquals($this->countGroupIdOne, count($found));
+        $found = $this->repo->getGroupGameIds($this->testData[0]->group_id);
+        $this->assertEquals($this->countGamesInGroup, count($found));
         echo PHP_EOL.'[42m OK  [0m get group game ids';
     }
 
     public function test_get_games_of_group()
     {
-        $found = $this->repo->getGamesOfGroup(1);
-        $this->assertEquals($this->countGroupIdOne, count($found));
+        $found = $this->repo->getGamesOfGroup($this->testData[0]->group_id);
+        $this->assertEquals($this->countGamesInGroup, count($found));
         echo PHP_EOL.'[42m OK  [0m get games of group';
     }
 
     public function test_create_group_game()
     {
         $data = [
-            'group_id' =>  1,
-            'game_id' => 1,
+            'group_id' =>  $this->testData[0]->group_id,
+            'game_id' => $this->listOfGames[0]->id,
         ];
 
-        $testData = $this->repo->create($data);
-        $this->assertInstanceOf(GroupGame::class, $testData);
-        $this->assertEquals($data['group_id'], $testData->group_id);
-        $this->assertEquals($data['game_id'], $testData->game_id);
+        $createdData = $this->repo->create($data);
+        $this->dataTests($data, $createdData);
+
         echo PHP_EOL.'[42m OK  [0m create group game';
     }
 
-    public function test_update_game()
+    public function test_update_group_game_ids()
     {
-        $found = $this->repo->getGroupGame($this->testData[0]->id);
-        $data = [
-            'group_id' =>  1,
-            'game_id' => 2,
-        ];
-        $return = $this->repo->updateGroupGameIds($found->id, $data['game_id']);
+        $return = $this->repo->updateGroupGameIds($this->testData[0]->game_id, $this->listOfGames[0]->id);
         $this->assertEquals($return , "group games updated");
 
-        echo PHP_EOL.'[42m OK  [0m update group game';
+        echo PHP_EOL.'[42m OK  [0m update group game ids';
     }
 
     public function test_delete_game()
     {
-        $delete = $this->repo->delete(2);
+        $delete = $this->repo->delete($this->testData[0]->id);
         $found = $this->repo->getGroupGames();
 
         $this->assertTrue($delete);
-        $this->assertEquals(9, count($found));
-        echo PHP_EOL.'[42m OK  [0m delete group test';
+        $this->assertEquals(($this->recordCount-1), count($found));
+        echo PHP_EOL.'[42m OK  [0m delete group game test';
     }
 }

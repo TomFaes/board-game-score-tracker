@@ -27,7 +27,7 @@
 
 <script>
     import apiCall from '../../services/ApiCall.js';
-    import navBar from '../IndexPage/navBar.vue'
+    //import navBar from '../IndexPage/navBar.vue'
 
     import TextInput from '../../components/ui/form/TextInput.vue';
     import DropdownInput from '../../components/ui/form/DropdownInput.vue';
@@ -36,7 +36,7 @@
 
     export default {
         components: {
-            navBar,
+            //navBar,
             TextInput,
             DropdownInput,
             ButtonInput

@@ -4,16 +4,7 @@ The idea is to create a score tracker for board games. You will be able to creat
 All authenticated users will be able to create groups, the admin of the group will be able to add games, users & links. If a user is known in the database he can approve himself to see the group info. 
 
 All members of a group will be able to add game scores and update them. The admin can always correct the scores. 
-
-## Future plans
-if the score tracker is up and running we might dream about future plans. The list will probably grow
-  -	 Game detailed scores: if you play games like 7 wonders you will notices the score fiche will exist out of several  lines(points for blue cards, points for wonders, ?) . It should be a nice feature to have this present.
-  -	Turn order drawer: Our group usually draws who is first, second and so on. 
-  -	Game drawer:  sometimes we are undecided on which game to play, so a program that could do it for us would be welcome
-  -	?
-
-## Versions
-Version 1: 
+# Version 1: 27/04/2020
     - create/Login to an account
     - create/edit groups
     - create group games
@@ -21,10 +12,33 @@ Version 1:
     - create group users
     - group statistics
     - played games
-Version 1.01:
+# Version 1.01: 30/04/2020 Current live version
     - update packages to the latest version
     - create roadmap view
     - Choose favorite group
     - add cookie consent
+# Version 2.00: 
+    - update Route api to the tuple way
+    - create global layout components for layout and input fields
+    - implement vue router
+    - implement vuex
+    - cleanup unused methods in Controllers, repos, services
+    - cleanup api routes
+    - update to Larevel to version 8
+    - update & add phpunit testing
+    - bugfixes
 
+
+## Future plans
+Version 2.01: 
+    - update packages to the latest version
+    - update php to version 8
+    - replace email from group user with a code string. 
+    - reimplent favorite group.
+    - bugfixes
+
+Undetermined futere plans
+    - Game detailed scores: if you play games like 7 wonders you will notices the score fiche will exist out of several  lines(points for blue cards, points for wonders, ?) . It should be a nice feature to have this present.
+    - Turn order drawer: Our group usually draws who is first, second and so on. 
+    - Game drawer:  sometimes we are undecided on which game to play, so a program that could do it for us would be welcome
 

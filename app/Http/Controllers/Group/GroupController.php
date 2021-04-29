@@ -37,11 +37,6 @@ class GroupController extends Controller
         $this->groupUser = $groupUser;
     }
 
-    public function view()
-    {
-        return view('group.index');
-    }
-
     /**
      * Display a listing of the resource.
      *

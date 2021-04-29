@@ -32,6 +32,7 @@ class PlayedGamesController extends Controller
 
     public function store($groupId, Request $request)
     {
+
         $this->validation->validatePlayedGame($request);
         $playedGame = $this->playedGame->create($request->all(), auth()->user()->id);
         if($request['expansions'] != ""){
@@ -42,13 +43,6 @@ class PlayedGamesController extends Controller
 
         return response()->json($playedGame, 200);
     }
-
-    public function show($groupId, $id)
-    {
-        $played = $this->playedGame->getPlayedGame($id);
-        return response()->json($played, 200);
-    }
-
 
     public function update(Request $request, $group, $id)
     {
@@ -71,6 +65,6 @@ class PlayedGamesController extends Controller
     public function destroy($group, $id)
     {
         $this->playedGame->delete($id);
-        return response()->json("The played game is removed");
+        return response()->json("The played game is removed", 204);
     }
 }

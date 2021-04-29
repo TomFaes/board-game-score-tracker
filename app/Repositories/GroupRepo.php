@@ -38,6 +38,13 @@ class GroupRepo extends Repository implements Contracts\IGroup
      */
     public function getUserGroups($userId, $itemsPerPage = 0)
     {
+        return Group::whereHas('groupUsers', function ($query) use ($userId){
+            $query->where('user_id', '=', $userId)->where('verified', 1);
+        })->orWhere('admin_id', $userId)->get();
+
+
+
+        /*
         if($itemsPerPage > 0){
             return Group::whereHas('groupUsers', function ($query) use ($userId){
                 $query->where('user_id', '=', $userId)->where('verified', 1);
@@ -46,16 +53,8 @@ class GroupRepo extends Repository implements Contracts\IGroup
         return Group::whereHas('groupUsers', function ($query) use ($userId){
             $query->where('user_id', '=', $userId)->where('verified', 1);
         })->orWhere('admin_id', $userId)->with(['groupUsers','admin', 'groupGames', 'baseGroupGames'])->get();
+        */
     }
-
-     /**
-     * get all played games in this group
-     * @return Object
-     */
-    public function getPlayedGames($id){
-        return Group::with('playedGames')->find($id);
-    }
-
     /***************************************************************************
      Next function will create or update the user object in de database
      **************************************************************************/

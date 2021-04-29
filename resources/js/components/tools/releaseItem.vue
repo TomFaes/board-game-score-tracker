@@ -52,8 +52,7 @@
         },
 
         mounted () {
-            console.log(this.$slots)
-
+            
         }
     }
 

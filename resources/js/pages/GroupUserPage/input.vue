@@ -80,11 +80,12 @@
 
                 apiCall.postData(this.action, this.formData)
                 .then(response =>{
-                    this.$bus.$emit('reloadGroups');
+                   this.$bus.$emit('reloadList');
                     this.message = "You've added " + this.fields.firstname + " " + this.fields.name + " to " + this.group.name;
                     this.$bus.$emit('showMessage', this.message,  'green', '2000' );
                     this.formData =  new FormData();
-                     this.fields = {}; //Clear input fields.
+                    this.$store.dispatch('getSelectedGroup', {id: this.group.id});
+                    this.fields = {}; //Clear input fields.
                 }).catch(error => {
                     this.errors = error;
                 });
@@ -96,9 +97,10 @@
 
                 apiCall.updateData(this.action, this.formData)
                 .then(response =>{
-                    this.$bus.$emit('reloadGroups');
+                    this.$bus.$emit('reloadList');
                     this.message = "You've updated the user " + this.fields.firstname + " " + this.fields.name + " for " + this.group.name;
                     this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                    this.$store.dispatch('getSelectedGroup', {id: this.group.id});
                     this.formData =  new FormData();
                 }).catch(error => {
                         this.errors = error;

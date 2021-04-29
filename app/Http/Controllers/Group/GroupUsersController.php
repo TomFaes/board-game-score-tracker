@@ -45,11 +45,6 @@ class GroupUsersController extends Controller
         return response()->json($groupUser, 200);
     }
 
-    public function show($id)
-    {
-        return response()->json($this->groupUser->getGroupUser($id), 200);
-    }
-
     public function update(Request $request, $group, $id)
     {
         $this->groupUserValidation->validateGroupUser($request);

@@ -42,8 +42,4 @@ class StatisticsController extends Controller
         $data = $statisticsGenerator->getAll($playedGames);
         return response()->json($data, 200);
     }
-
-
-
-
 }

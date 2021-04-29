@@ -57,39 +57,8 @@ class HomeController extends Controller
         $data = array();
         echo "<pre>";
 
-        $user = new UserRepo();
-        $user->changeFavoriteGroup(1, 1);
-
-        //$mergeService = new MergeGameService();
-        //$container = Container::getInstance();
-        //$mergeService = $container->make(MergeGameService::class);
-        //$mergeService->mergeGame(2, 1);
-
         echo "</pre>";
-        //$repo = new GroupGameRepo();
-        //$data = $repo->getGamesOfGroup(1, 20);
 
-
-/*
-
-        $statisticsGenerator = StatisticsFactory::generate("GroupStatistics");
-        $repo = new PlayedGameRepo();
-
-
-        $playedGames = $repo->getStatPlayedGroupYearGames(2);
-
-
-
-
-        $data = $statisticsGenerator->getAll($playedGames);
-*/
-
-        /*
-public function getAll($playedGames);
-    public function getScores($playedGames);
-    public function getPositions($playedGames);
-    public function getVictories($playedGames);
-        */
 
         return response()->json($data, 200);
 

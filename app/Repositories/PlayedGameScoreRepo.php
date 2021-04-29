@@ -34,14 +34,6 @@ class PlayedGameScoreRepo extends Repository implements IPlayedGameScore
         return PlayedGameScore::with(['playedGame', 'groupUser', 'groupUser.user'])->find($id);
     }
 
-    public function getScorePlayedGame($playedGameId, $itemsPerPage = 0)
-    {
-        if ($itemsPerPage > 0) {
-             return PlayedGameScore::with(['playedGame', 'groupUser', 'groupUser.user'])->where('played_game_id', $playedGameId)->paginate($itemsPerPage);
-        }
-        return PlayedGameScore::with(['playedGame', 'groupUser', 'groupUser.user'])->where('played_game_id', $playedGameId)->get();
-    }
-
     public function getUserPlayedGameScores($groupUserId, $itemsPerPage = 0)
     {
         if ($itemsPerPage > 0) {

@@ -1,7 +1,10 @@
 <template>
     <div>
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav" style="background-color:lightblue">
+            <!--
             <span class="navbar-brand js-scroll-trigger item-link"  @click="displayIndex">Beta Version</span>
+            -->
+            <router-link :to="{ name: 'home' }">Beta Version</router-link>
 
             <div>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
@@ -10,21 +13,32 @@
             <div class="collapse navbar-collapse" id="navbarResponsive" style="width: 100%">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item" data-toggle="collapse" data-target=".navbar-collapse.show" v-if="user.role == 'Admin'" >
-                        <span class="nav-link js-scroll-trigger item-link"  @click="displayGameIndex">Add game</span>
+                         <span class="nav-link js-scroll-trigger item-link">
+                            <router-link :to="{ name: 'addGame' }">Add game</router-link>
+                        </span>
                     </li>
                     <li class="nav-item" data-toggle="collapse" data-target=".navbar-collapse.show">
-                        <span class="nav-link js-scroll-trigger item-link"  @click="displayRoadMap"><i class="fa fa-road fa-2x"></i></span>
+                        <span class="nav-link js-scroll-trigger item-link">
+                            <router-link :to="{ name: 'roadmap' }"><i class="fa fa-road fa-2x"></i></router-link>
+                        </span>
                     </li>
 
                     <li class="nav-item"  data-toggle="collapse" data-target=".navbar-collapse.show" v-if="user.id > 0">
-                         <span class="nav-link js-scroll-trigger item-link"  @click="displayProfile"><i class="fa fa-user fa-2x"></i></span>
+                         <span class="nav-link js-scroll-trigger item-link">
+                            <router-link :to="{ name: 'profile' }"><i class="fa fa-user fa-2x"></i></router-link>
+                         </span>
                     </li>
 
                     <li class="nav-item"  data-toggle="collapse" data-target=".navbar-collapse.show" v-if="user.id > 0">
-                          <a class="nav-link js-scroll-trigger" href="logout">Logout</a>
+                          <a class="nav-link js-scroll-trigger nav-link js-scroll-trigger item-link" @click.prevent="logout">Logout</a>
                     </li>
                     <li class="nav-item" data-toggle="collapse" data-target=".navbar-collapse.show" v-else>
-                          <span class="nav-link js-scroll-trigger item-link"  @click="displayLogin">Login</span>
+                        <span class="nav-link js-scroll-trigger item-link">
+                            <router-link :to="{ name: 'login' }">Login</router-link>
+                         </span>
+                         <!--
+                          <span class="nav-link js-scroll-trigger item-link"  @click="logout">Login</span>
+                          -->
                     </li>
                 </ul>
             </div>
@@ -39,6 +53,7 @@
         data (){
             return {
                 'userOld': {},
+                'envirement': "", 
             }
         },
 
@@ -52,24 +67,12 @@
                 this.$router.push('logout');
             },
 
-            displayGameIndex(){
-                this.$bus.$emit('displayNav', 'adminGame');
-            },
-
-            displayProfile(){
-                 this.$bus.$emit('displayNav', 'profile');
-            },
-
-            displayIndex(){
-                this.$bus.$emit('displayNav', '');
-            },
-
-            displayLogin(){
-                 this.$bus.$emit('displayNav', 'login');
-            },
-
-            displayRoadMap(){
-                this.$bus.$emit('displayNav', 'RoadMap');
+           logout(){          
+               console.log("envirement: " + this.envirement);     
+                if(this.envirement == "development"){
+                    return window.location.href = "http://localhost/boardgametracker/public_html/logout";
+                }
+                return window.location.href = "https://boardgametracker.000webhostapp.com/logout";
             }
 
 
@@ -80,12 +83,19 @@
         },
 
         mounted () {
+            this.envirement = process.env.NODE_ENV;
 
         }
     }
 
 </script>
 <style scoped>
-
-
+a {
+    color: rgba(255, 255, 255, 0.5);
+    padding-right: 0,5rem;
+    padding-left: 0,5rem;
+}
+a :hover{
+    filter: brightness(50%);
+}
 </style>

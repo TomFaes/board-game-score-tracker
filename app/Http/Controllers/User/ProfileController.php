@@ -23,16 +23,6 @@ class ProfileController extends Controller
          $this->user = $user;
      }
 
-     /**
-     * default view
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function view()
-    {
-        return view('profile.index');
-    }
-
     /**
      * Display a listing of the resource.
      *

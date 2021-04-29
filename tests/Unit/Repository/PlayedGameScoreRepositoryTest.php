@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Repository;
 
+use App\Models\PlayedGame;
 use Tests\TestCase;
 
 
@@ -11,27 +12,25 @@ use App\Repositories\PlayedGameScoreRepo;
 
 class PlayedGameScoreRepositoryTest extends TestCase
 {
-
     protected $testData;
-    protected $data;
     protected $repo;
+    protected $recordCount;
+    protected $countPlayerGameScores;
 
     public function setUp() : void
     {
         parent::setUp();
-        for($x=0;$x<10;$x++){
-            $this->testData[] = factory(\App\Models\PlayedGameScore::class)->create();
-        }
+        $this->seed();
 
         $this->repo = new PlayedGameScoreRepo();
+        $this->testData  = PlayedGameScore::all();
+        $this->recordCount = count($this->testData);
 
-        //default dataset
-        $this->data = [
-            'played_game_id' => '1',
-            'group_user_id' => '1',
-            'score' => '100',
-            'remarks' => 'A random remark',
-        ];
+        foreach($this->testData AS $playedGame){
+            if($playedGame['group_user_id'] == $this->testData[0]->group_user_id){
+                $this->countPlayerGameScores++;
+            }
+        }
     }
 
     /**
@@ -43,6 +42,7 @@ class PlayedGameScoreRepositoryTest extends TestCase
         $this->assertEquals($data['played_game_id'], $testData->played_game_id);
         $this->assertEquals($data['group_user_id'], $testData->group_user_id);
         $this->assertEquals($data['score'], $testData->score);
+        $this->assertEquals($data['place'], $testData->place);
         $this->assertEquals($data['remarks'], $testData->remarks);
     }
 
@@ -51,11 +51,15 @@ class PlayedGameScoreRepositoryTest extends TestCase
      *
      * @return void
      */
+
     public function test_get_played_game_scores()
     {
-        echo PHP_EOL.PHP_EOL.'[43m Played Game Score Repository Test:   [0m';
+        echo "\n\n---------------------------------------------------------------------------------";
+        echo PHP_EOL.PHP_EOL.'[44m GroupUser Repository Test:   [0m';
+        echo PHP_EOL.'[46m Records:   [0m'.$this->recordCount;
+
         $found = $this->repo->getPlayedGameScores();
-        $this->assertEquals(10, count($found));
+        $this->assertEquals($this->recordCount, count($found));
         echo PHP_EOL.'[42m OK  [0m get all played games scores';
     }
 
@@ -66,81 +70,95 @@ class PlayedGameScoreRepositoryTest extends TestCase
         echo PHP_EOL.'[42m OK  [0m get played game score';
     }
 
-    public function test_get_scores_of_a_played_game()
-    {
-        $changePlayedGame = $this->repo->getPlayedGameScore(1);
-        $changePlayedGame->played_game_id = 2;
-        $changePlayedGame->save();
-
-        $found = $this->repo->getScorePlayedGame(1);
-
-        $this->assertEquals(9, count($found));
-        echo PHP_EOL.'[42m OK  [0m get all scores from a played game';
-    }
-
     public function test_get_user_scores()
     {
-        $changePlayedGameUser = $this->repo->getPlayedGameScore(1);
-        $changePlayedGameUser->group_user_id = 2;
-        $changePlayedGameUser->save();
+        $found = $this->repo->getUserPlayedGameScores($this->testData[0]->group_user_id);
+        echo "extra count: ". $this->countPlayerGameScores;
+        $this->assertEquals($this->countPlayerGameScores, count($found));
 
-        $found = $this->repo->getUserPlayedGameScores(1);
-
-        $this->assertEquals(9, count($found));
         echo PHP_EOL.'[42m OK  [0m get all scores from a user';
     }
 
-
-
     public function test_create_played_game_score()
     {
-        $testData = $this->repo->create($this->data);
-        $this->dataTests($this->data, $testData);
+        $data = [
+            'played_game_id' => $this->testData[0]->played_game_id,
+            'group_user_id' => $this->testData[0]->group_user_id,
+            'score' => $this->testData[0]->score,
+            'place' => $this->testData[0]->place,
+            'remarks' => $this->testData[0]->remarks,
+        ];
+
+        $testData = $this->repo->create($data);
+        $this->dataTests($data, $testData);
         echo PHP_EOL.'[42m OK  [0m create played game score';
     }
 
     public function test_create_set_of_played_gamescores()
     {
-        $score[] = array( 'group_user_id' => '1', 'score' => '100', 'place' => '0', 'remarks' => 'A random remark');
-        $score[] = array( 'group_user_id' => '2', 'score' => '102', 'place' => '0', 'remarks' => 'A random remark');
-        $score[] = array( 'group_user_id' => '3', 'score' => '103', 'place' => '0', 'remarks' => 'A random remark');
-        $score[] = array( 'group_user_id' => '4', 'score' => '99', 'place' => '0', 'remarks' => 'A random remark');
+        $playedGame = PlayedGame::factory()->create();
 
-        $winnerId = $this->repo->createSetScores($score, 1);
+        $score = array();
+        for($x=0; $x<4; $x++){
+            $score[] = array(
+                'group_user_id' => $this->testData[$x]->group_user_id,
+                'score' => 100 + $x,
+                'place' => '0',
+                'remarks' => 'A random remark'
+            );
+        }
 
-        $this->assertEquals(3, $winnerId);
+        $winnerId = $this->repo->createSetScores($score, $playedGame->id);
+        //$x - 1 because the for loops stops when $x is 4
+        $this->assertEquals($this->testData[$x-1]->group_user_id, $winnerId);
 
         echo PHP_EOL.'[42m OK  [0m create a set of played game score';
     }
 
     public function test_update_played_game_score()
     {
-        $playedGame = $this->repo->update($this->data, 1);
-        $this->dataTests($this->data, $playedGame);
+        $data = [
+            'played_game_id' => $this->testData[0]->played_game_id,
+            'group_user_id' => $this->testData[0]->group_user_id,
+            'score' => $this->testData[0]->score,
+            'place' => $this->testData[0]->place,
+            'remarks' => $this->testData[0]->remarks,
+        ];
+
+        $playedGame = $this->repo->update($data, $this->testData[1]->id);
+        $this->dataTests($data, $playedGame);
         echo PHP_EOL.'[42m OK  [0m update played game score';
     }
 
     public function test_update_set_of_played_gamescores()
     {
-        $score[] = array( 'id'=> 1, 'group_user_id' => '1', 'score' => '100', 'place' => '0', 'remarks' => 'A random remark');
-        $score[] = array( 'id'=> 1, 'group_user_id' => '2', 'score' => '102', 'place' => '0', 'remarks' => 'A random remark');
-        $score[] = array( 'id'=> 1, 'group_user_id' => '3', 'score' => '103', 'place' => '0', 'remarks' => 'A random remark');
-        $score[] = array( 'id'=> 1, 'group_user_id' => '4', 'score' => '99', 'place' => '0', 'remarks' => 'A random remark');
+        $score = array();
+        for($x=0; $x<4; $x++){
+            $score[] = array(
+                'id' => $this->testData[$x]->id,
+                'group_user_id' => $this->testData[$x]->group_user_id,
+                'score' => 100 + $x,
+                'place' => '0',
+                'remarks' => 'A random remark'
+            );
+        }
 
-        $winnerId = $this->repo->updateSetScore($score, 1);
-
-        $this->assertEquals(3, $winnerId);
+        $winnerId = $this->repo->updateSetScore($score, $this->testData[0]->played_game_id);
+        //$x - 1 because the for loops stops when $x is 4
+        $this->assertEquals($this->testData[$x-1]->group_user_id, $winnerId);
 
         echo PHP_EOL.'[42m OK  [0m update a set of played game score';
     }
 
     public function test_delete_game_score()
     {
-        $delete = $this->repo->delete(2);
+        $delete = $this->repo->delete($this->testData[0]->id);
         $found = $this->repo->getPlayedGameScores();
 
         $this->assertTrue($delete);
-        $this->assertEquals(9, count($found));
+        $this->assertEquals(($this->recordCount-1), count($found));
+
         echo PHP_EOL.'[42m OK  [0m delete played game score';
     }
+
 }

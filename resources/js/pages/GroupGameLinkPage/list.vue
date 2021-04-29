@@ -15,8 +15,8 @@
                     <td>{{ link.description }}</td>
                     <td class="options-column">
                         <span v-if="group.typeMember == 'Admin'">
-                            <button class="btn btn-primary" @click.prevent="editLink(link.id)"><img :src="'images/layout/edit_link_icon.png'"  style="heigth:14px; width:14px"></button>
-                            <button class="btn btn-danger" @click.prevent="deleteLink(link.id, link.group_game_id)"><img :src="'images/layout/delete_link_icon.png'"  style="heigth:14px; width:14px"></button>
+                            <button class="btn btn-primary" @click.prevent="editLink(link.id)"><img :src="getImageUrl('images/layout/edit_link_icon.png')"  style="heigth:14px; width:14px"></button>
+                            <button class="btn btn-danger" @click.prevent="deleteLink(link.id, link.group_game_id)"><img :src="getImageUrl('images/layout/delete_link_icon.png')"  style="heigth:14px; width:14px"></button>
                         </span>
                     </td>
                 </tr>
@@ -63,7 +63,7 @@
 
             deleteLink(id, group_game_id){
                 if(confirm('are you sure you want to delete this link?')){
-                    apiCall.deleteData('group/game/' + group_game_id +'/link/' + id + 'delete')
+                    apiCall.updateData('group/game/' + group_game_id +'/link/' + id + '/delete')
                     .then(response =>{
                         console.log("console convertion delete worked");
                         this.$bus.$emit('reloadGroupGames');
@@ -73,6 +73,14 @@
                         console.log('handle server error from here');
                     });
                 }
+            },
+
+            getImageUrl(urlName){
+                var localPath = "";
+                if(process.env.NODE_ENV == 'development'){
+                    localPath = "/boardgametracker/public_html"
+                }
+                return localPath + '/' + urlName;
             }
         },
 

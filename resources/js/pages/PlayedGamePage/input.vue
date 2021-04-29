@@ -1,7 +1,8 @@
 <template>
     <div class="container">
-        <form @submit.prevent="submit" method="POST" enctype="multipart/form-data">
+        <form @submit.prevent="submit" method="POST" enctype="multipart/form-data" v-if="group.id != undefined">
             <!-- Basic Game Details -->
+            
             <div class="row" >
                 <div class="col-lg-2 col-md-2 col-sm-0"></div>
                     <div class="col-lg-8 col-md-8 col-sm-12">
@@ -23,6 +24,7 @@
                     </div>
                 <div class="col-lg-2 col-md-2 col-sm-0"></div>
             </div>
+            
             <date-input :disabled="disabled" inputName="date" inputId="date" tekstLabel="Date: " v-model="fields.date" :errors="errors.date" :value='fields.date'></date-input>
             <time-input :disabled="disabled" inputName="time_played" inputId="time_played" tekstLabel="Time played: " v-model="fields.time_played" :errors="errors.time_played" :value='fields.time_played'></time-input>
             <text-area :disabled="disabled" inputName="remarks" inputId="remarks" tekstLabel="Remarks: " v-model="fields.remarks" :errors="errors.remarks" :value='fields.remarks'></text-area>
@@ -175,6 +177,9 @@
 
                  'multigroupUsers': [],
                  'groupUsers': [],
+                 'test': '',
+
+                 
             }
         },
 
@@ -184,6 +189,21 @@
                     this.disabled = true;
                 }else if(this.submitOption == 'Update'){
                     this.disabled = false;
+                }
+            },
+
+            group(){
+                //set score properties
+                if(this.group != undefined){
+                    
+                    this.groupUsers = JSON.parse(JSON.stringify(this.group.group_users));
+                    for(var item in this.group_users){
+                        this.groupUsers[item]['ScorePlayedGameId'] = false;
+                        this.groupUsers[item]['ScoreDisplay'] = false;
+                        this.groupUsers[item]['ScoreScore'] = 0;
+                        this.groupUsers[item]['ScorePlace'] = 0;
+                        this.groupUsers[item]['ScoreRemarks'] = "";
+                    }
                 }
             }
         },
@@ -268,18 +288,21 @@
                     }else{
                         this.formData.append('player[' + userId + '][place]', this.groupUsers[item]['ScorePlace']);
                     }
-                    this.formData.append('player[' + userId + '][remarks]', this.groupUsers[item]['ScoreRemarks']);
+                    if(this.groupUsers[item]['ScoreRemarks'] != undefined){
+                        this.formData.append('player[' + userId + '][remarks]', this.groupUsers[item]['ScoreRemarks']);
+                    }else{
+                        this.formData.append('player[' + userId + '][remarks]', "");
+                    }
+                    
                 }
             },
 
             submit(){
-                if(this.submitOption == 'Create'){
-                    this.create();
-                }else if(this.submitOption == 'Update'){
+                if(this.submitOption == 'Update'){
                     this.update();
-                }else{
-                    console.log('geen optie opgegeven');
+                    return;
                 }
+                this.create();
             },
 
             create(){
@@ -293,6 +316,7 @@
                     this.message = "You've added a game for " + this.group.name;
                     this.$bus.$emit('showMessage', this.message,  'green', '2000' );
                     this.formData =  new FormData();
+                    this.$router.push({name: "allPlayedGames", params: { id: this.group.id },});
                 }).catch(error => {
                     this.errors = error;
                 });
@@ -323,16 +347,30 @@
                this.fields.remarks = "";
                this.fields.remarks = this.playedGame.remarks;
 
+               if(this.groupUsers == ""){
+                    this.groupUsers = JSON.parse(JSON.stringify(this.group.group_users));
+                    for(var item in this.group.group_users){
+                        this.groupUsers[item]['ScorePlayedGameId'] = false;
+                        this.groupUsers[item]['ScoreDisplay'] = false;
+                        this.groupUsers[item]['ScoreScore'] = 0;
+                        this.groupUsers[item]['ScorePlace'] = 0;
+                        this.groupUsers[item]['ScoreRemarks'] = "";
+                    }
+               }
+               this.multigroupUsers = JSON.parse(JSON.stringify(this.group.group_users));
+
                for(var item in this.playedGame.scores){
                    for(var item2 in this.groupUsers){
                        if(this.playedGame.scores[item].group_user_id == this.groupUsers[item2]['id']){
-                           this.groupUsers[item2]['ScorePlayedGameId'] = this.playedGame.scores[item].id;
+                            this.groupUsers[item2]['ScorePlayedGameId'] = this.playedGame.scores[item].id;
                             this.groupUsers[item2]['ScoreDisplay'] = true;
                             this.groupUsers[item2]['ScoreScore'] = this.playedGame.scores[item].score;
                             this.groupUsers[item2]['ScorePlace'] = this.playedGame.scores[item].place;
                             if(this.playedGame.scores[item].remarks != null){
                                 this.groupUsers[item2]['ScoreRemarks'] = this.playedGame.scores[item].remarks;
                             }
+                            //adjust the multiselect drop down to have te users who haven't had a score
+                            this.multigroupUsers.splice(item2, 1);
                        }
                    }
                 }
@@ -366,18 +404,6 @@
                 this.disabled = true;
             }
 
-            //set score properties
-            if(this.group != undefined){
-                this.groupUsers = JSON.parse(JSON.stringify(this.group.group_users));
-                for(var item in this.groupUsers){
-                    this.groupUsers[item]['ScorePlayedGameId'] = false;
-                    this.groupUsers[item]['ScoreDisplay'] = false;
-                    this.groupUsers[item]['ScoreScore'] = 0;
-                    this.groupUsers[item]['ScorePlace'] = 0;
-                    this.groupUsers[item]['ScoreRemarks'] = "";
-                }
-            }
-
             if(this.playedGame != undefined){
                 this.setData();
                 this.selectedGame = this.playedGame.game;
@@ -386,11 +412,29 @@
                 this.seletectedExpansions = [];
                 this.playedGame.expansions.map((expansionsTest) => {
                     this.seletectedExpansions.push(expansionsTest.id);
-                });
+                });    
+            }
+        },
+
+        created(){
+            if(this.group.id != undefined){
+                //set score properties
+                if(this.group != undefined){
+                    
+                    this.groupUsers = JSON.parse(JSON.stringify(this.group.group_users));
+                    for(var item in this.group_users){
+                        this.groupUsers[item]['ScorePlayedGameId'] = false;
+                        this.groupUsers[item]['ScoreDisplay'] = false;
+                        this.groupUsers[item]['ScoreScore'] = 0;
+                        this.groupUsers[item]['ScorePlace'] = 0;
+                        this.groupUsers[item]['ScoreRemarks'] = "";
+                    }
+                }
             }
         }
     }
 </script>
+
 
 <style scoped>
 

@@ -19,8 +19,7 @@
 </template>
 
 <script>
-    import apiCall from '../../services/ApiCall.js';
-    import inputForm from '../GamePage/input';
+    import inputForm from '../GamePage/input.vue';
     import list from '../GamePage/list.vue';
     import listUnapproved from '../GamePage/listUnapprovedGames.vue';
 
