@@ -5112,6 +5112,10 @@ __webpack_require__.r(__webpack_exports__);
           this.formData.append('player[' + userId + '][place]', 0);
           this.formData.append('player[' + userId + '][place]', 0);
         } else {
+          if (this.groupUsers[item]['ScorePlace'] == undefined || this.groupUsers[item]['ScorePlace'] == "") {
+            this.groupUsers[item]['ScorePlace'] = 0;
+          }
+
           this.formData.append('player[' + userId + '][place]', this.groupUsers[item]['ScorePlace']);
         }
 

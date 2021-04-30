@@ -2,7 +2,7 @@
     <div class="container">
         <form @submit.prevent="submit" method="POST" enctype="multipart/form-data" v-if="group.id != undefined">
             <!-- Basic Game Details -->
-            
+
             <div class="row" >
                 <div class="col-lg-2 col-md-2 col-sm-0"></div>
                     <div class="col-lg-8 col-md-8 col-sm-12">
@@ -24,7 +24,7 @@
                     </div>
                 <div class="col-lg-2 col-md-2 col-sm-0"></div>
             </div>
-            
+
             <date-input :disabled="disabled" inputName="date" inputId="date" tekstLabel="Date: " v-model="fields.date" :errors="errors.date" :value='fields.date'></date-input>
             <time-input :disabled="disabled" inputName="time_played" inputId="time_played" tekstLabel="Time played: " v-model="fields.time_played" :errors="errors.time_played" :value='fields.time_played'></time-input>
             <text-area :disabled="disabled" inputName="remarks" inputId="remarks" tekstLabel="Remarks: " v-model="fields.remarks" :errors="errors.remarks" :value='fields.remarks'></text-area>
@@ -179,7 +179,7 @@
                  'groupUsers': [],
                  'test': '',
 
-                 
+
             }
         },
 
@@ -195,7 +195,7 @@
             group(){
                 //set score properties
                 if(this.group != undefined){
-                    
+
                     this.groupUsers = JSON.parse(JSON.stringify(this.group.group_users));
                     for(var item in this.group_users){
                         this.groupUsers[item]['ScorePlayedGameId'] = false;
@@ -286,6 +286,9 @@
                         this.formData.append('player[' + userId + '][place]', 0);
                         this.formData.append('player[' + userId + '][place]', 0);
                     }else{
+                        if(this.groupUsers[item]['ScorePlace'] == undefined || this.groupUsers[item]['ScorePlace'] == ""){
+                            this.groupUsers[item]['ScorePlace'] = 0;
+                        }
                         this.formData.append('player[' + userId + '][place]', this.groupUsers[item]['ScorePlace']);
                     }
                     if(this.groupUsers[item]['ScoreRemarks'] != undefined){
@@ -293,7 +296,7 @@
                     }else{
                         this.formData.append('player[' + userId + '][remarks]', "");
                     }
-                    
+
                 }
             },
 
@@ -412,15 +415,15 @@
                 this.seletectedExpansions = [];
                 this.playedGame.expansions.map((expansionsTest) => {
                     this.seletectedExpansions.push(expansionsTest.id);
-                });    
+                });
             }
         },
 
         created(){
+
             if(this.group.id != undefined){
                 //set score properties
                 if(this.group != undefined){
-                    
                     this.groupUsers = JSON.parse(JSON.stringify(this.group.group_users));
                     for(var item in this.group_users){
                         this.groupUsers[item]['ScorePlayedGameId'] = false;
