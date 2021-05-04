@@ -5099,6 +5099,11 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       for (var item in this.groupUsers) {
+        if (this.groupUsers[item]['ScoreScore'] == undefined && this.groupUsers[item]['ScoreScore'] == undefined) {
+          continue;
+
+        }
+        
         var userId = this.groupUsers[item]['id'];
 
         if (this.playedGame != undefined) {
