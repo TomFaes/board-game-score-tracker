@@ -23,7 +23,6 @@ class GroupService
      */
     public function checkNewUser(User $user){
         if(isset($user->id) === true){
-            $this->addUserToGroupUser($user);
             return true;
         }
         return false;
@@ -37,22 +36,8 @@ class GroupService
         $user = $this->user->existingUser($email);
 
         if(isset($user->id) === true){
-            $this->addUserToGroupUser($user);
             return true;
         }
         return false;
-    }
-
-    /**
-     * this method will add the user id to the groupuser
-     */
-    protected function addUserToGroupUser(User $user){
-        //get all groups where there is a user with the given email adres and doesn't have a user id
-        $groupsOfUser = $this->groupUser->getGroupsBasedOnEmail($user->email);
-        $data['user_id'] = $user->id;
-        //add the user to all groups
-        foreach( $groupsOfUser AS $groupUser){
-            $this->groupUser->update($data, $groupUser->id);
-        }
     }
 }

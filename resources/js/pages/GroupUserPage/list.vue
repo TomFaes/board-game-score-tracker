@@ -14,22 +14,29 @@
             <thead>
                 <tr>
                     <th>Name</th>
+                    <th>Code</th>
                     <th>Options</th>
                 </tr>
             </thead>
             <tbody  v-for="data in group.group_users"  :key="data.id" >
                     <tr>
                         <td>
-                            <div v-if="data.user_id > 0 && data.user.verified == 1">
+                            <div v-if="data.user_id > 0">
                                 {{ data.user.firstname }} {{ data.user.name }}
                             </div>
                             <div v-else>
                                 {{data.firstname}} {{data.name}}
                             </div>
                         </td>
+                        <td v-if="group.typeMember == 'Admin'">
+                            {{data.code}}
+                        </td>
                         <td v-if="group.typeMember == 'Admin'" class="options-column">
                             <button class="btn btn-primary"  v-if="!data.user_id" @click.prevent="updateGroupUser(data)"> <i class="fa fa-edit" style="heigth:14px; width:14px"></i></button>
                             <button class="btn btn-danger" @click.prevent="deleteGroupUser(data)" ><i class="fas fa-trash-alt" style="heigth:14px; width:14px" ></i></button>
+                            <button class="btn btn-secondary" v-if="!data.user_id" @click.prevent="regenerateCode(data)" ><i class="fas fa-sync" style="heigth:14px; width:14px" ></i></button>
+
+
                         </td>
                     </tr>
             </tbody>
@@ -93,6 +100,18 @@
                 }else{
                     this.display = 'showAddUserToGroup';
                 }
+            },
+
+            regenerateCode(data){
+                apiCall.postData('group/' + this.group.id + '/user/' + data.id + '/regenerate_code')
+                    .then(response =>{
+                         this.message = "code is regenerated";
+
+                        this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                        this.$store.dispatch('getSelectedGroup', {id: this.group.id});
+                    }).catch(() => {
+                        console.log('handle server error from here');
+                    });
             },
 
             deleteGroupUser(data){

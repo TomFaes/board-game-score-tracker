@@ -36,7 +36,7 @@ class GroupRouteTest extends TestCase
                 continue;
             }
             foreach($group->groupUsers AS $groupUser){
-                if($groupUser->user_id == $this->loggedInUser->id && $groupUser->verified == 1){
+                if($groupUser->user_id == $this->loggedInUser->id){
                     $this->countUserInGroup++;
                     break;
                 }
@@ -86,7 +86,6 @@ class GroupRouteTest extends TestCase
         $data = [
             'firstname' => "new person",
             'name' => "in this group",
-            'email' => $this->loggedInUser->email,
             'group_id' => $groupId,
             'user_id' => $this->loggedInUser->id,
         ];
@@ -225,7 +224,6 @@ class GroupRouteTest extends TestCase
 
         $this->assertEquals($data['firstname'], $response_data->firstname);
         $this->assertEquals($data['name'], $response_data->name);
-        $this->assertEquals($data['email'], $response_data->email);
         echo PHP_EOL.'[42m OK  [0m GroupUsersController: test store';
     }
 
@@ -270,12 +268,71 @@ class GroupRouteTest extends TestCase
         echo PHP_EOL.'[42m OK  [0m GroupUsersController: test destroy';
     }
 
+    public function test_GroupUsersController_joinGroup()
+    {
+        $this->be($this->authenticatedUser('Admin'));
+
+        $newGroup = $this->createGroup();
+
+        //create a new group user
+        $data = [
+            'firstname' => "new person",
+            'name' => "in this group",
+            'group_id' => $newGroup->id,
+        ];
+
+        $response = $this->postJson('/api/group/'.$newGroup->id.'/user', $data);
+        $response_data = $response->getData();
+
+        $data = [
+            'code' => $response_data->code,
+        ];
+        $response = $this->postJson('/api/join_group', $data);
+        $response_data = $response->getData();
+
+        $response->assertStatus(201);
+        $this->assertEquals(201, $response->status());
+
+        $this->assertEquals($response_data->code, null);
+        $this->assertEquals($response_data->user_id,  $this->loggedInUser->id,);
+
+        echo PHP_EOL.'[42m OK  [0m GroupUsersController: test join group';
+    }
+
+
+    public function test_GroupUsersController_regenerateGroupUserCode()
+    {
+        $this->be($this->authenticatedUser('Admin'));
+
+        $newGroup = $this->createGroup();
+
+        //create a new group user
+        $data = [
+            'firstname' => "new person",
+            'name' => "in this group",
+            'group_id' => $newGroup->id,
+        ];
+
+        $response = $this->postJson('/api/group/'.$newGroup->id.'/user', $data);
+        $response_data = $response->getData();
+
+        $originalCode = $response_data->code;
+
+        $response = $this->postJson('/api/group/'.$newGroup->id.'/user/'.$response_data->id.'/regenerate_code');
+        $response_data = $response->getData();
+
+        $this->assertNotEquals($response_data->code,$originalCode);
+        echo PHP_EOL.'[42m OK  [0m GroupUsersController: test regenerate group user code';
+    }
+
     public function test_FavoriteUserGroupController_store()
     {
         $this->be($this->authenticatedUser('Admin'));
 
         $response = $this->postJson('/api/group/'.$this->testData[0]->id.'/changeFavoriteGroup');
         $response_data = $response->getData();
+
+
 
         $response->assertStatus(201);
         $this->assertEquals(201, $response->status());
@@ -284,107 +341,6 @@ class GroupRouteTest extends TestCase
 
         echo PHP_EOL.'[42m OK  [0m FavoriteUserGroupController: test update';
     }
-
-    public function test_UnverifiedGroupUsersController_index()
-    {
-        $this->be($this->authenticatedUser('Admin'));
-
-        //create a new group where the logged in user is admin of
-        $data = [
-            'name' => "A random created Group",
-            'description' => "This is a group that is created for php unit testing",
-            'admin_id' => $this->loggedInUser->id
-        ];
-
-        $response = $this->postJson('/api/group/', $data);
-        $newGroup = $response->getData();
-
-        $newGroup = $this->createGroup();
-
-        //create a new group user
-        $data = [
-            'firstname' => "new person",
-            'name' => "in this group",
-            'email' => $this->loggedInUser->email,
-            'group_id' => $newGroup->id,
-            'user_id' => $this->loggedInUser->id,
-        ];
-
-        $this->postJson('/api/group/'.$newGroup->id.'/user', $data);
-        $this->postJson('/api/group/'.$newGroup->id.'/user', $data);
-        $this->postJson('/api/group/'.$newGroup->id.'/user', $data);
-        $this->postJson('/api/group/'.$newGroup->id.'/user', $data);
-
-        $response = $this->get('/api/unverified-group-user');
-        $response_data = $response->getData();
-
-        $response->assertStatus(200);
-        $this->assertEquals(200, $response->status());
-
-        $this->assertEquals(count($response_data), 4);
-
-        echo PHP_EOL.'[42m OK  [0m UnverifiedGroupUsersController: test index';
-    }
-
-    public function test_UnverifiedGroupUsersController_update()
-    {
-        $this->be($this->authenticatedUser('Admin'));
-
-        $newGroup = $this->createGroup();
-
-        $this->createGroupUser($newGroup->id);
-        $this->createGroupUser($newGroup->id);
-        $this->createGroupUser($newGroup->id);
-        $groupUser = $this->createGroupUser($newGroup->id);
-
-        $response = $this->postJson('/api/unverified-group-user/'.$groupUser->id);
-        $response_data = $response->getData();
-
-        $response->assertStatus(200);
-        $this->assertEquals(200, $response->status());
-
-        $response = $this->get('/api/unverified-group-user');
-        $response_data = $response->getData();
-        $response->assertStatus(200);
-        $this->assertEquals(200, $response->status());
-        $this->assertEquals(count($response_data), 3);
-
-        echo PHP_EOL.'[42m OK  [0m UnverifiedGroupUsersController: test update';
-    }
-
-    public function test_UnverifiedGroupUsersController_destroy()
-    {
-        $this->be($this->authenticatedUser('Admin'));
-
-        $newGroup = $this->createGroup();
-
-        $this->createGroupUser($newGroup->id);
-        $this->createGroupUser($newGroup->id);
-        $this->createGroupUser($newGroup->id);
-        $groupUser = $this->createGroupUser($newGroup->id);
-
-        $response = $this->postJson('/api/unverified-group-user/'.$groupUser->id);
-        $response_data = $response->getData();
-
-        $response->assertStatus(200);
-        $this->assertEquals(200, $response->status());
-
-        $response = $this->get('/api/unverified-group-user');
-        $response_data = $response->getData();
-        $response->assertStatus(200);
-        $this->assertEquals(200, $response->status());
-        $this->assertEquals(count($response_data), 3);
-
-        //unverifie user again
-        $response = $this->postJson('/api/unverified-group-user/'.$groupUser->id.'/delete');
-        $response_data = $response->getData();
-
-        $this->assertEquals($response_data->user_id, null);
-        $this->assertEquals($response_data->verified, 0);
-
-        echo PHP_EOL.'[42m OK  [0m UnverifiedGroupUsersController: test destroy';
-    }
-
 
     public function test_GroupGameController_searchNonGroupGames()
     {

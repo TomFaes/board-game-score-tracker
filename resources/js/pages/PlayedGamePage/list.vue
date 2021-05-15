@@ -92,11 +92,7 @@
             dataList(){
                 return this.$store.state.playedGames;
             },
-
-            
         },
-
-        
 
         components: {
             EditPlayedGame,
@@ -107,6 +103,9 @@
 
         methods: {
             loadList(){
+                if(this.group.id == undefined){
+                    return;
+                }
                 this.$store.dispatch('getPlayedGames', {id: this.group.id, current_page: this.dataList.current_page ?? '1'});
                 return;
             },
@@ -140,7 +139,6 @@
                      return Moment(value, "hh:mm:ss").format('hh:mm');
                 }
                 return "";
-
             },
 
             deletePlayedGame(data){
@@ -156,7 +154,6 @@
         },
 
         mounted(){
-            
             //this.loadList();
             this.$bus.$on('reloadPlayedGameList', () => {
                 this.selectedPlayedGameId = "";

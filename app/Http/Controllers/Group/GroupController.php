@@ -67,7 +67,7 @@ class GroupController extends Controller
         $data['group_id'] = $group->id;
         $data['user_id'] = auth()->user()->id;
         $groupUser = $this->groupUser->create($data);
-        $groupUser = $this->groupUser->verifyUser($groupUser->id);
+        $groupUser = $this->groupUser->joinGroup($groupUser->code, $userId);
 
         return response()->json($group, 200);
     }

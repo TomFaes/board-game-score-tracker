@@ -17,11 +17,8 @@ class CreateGroupUsersTable extends Migration
             $table->bigIncrements('id');
             $table->string('firstname');
             $table->string('name');
-            $table->string('email')->nullable();
             $table->bigInteger('group_id')->unsigned();
             $table->bigInteger('user_id')->nullable()->unsigned();
-
-            $table->integer('verified')->nullable()->default(0);
             $table->timestamps();
             $table->softDeletes();
 

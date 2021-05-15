@@ -17,6 +17,6 @@ class GroupGameLink extends Model
 
     public function groupGame()
     {
-        return $this->belongsTo('App\Models\GroupGame', 'group_game_id', 'id')->with('game', 'group');
+        return $this->belongsTo(GroupGame::class)->with('game', 'group');
     }
 }

@@ -12,12 +12,12 @@ All members of a group will be able to add game scores and update them. The admi
     - create group users
     - group statistics
     - played games
-# Version 1.01: 30/04/2020 Current live version
+# Version 1.01: 30/04/2020
     - update packages to the latest version
     - create roadmap view
     - Choose favorite group
     - add cookie consent
-# Version 2.00: 
+# Version 2.00: 29/04/2021
     - update Route api to the tuple way
     - create global layout components for layout and input fields
     - implement vue router
@@ -28,17 +28,26 @@ All members of a group will be able to add game scores and update them. The admi
     - update & add phpunit testing
     - bugfixes
 
+# Version 2.01: 15/05/2021
+    - laravel version: 8.40.0
+    - update packages to the latest version
+    - Start using php 8
+    - replace email from group user with a code string. Needed to reduce the amount of user data not provided by the owner of the email
+    - change related model to Model::class instead of App\Models\Model
+    - remove links to 000webhost
+    - bugfixes
+        - if you are in a group and go back to the home page you get an 500 error
+        - faker text option didn't work anymore
+
 
 ## Future plans
-Version 2.01: 
-    - update packages to the latest version
-    - update php to version 8
-    - replace email from group user with a code string. 
-    - reimplent favorite group.
-    - bugfixes
+Version 2.02: 
+     - update packages to the latest version
+     - ???
+        
+
 
 Undetermined futere plans
     - Game detailed scores: if you play games like 7 wonders you will notices the score fiche will exist out of several  lines(points for blue cards, points for wonders, ?) . It should be a nice feature to have this present.
     - Turn order drawer: Our group usually draws who is first, second and so on. 
     - Game drawer:  sometimes we are undecided on which game to play, so a program that could do it for us would be welcome
-

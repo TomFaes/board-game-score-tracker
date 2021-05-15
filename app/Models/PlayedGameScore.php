@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class PlayedGameScore extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
         'played_game_id', 'group_user_id', 'score', 'place', ' remarks', 'creator_id'
     ];
@@ -19,12 +19,12 @@ class PlayedGameScore extends Model
 
     public function playedGame()
     {
-        return $this->belongsTo('App\Models\PlayedGame', 'played_game_id', 'id')->withDefault();
+        return $this->belongsTo(PlayedGame::class)->withDefault();
     }
 
     public function groupUser()
     {
-        return $this->belongsTo('App\Models\GroupUser', 'group_user_id', 'id')->withDefault();
+        return $this->belongsTo(GroupUser::class)->withDefault();
     }
 
 }

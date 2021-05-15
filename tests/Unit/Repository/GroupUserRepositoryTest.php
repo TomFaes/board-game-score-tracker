@@ -23,14 +23,6 @@ class GroupUserRepositoryTest extends TestCase
         $this->repo = new GroupUserRepo();
         $this->testData  = GroupUser::all();
         $this->recordCount = count($this->testData);
-/*
-        //default dataset
-        $this->data = [
-            'firstname' => "Test first name",
-            'name' => "Test name",
-            'email' => "test@mail.be",
-        ];
-        */
     }
 
     /**
@@ -41,7 +33,6 @@ class GroupUserRepositoryTest extends TestCase
         $this->assertInstanceOf(GroupUser::class, $testData);
         $this->assertEquals($data['firstname'], $testData->firstname);
         $this->assertEquals($data['name'], $testData->name);
-        $this->assertEquals($data['email'], $testData->email);
     }
 
     /**
@@ -54,7 +45,6 @@ class GroupUserRepositoryTest extends TestCase
     {
         echo PHP_EOL.PHP_EOL.'[44m GroupUser Repository Test:   [0m';
         echo PHP_EOL.'[46m Records:   [0m'.$this->recordCount;
-
         $found = $this->repo->getAllGroupUsers();
         $this->assertEquals($this->recordCount, count($found));
         //$this->assertEquals(10, 10);
@@ -66,33 +56,6 @@ class GroupUserRepositoryTest extends TestCase
         $found = $this->repo->getGroupUser($this->testData[0]->id);
         $this->dataTests($this->testData[0], $found);
         echo PHP_EOL.'[42m OK  [0m get group user';
-    }
-
-    public function test_get_unverified_users(){
-        $user = User::all()->random(1)->first();
-        $data = [
-            'user_id' => $user['id'],
-        ];
-
-        $this->repo->update($data, $this->testData[0]->id);
-        $groupUser = $this->repo->getUnverifiedGroupUsers($data['user_id']);
-        $this->assertEquals(1, count($groupUser));
-
-        echo PHP_EOL.'[42m OK  [0m get unverified group users ';
-    }
-
-    public function test_get_group_based_on_email(){
-        $data = [
-            'email' => $this->testData[0]->email,
-        ];
-        $this->repo->update($data, $this->testData[3]->id);
-        $this->repo->update($data, $this->testData[4]->id);
-        $this->repo->update($data, $this->testData[5]->id);
-
-        $found = $this->repo->getGroupsBasedOnEmail($this->testData[0]->email);
-        $this->assertEquals(4, count($found));
-
-        echo PHP_EOL.'[42m OK  [0m get groups based on email ';
     }
 
     public function test_get_user_with_list_of_created_games()
@@ -125,7 +88,6 @@ class GroupUserRepositoryTest extends TestCase
         $data = [
             'firstname' => 'Jane',
             'name' => 'Doe',
-            'email' => 'test@test.be',
             'group_id' => $this->testData[0]->group_id,
         ];
 
@@ -146,22 +108,68 @@ class GroupUserRepositoryTest extends TestCase
         echo PHP_EOL.'[42m OK  [0m delete group user ';
     }
 
-    public function test_verify_user(){
-        $groupUser = $this->repo->getGroupUser($this->testData[0]->id);
-        $this->assertEquals($groupUser->verified, 0);
-        $groupUser = $this->repo->verifyUser($this->testData[0]->id);
-        $this->assertEquals($groupUser->verified, 1);
-        $groupUser = $this->repo->getGroupUser($this->testData[0]->id);
-        $this->assertEquals($groupUser->verified, 1);
+    public function test_create_code_group_user(){
+        $code = $this->repo->createCode();
 
-        echo PHP_EOL.'[42m OK  [0m verify group user ';
+        $this->assertEquals(strlen ($code), 60);
+
+        echo PHP_EOL.'[42m OK  [0m create code group user ';
     }
 
-    public function test_unverify_user(){
-        $groupUser = $this->repo->unverifyUser($this->testData[0]->id);
-        $this->assertEquals($groupUser->user_id , null);
-        $this->assertEquals($groupUser->email, null);
-        $this->assertEquals($groupUser->verified, 0);
-        echo PHP_EOL.'[42m OK  [0m unverify group user ';
+    public function test_join_group(){
+        //create user with code
+        $data = [
+            'firstname' => 'Jane',
+            'name' => 'Doe',
+            'email' => 'test@test.be',
+            'group_id' => $this->testData[0]->group_id,
+        ];
+        $newUser = $this->repo->create($data);
+
+        $user = User::all()->random(1)->first();
+        $testUser = $this->repo->joinGroup($newUser->code, $user->id);
+
+        $this->assertEquals($testUser->code, null);
+        $this->assertEquals($testUser->user_id, $user->id);
+
+        echo PHP_EOL.'[42m OK  [0m Join group ';
     }
+
+    public function test_regenerate_code_for_non_user(){
+         //create user with code
+         $data = [
+            'firstname' => 'Jane',
+            'name' => 'Doe',
+            'email' => 'test@test.be',
+            'group_id' => $this->testData[0]->group_id,
+        ];
+        $newUser = $this->repo->create($data);
+
+        $regenerateCode = $this->repo->regenerateGroupUserCode($newUser->id);
+
+        $this->assertNotEquals($regenerateCode->code,$newUser->code);
+
+        echo PHP_EOL.'[42m OK  [0m Regenerate group user code ';
+    }
+
+    public function test_regenerate_code_with_user_id(){
+        //create user with code
+        $data = [
+           'firstname' => 'Jane',
+           'name' => 'Doe',
+           'email' => 'test@test.be',
+           'group_id' => $this->testData[0]->group_id,
+       ];
+       $newUser = $this->repo->create($data);
+
+       //join group
+       $user = User::all()->random(1)->first();
+       $newUser = $this->repo->joinGroup($newUser->code, $user->id);
+
+       $regenerateCode = $this->repo->regenerateGroupUserCode($newUser->id);
+
+       $this->assertEquals($regenerateCode, 'There is still a user connected to this group user');
+
+       echo PHP_EOL.'[42m OK  [0m Regenerate group user code for group user connected to a user ';
+   }
 }

@@ -16,7 +16,6 @@ use App\Http\Controllers\Group\GroupGameController;
 use App\Http\Controllers\Group\GroupUsersController;
 use App\Http\Controllers\Group\UserGroupsController;
 use App\Http\Controllers\Group\GroupGameLinkController;
-use App\Http\Controllers\Group\UnverifiedGroupUsersController;
 
 use App\Http\Controllers\Played\PlayedGamesController;
 
@@ -46,12 +45,10 @@ Route::get('user-group', [UserGroupsController::class, 'index']);
 
 Route::post('group/{group_id}/user', [GroupUsersController::class, 'store']);
 Route::post('group/{group_id}/user/{id}', [GroupUsersController::class, 'update']);
+Route::post('join_group', [GroupUsersController::class, 'joinGroup']);
+Route::post('group/{group_id}/user/{id}/regenerate_code', [GroupUsersController::class, 'regenerateGroupUserCode']);
 
 Route::post('group/{group_id}/changeFavoriteGroup', [FavoriteUserGroupController::class, 'update']);
-
-//UnverifiedGroupUsersController
-Route::get('unverified-group-user', [UnverifiedGroupUsersController::class, 'index']);
-Route::post('unverified-group-user/{id}', [UnverifiedGroupUsersController::class, 'update']);
 
 //GroupGameController
 Route::get('group/{group_id}/search-non-group-games', [GroupGameController::class, 'searchNonGroupGames']);
@@ -83,4 +80,3 @@ Route::post('group/{group_id}/user/{id}/delete', [GroupUsersController::class, '
 Route::post('group/{group_id}/group-game/{id}/delete', [GroupGameController::class, 'destroy']);
 Route::post('group/game/{group_game_id}/link/{id}/delete', [GroupGameLinkController::class, 'destroy']);
 Route::post('group/{group_id}/played/{id}/delete', [PlayedGamesController::class, 'destroy']);
-Route::post('unverified-group-user/{id}/delete', [UnverifiedGroupUsersController::class, 'destroy']);

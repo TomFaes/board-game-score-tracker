@@ -25,7 +25,7 @@ class Game extends Model
      */
     public function baseGame()
     {
-        return $this->belongsTo('App\Models\Game', 'base_game_id', 'id');
+        return $this->belongsTo(Game::class, 'base_game_id', 'id');
     }
 
     /**
@@ -33,7 +33,7 @@ class Game extends Model
      */
     public function expansions()
     {
-        return $this->hasMany('App\Models\Game', 'base_game_id', 'id');
+        return $this->hasMany(Game::class, 'base_game_id', 'id');
     }
 
      /**
@@ -41,7 +41,7 @@ class Game extends Model
      */
     public function groupGames()
     {
-        return $this->hasMany('App\Models\GroupGame', 'game_id', 'id');
+        return $this->hasMany(GroupGame::class);
     }
 
     protected $appends = ['display'];
@@ -57,6 +57,6 @@ class Game extends Model
     //Pivot table connection
     public function playedGameExpansions()
     {
-        return $this->belongsToMany('App\Models\PlayedGame', 'expansion_played_game');
+        return $this->belongsToMany(PlayedGame::class, 'expansion_played_game');
     }
 }

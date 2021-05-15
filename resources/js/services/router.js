@@ -13,6 +13,7 @@ import Profile from '../pages/ProfilePage/index.vue';
 import Roadmap from '../pages/RoadmapPage/index.vue';
 import AddGame from '../pages/GamePage/index.vue';
 import NewGroup from '../pages/GroupPage/input.vue';
+import JoinGroup from '../pages/GroupUserPage/joinGroup.vue';
 
 import GroupDetail from '../pages/GroupPage/details.vue';
 import groupStats from '../pages/StatisticPage/index.vue';
@@ -72,7 +73,7 @@ const router = new VueRouter({
                 requiresAuth: false,
             },
         },
-        
+
         {
             path: localPath + '/add_game',
             name: 'addGame',
@@ -86,6 +87,15 @@ const router = new VueRouter({
             path: localPath + '/new_group',
             name: 'newGroup',
             component: NewGroup,
+            meta: {
+                requiresAuth: true,
+            },
+        },
+
+        {
+            path: localPath + '/join_group',
+            name: 'joinGroup',
+            component: JoinGroup,
             meta: {
                 requiresAuth: true,
             },
@@ -109,7 +119,7 @@ const router = new VueRouter({
                         groupDetails: groupStats
                     }
                 },
-                
+
                 {
                     name: 'addPlayedGame',
                     path: 'add_played_game',
@@ -161,7 +171,7 @@ const router = new VueRouter({
         {
             path: localPath + '/guest',
             name: 'guest',
-            component: Guest, 
+            component: Guest,
         },
     ]
 });

@@ -5,7 +5,6 @@
             <!-- the form items -->
              <text-input inputName="firstname" inputId="firstname" tekstLabel="firstname: " v-model="fields.firstname" :errors="errors.firstname" :value='fields.firstname'></text-input>
             <text-input inputName="name" inputId="name" tekstLabel="name: " v-model="fields.name" :errors="errors.name" :value='fields.name'></text-input>
-            <text-input inputName="email" inputId="email" tekstLabel="email: " v-model="fields.email" :errors="errors.email" :value='fields.email'></text-input>
             <button-input btnClass="btn btn-primary">Save user</button-input>
         </form>
         <hr>
@@ -53,9 +52,6 @@
                 }
                 if(this.fields.name != undefined){
                     this.formData.set('name', this.fields.name);
-                }
-                if(this.fields.email != undefined){
-                    this.formData.append('email', this.fields.email);
                 }
                 if(this.fields.group_id > 0){
                          this.formData.append('group_id', this.fields.group_id);
@@ -110,7 +106,6 @@
             setData(){
                 this.fields.firstname = this.groupUser.firstname;
                 this.fields.name = this.groupUser.name;
-                this.fields.email = this.groupUser.email;
                 this.fields.group_id = this.groupUser.group_id;
             }
         },

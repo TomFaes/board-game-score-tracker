@@ -40,7 +40,7 @@
                 return this.$store.state.selectedGroup;
             },
 
-            user(){ 
+            user(){
                 return this.$store.state.LoggedInUser;
             }
         },
@@ -63,8 +63,7 @@
                     return;
                 }
                 if(name == 'home'){
-                    console.log('go home');
-                    this.$store.dispatch('resetToDefault');   
+                    this.$store.dispatch('resetToDefault');
                 }
                 this.$router.push({name: name, params: { id: this.id },})
            },

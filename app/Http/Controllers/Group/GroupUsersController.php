@@ -23,7 +23,7 @@ class GroupUsersController extends Controller
      public function __construct(GroupUserValidation $groupUserValidation, IGroupUser $groupUser) {
         $this->middleware('auth:api');
 
-        $this->middleware('groupuser')->except('show');
+        $this->middleware('groupuser')->except('show', 'joinGroup');
 
         $this->groupUserValidation = $groupUserValidation;
         $this->groupUser = $groupUser;
@@ -61,5 +61,20 @@ class GroupUsersController extends Controller
     {
         $this->groupUser->delete($id);
         return response()->json("Group user is deleted", 204);
+    }
+
+    public function joinGroup(Request $request)
+    {
+        $userId = auth()->user()->id;
+
+        $groupUser = $this->groupUser->joinGroup($request->code, $userId);
+        return response()->json($groupUser, 201);
+    }
+
+    public function regenerateGroupUserCode($group, $id)
+    {
+        $groupUser = $this->groupUser->regenerateGroupUserCode($id);
+        return response()->json($groupUser, 201);
+        return response()->json("Group user regenerate method needs to be made", 201);
     }
 }

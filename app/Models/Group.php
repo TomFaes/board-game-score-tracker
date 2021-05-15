@@ -26,27 +26,29 @@ class Group extends Model
      */
     public function admin()
     {
-        return $this->belongsTo('App\Models\User', 'admin_id', 'id')->select(['id', 'firstname', 'name'])->withDefault();
+        return $this->belongsTo(User::class, 'admin_id', 'id')->select(['id', 'firstname', 'name'])->withDefault();
     }
 
     public function groupUsers()
     {
-        return $this->hasMany('App\Models\GroupUser', 'group_id', 'id')->with('user');
+        return $this->hasMany(GroupUser::class)->with('user');
     }
 
     public function groupGames()
     {
-        $groupgames = $this->hasMany('App\Models\GroupGame', 'group_id', 'id')->with('game', 'game.expansions');
+        $groupgames = $this->hasMany(GroupGame::class)->with('game', 'game.expansions');
         $groupgames = $groupgames->join('games' , 'group_games.game_id', '=', 'games.id')->orderBy('games.full_name');
         return $groupgames;
     }
 
-    public function baseGroupGames(){
-        $groupgames =  $this->hasMany('App\Models\GroupGame', 'group_id', 'id')->whereHas('game', function(Builder $query){
-                $query->where('base_game_id', '=', null);
-            }
-        )
-        ->with('game', 'game.expansions');
+    public function baseGroupGames()
+    {
+        $groupgames =  $this->hasMany(GroupGame::class)->whereHas('game', function(Builder $query){
+            $query->where('base_game_id', '=', null);
+        }
+    )
+    ->with('game', 'game.expansions');
+
 
         $groupgames = $groupgames->join('games' , 'group_games.game_id', '=', 'games.id')
         ->orderBy('games.full_name');
@@ -55,7 +57,7 @@ class Group extends Model
 
     public function playedGames()
     {
-        return $this->hasMany('App\Models\PlayedGame', 'group_id', 'id');
+        return $this->hasMany(PlayedGame::class);
     }
 
     protected $appends = ['display' , 'typeMember'];

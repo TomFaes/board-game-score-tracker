@@ -4,7 +4,9 @@
             <global-layout>
                 <nav-bar :user=user></nav-bar><br>
                 <message-box></message-box>
-                <unverified-user v-if="auth == true"></unverified-user>
+                <!--
+                <join-group></join-group>
+                -->
                 <router-view :key="$route.path" :user=user></router-view>
             </global-layout>
         </div>
@@ -16,15 +18,16 @@
     import navBar from '../IndexPage/navBar.vue';
     import login from '../IndexPage/login.vue';
 
+    import joinGroup from '../GroupUserPage/joinGroup.vue'
+
     import messageBox from '../../components/tools/messageBar.vue';
-    import unverifiedUser from '../GroupUserPage/unverifiedUser.vue';
 
     export default {
         components: {
             navBar,
             login,
             messageBox,
-            unverifiedUser,
+            joinGroup
         },
 
         props: {
@@ -47,7 +50,7 @@
         },
 
         methods: {
-            
+
         },
 
         mounted(){

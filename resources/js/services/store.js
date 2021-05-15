@@ -23,7 +23,7 @@ export default new Vuex.Store({
   },
 
 
-  mutations: {    
+  mutations: {
     setAuthentication(state, status){
       state.authenticated = status;
     },
@@ -101,13 +101,10 @@ export default new Vuex.Store({
     },
 
     resetToDefault({commit}){
-      console.log('reset to default');
       commit('setSelectedGroup', {});
       commit('setPlayedGames', {});
-
-      
     },
-    
+
   },
 
   getters: {

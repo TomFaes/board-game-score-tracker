@@ -12,7 +12,15 @@
                         </div>
                     </router-link>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-0"></div>
+                <div class="col-lg-4 col-md-4 col-sm-0">
+                    <router-link :to="{ name: 'joinGroup'}" >
+                        <div class="tile blue">
+                            <div>
+                                Join group
+                            </div>
+                        </div>
+                    </router-link>
+                </div>
             </div>
 
             <div class="row">
@@ -27,7 +35,7 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
 </template>
 
@@ -78,7 +86,7 @@
             }
             */
 
-            
+
         }
     }
 </script>

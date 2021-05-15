@@ -37,7 +37,7 @@ class User extends Authenticatable
 
     public function group()
     {
-        return $this->belongsTo('App\Models\Group', 'favorite_group_id', 'id')->withDefault();
+        return $this->belongsTo(Group::class, 'favorite_group_id', 'id')->withDefault();
     }
 }
 

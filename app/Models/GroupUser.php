@@ -24,7 +24,7 @@ class GroupUser extends Model
      */
     public function group()
     {
-        return $this->belongsTo('App\Models\Group', 'group_id', 'id')->select(['id', 'name', 'admin_id', 'description'])->withDefault();
+        return $this->belongsTo(Group::class)->select(['id', 'name', 'admin_id', 'description'])->withDefault();
     }
 
      /**
@@ -32,7 +32,7 @@ class GroupUser extends Model
      */
     public function user()
     {
-        return $this->belongsTo('App\Models\User', 'user_id', 'id')->select(['id', 'firstname', 'name'])->withDefault();
+        return $this->belongsTo(User::class)->select(['id', 'firstname', 'name'])->withDefault();
     }
 
      /**
@@ -40,7 +40,7 @@ class GroupUser extends Model
      */
     public function gameCreator()
     {
-        return $this->hasMany('App\Models\PlayedGame', 'creator_id', 'user_id');
+        return $this->hasMany(PlayedGame::class, 'creator_id', 'user_id');
     }
 
     protected $appends = ['fullName'];
@@ -50,7 +50,7 @@ class GroupUser extends Model
      */
     public function getfullNameAttribute()
     {
-        if($this->user->id > 0 && $this->verified == 1){
+        if($this->user->id > 0){
             return $this->user->firstname." ".$this->user->name;
         }
         return $this->firstname." ".$this->name;

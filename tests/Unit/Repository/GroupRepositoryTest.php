@@ -31,7 +31,7 @@ class GroupRepositoryTest extends TestCase
                 continue;
             }
             foreach($group->groupUsers AS $groupUser){
-                if($groupUser->user_id == $this->testData[0]->admin_id && $groupUser->verified == 1){
+                if($groupUser->user_id == $this->testData[0]->admin_id){
                     $this->countUserInGroup++;
                     break;
                 }

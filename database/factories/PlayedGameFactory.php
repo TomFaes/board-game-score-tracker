@@ -9,8 +9,9 @@ use App\Models\GroupUser;
 use App\Models\PlayedGame;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
-use Faker\Generator as Faker;
+
+
+
 
 class PlayedGameFactory extends Factory
 {
@@ -35,7 +36,7 @@ class PlayedGameFactory extends Factory
             'creator_id' => User::all()->random()->id,
             'date' => $this->faker->dateTimeThisCentury->format('Y-m-d'),
             'time_played' => '01:00:00',
-            'remarks' => $this->faker->text,
+            'remarks' => $this->faker->name,
         ];
     }
 }

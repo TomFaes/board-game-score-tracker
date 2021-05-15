@@ -13,18 +13,16 @@ class GroupGame extends Model
 
     public function game()
     {
-        return $this->belongsTo('App\Models\Game', 'game_id', 'id')->select(['id', 'name', 'full_name', 'players_max', 'players_min', 'base_game_id'])->withDefault();
+        return $this->belongsTo(Game::class)->select(['id', 'name', 'full_name', 'players_max', 'players_min', 'base_game_id'])->withDefault();
     }
 
     public function group()
     {
-        return $this->belongsTo('App\Models\Group', 'group_id', 'id')->withDefault();
+        return $this->belongsTo(Group::class)->withDefault();
     }
 
     public function links()
     {
-        return $this->hasMany('App\Models\GroupGameLink', 'group_game_id', 'id');
+        return $this->hasMany(GroupGameLink::class);
     }
-
-
 }

@@ -29,7 +29,7 @@ class PlayedGameScoreFactory extends Factory
             'played_game_id' => PlayedGame::all()->random()->id,
             'group_user_id' => GroupUser::all()->random()->id,
             'score' => $this->faker->numberBetween(50, 200),
-            'remarks' => $this->faker->text,
+            'remarks' => $this->faker->name,
         ];
     }
 }

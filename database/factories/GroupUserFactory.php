@@ -29,10 +29,8 @@ class GroupUserFactory extends Factory
         return [
             'firstname' => $this->faker->name,
             'name' => $this->faker->name,
-            'email' => $this->faker->safeEmail,
             'group_id' => Group::all()->random()->id,
-            'user_id' => null,
-            'verified' => 0,
+            'user_id' => null
         ];
     }
 }

@@ -39,7 +39,7 @@ class GroupGameLinkFactory extends Factory
             'group_game_id' => GroupGame::all()->random()->id,
             'name' => $this->faker->name,
             'link' => 'www.google.com',
-            'description' => $this->faker->text,
+            'description' => $this->faker->name,
         ];
     }
 }

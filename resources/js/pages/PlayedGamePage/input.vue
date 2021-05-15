@@ -274,10 +274,11 @@
                 }
 
                 for(var item in this.groupUsers){
+
                     if(this.groupUsers[item]['ScoreScore'] == undefined && this.groupUsers[item]['ScoreScore'] == undefined){
-                      continue;
+                        continue;
                     }
-                    
+
                     var userId = this.groupUsers[item]['id'];
                     if(this.playedGame != undefined){
                         this.formData.append('player[' + userId + '][id]', this.groupUsers[item]['ScorePlayedGameId']);

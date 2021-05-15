@@ -39,21 +39,8 @@ class GroupRepo extends Repository implements Contracts\IGroup
     public function getUserGroups($userId, $itemsPerPage = 0)
     {
         return Group::whereHas('groupUsers', function ($query) use ($userId){
-            $query->where('user_id', '=', $userId)->where('verified', 1);
+            $query->where('user_id', '=', $userId);
         })->orWhere('admin_id', $userId)->get();
-
-
-
-        /*
-        if($itemsPerPage > 0){
-            return Group::whereHas('groupUsers', function ($query) use ($userId){
-                $query->where('user_id', '=', $userId)->where('verified', 1);
-            })->orWhere('admin_id', $userId)->with(['groupUsers','admin', 'groupGames', 'baseGroupGames'])->paginate($itemsPerPage);
-        }
-        return Group::whereHas('groupUsers', function ($query) use ($userId){
-            $query->where('user_id', '=', $userId)->where('verified', 1);
-        })->orWhere('admin_id', $userId)->with(['groupUsers','admin', 'groupGames', 'baseGroupGames'])->get();
-        */
     }
     /***************************************************************************
      Next function will create or update the user object in de database
