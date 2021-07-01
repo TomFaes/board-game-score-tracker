@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Game;
 use App\Http\Controllers\Controller;
-
+use App\Http\Resources\GameCollection;
+use App\Http\Resources\GameResource;
 use Illuminate\Http\Request;
 
 use App\Repositories\Contracts\IGame;
-use App\Validators\GameValidation;
 
 class UnapprovedGameController extends Controller
 {
@@ -14,11 +14,10 @@ class UnapprovedGameController extends Controller
     /** @var App\Repositories\Contracts\IGame */
     protected $game;
 
-    public function __construct(GameValidation $gameValidation, IGame $game) {
+    public function __construct(IGame $game) {
         $this->middleware('auth:api');
         $this->middleware('admin:Admin');
 
-        $this->gameValidation = $gameValidation;
         $this->game = $game;
     }
 
@@ -29,7 +28,7 @@ class UnapprovedGameController extends Controller
      */
     public function index()
     {
-        return response()->json($this->game->getUnapprovedGames(20), 200);
+        return new GameCollection($this->game->getUnapprovedGames(20));
     }
 
     /**
@@ -43,6 +42,6 @@ class UnapprovedGameController extends Controller
     {
         $game = $this->game->getGame($id);
         $game = $this->game->approveGame($game);
-        return response()->json($game, 201);
+        return new GameResource($game);
     }
 }

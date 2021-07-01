@@ -90,6 +90,7 @@
                     this.dataList = response;
                     this.updateField = '';
                     this.display = '';
+                    this.selectedId = 0;
                 }).catch(() => {
                     console.log('handle server error from here');
                 });

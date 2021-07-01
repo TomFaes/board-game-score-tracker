@@ -2539,7 +2539,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 
 
@@ -2708,9 +2707,9 @@ __webpack_require__.r(__webpack_exports__);
         if (_this.submitOption == "CreateFromGroup") {
           _this.$bus.$emit('reloadGroupGames');
 
-          _this.message = response.name + " has been created, you can now add it to your game list";
+          _this.message = response.data.name + " has been created, you can now add it to your game list";
         } else {
-          _this.message = response.name + " has been added to the list";
+          _this.message = response.data.name + " has been added to the list";
         }
 
         _this.$bus.$emit('showMessage', _this.message, 'green', '2000');
@@ -2725,7 +2724,7 @@ __webpack_require__.r(__webpack_exports__);
       this.action = 'game/' + this.game.id, _services_ApiCall_js__WEBPACK_IMPORTED_MODULE_0__.default.updateData(this.action, this.formData).then(function (response) {
         _this2.$bus.$emit('reloadGameList');
 
-        _this2.message = response.name + " has been updated";
+        _this2.message = response.data.full_name + " has been updated";
 
         _this2.$bus.$emit('showMessage', _this2.message, 'green', '2000');
 
@@ -2745,7 +2744,7 @@ __webpack_require__.r(__webpack_exports__);
       var _this3 = this;
 
       _services_ApiCall_js__WEBPACK_IMPORTED_MODULE_0__.default.getData('basegame').then(function (response) {
-        _this3.basegame = response;
+        _this3.basegame = response.data;
       })["catch"](function () {
         console.log('handle server error from here');
       });
@@ -2876,6 +2875,7 @@ __webpack_require__.r(__webpack_exports__);
         _this.dataList = response;
         _this.updateField = '';
         _this.display = '';
+        _this.selectedId = 0;
       })["catch"](function () {
         console.log('handle server error from here');
       });
@@ -4507,6 +4507,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 
 
@@ -4590,6 +4592,14 @@ __webpack_require__.r(__webpack_exports__);
           console.log('handle server error from here');
         });
       }
+    },
+    createLink: function createLink(code) {
+      var subject = "Your invitation code for the boardgametracker";
+      subject = subject.replace(/\s/g, '%20');
+      var body = "%0D%0A You have been invited to join " + this.group.name + ". After logging in you can enter this code to join the group: " + code;
+      body = body.replace(/\s/g, '%20');
+      var maillink = "mailto:?" + "subject=" + subject + "&body=" + body;
+      return maillink;
     }
   },
   mounted: function mounted() {
@@ -11146,7 +11156,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\ndiv[data-v-1fa6a18c]{\r\n    display: block;\r\n    margin: auto;\r\n    width: 80%\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\ndiv[data-v-1fa6a18c]{\n    display: block;\n    margin: auto;\n    width: 80%\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -11170,7 +11180,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.title[data-v-5c1a6aa6]{\r\n    width: 90%;\r\n    text-align: center;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.title[data-v-5c1a6aa6]{\n    width: 90%;\n    text-align: center;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -67583,17 +67593,13 @@ var render = function() {
           _c(
             "div",
             { staticClass: "container" },
-            [
-              _vm.display == "Create"
-                ? _c("inputForm", { attrs: { submitOption: "Create" } })
-                : _vm._e()
-            ],
+            [_c("inputForm", { attrs: { submitOption: "Create" } })],
             1
           )
         ]
       ),
       _vm._v(" "),
-      _c("div", [_c("list")], 1)
+      _c("list")
     ],
     1
   )
@@ -69415,11 +69421,16 @@ var render = function() {
                 _vm._v(" "),
                 _vm.group.typeMember == "Admin"
                   ? _c("td", [
-                      _vm._v(
-                        "\n                        " +
-                          _vm._s(data.code) +
-                          "\n                    "
-                      )
+                      data.code != null
+                        ? _c(
+                            "a",
+                            {
+                              staticClass: "mailtoui",
+                              attrs: { href: _vm.createLink(data.code) }
+                            },
+                            [_vm._v(_vm._s(data.code))]
+                          )
+                        : _vm._e()
                     ])
                   : _vm._e(),
                 _vm._v(" "),

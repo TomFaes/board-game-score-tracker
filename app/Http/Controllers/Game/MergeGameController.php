@@ -34,7 +34,6 @@ class MergeGameController extends Controller
     {
         $container = Container::getInstance();
         $mergeService = $container->make(MergeGameService::class);
-        $mergeService->mergeGame($id, $mergedId);
-        return response()->json('Game is merged', 201);
+        return response()->json($mergeService->mergeGame($id, $mergedId), 201);
     }
 }

@@ -2,23 +2,21 @@
 
 namespace App\Http\Controllers\Game;
 use App\Http\Controllers\Controller;
-
+use App\Http\Resources\GameCollection;
 use Illuminate\Http\Request;
 
 use App\Repositories\Contracts\IGame;
-use App\Validators\GameValidation;
 
 class BaseGameController extends Controller
 {
     /** @var App\Repositories\Contracts\IGame */
     protected $game;
 
-    public function __construct(GameValidation $gameValidation, IGame $game)
+    public function __construct(IGame $game)
     {
         $this->middleware('auth:api');
         $this->middleware('admin:Admin', ['except' => ['index']]);
 
-        $this->gameValidation = $gameValidation;
         $this->game = $game;
     }
 
@@ -29,6 +27,6 @@ class BaseGameController extends Controller
      */
     public function index()
     {
-        return response()->json($this->game->getBaseGames(), 200);
+        return new GameCollection($this->game->getBaseGames());
     }
 }

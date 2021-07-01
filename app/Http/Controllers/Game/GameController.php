@@ -6,7 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Repositories\Contracts\IGame;
-use App\Validators\GameValidation;
+
+use App\Http\Requests\GamesRequest;
+use App\Http\Resources\GameResource;
+use App\Http\Resources\GameCollection;
+use App\Models\Game;
 
 class GameController extends Controller
 {
@@ -16,22 +20,26 @@ class GameController extends Controller
     /** App\Repositories\Contracts\IGame */
     protected $game;
 
-    public function __construct(GameValidation $gameValidation, IGame $game) {
+    public function __construct(IGame $game) {
         $this->middleware('auth')->only('view');
         $this->middleware('auth:api')->except('view');
 
         $this->middleware('game:normal')->only('view');
         $this->middleware('game')->except('store');
 
-        $this->gameValidation = $gameValidation;
         $this->game = $game;
     }
-/*
+
     public function view()
     {
-        return view('game.index');
+        return "TEST";
+
+        /*
+        $pageItems = isset($request->page_items) === true ? $request->page_items : 0;
+        return new GameCollection($this->game->getGames($pageItems));
+*/
     }
-    */
+
     /**
      * Display a listing of the resource.
      *
@@ -39,8 +47,8 @@ class GameController extends Controller
      */
     public function index(Request $request)
     {
-        $pageItems = isset($request->page_items) === true ? $request->page_items : 0;
-        return response()->json($this->game->getGames($pageItems), 200);
+        $pageItems = $request->page_items ?? 0;
+        return new GameCollection($this->game->getGames($pageItems));
     }
 
     /**
@@ -49,14 +57,13 @@ class GameController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(GamesRequest $request)
     {
-        $this->gameValidation->validateGame($request);
         $game = $this->game->create($request->all());
         if(auth()->user()->role == 'Admin'){
             $game = $this->game->approveGame($game);
         }
-        return response()->json($game, 200);
+        return new GameResource($game);
     }
 
     /**
@@ -66,12 +73,12 @@ class GameController extends Controller
      * @param  \App\Game  $game
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(GamesRequest $request, $id)
     {
-        $this->gameValidation->validateGame($request, $id);
         $game = $this->game->update($request->all(), $id);
-        return response()->json($game, 201);
+        return new GameResource($game);
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -79,9 +86,8 @@ class GameController extends Controller
      * @param  \App\Game  $game
      * @return \Illuminate\Http\Response
      */
-    public function destroy($gameId)
+    public function destroy($id)
     {
-        $this->game->delete($gameId);
-        return response()->json("Game is deleted", 204);
+        return response()->json($this->game->delete($id), 204);
     }
 }

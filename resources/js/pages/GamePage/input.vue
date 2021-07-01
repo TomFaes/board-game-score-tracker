@@ -113,9 +113,9 @@
                     this.formData =  new FormData();
                      if(this.submitOption == "CreateFromGroup"){
                         this.$bus.$emit('reloadGroupGames');
-                        this.message = response.name + " has been created, you can now add it to your game list";
+                        this.message = response.data.name + " has been created, you can now add it to your game list";
                     }else{
-                        this.message = response.name + " has been added to the list";
+                        this.message = response.data.name + " has been added to the list";
                     }
                     this.$bus.$emit('showMessage', this.message,  'green', '2000' );
                 }).catch(error => {
@@ -130,7 +130,7 @@
                 apiCall.updateData(this.action, this.formData)
                 .then(response =>{
                     this.$bus.$emit('reloadGameList');
-                    this.message = response.name + " has been updated";
+                    this.message = response.data.full_name + " has been updated";
                     this.$bus.$emit('showMessage', this.message,  'green', '2000' );
                     this.$bus.$emit('display', 'groupStats');
                 }).catch(error => {
@@ -149,7 +149,7 @@
             loadBaseGameList(){
                 apiCall.getData('basegame')
                 .then(response =>{
-                    this.basegame = response;
+                    this.basegame = response.data;
                 }).catch(() => {
                     console.log('handle server error from here');
                 });

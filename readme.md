@@ -38,16 +38,23 @@ All members of a group will be able to add game scores and update them. The admi
     - bugfixes
         - if you are in a group and go back to the home page you get an 500 error
         - faker text option didn't work anymore
+# Version 2.02: 
+    - update packages to the latest version
+    - add mailto at the group user to invite a user to a group. 
+    - replace Validator with Request
+    - add GameResource & GameCollection
 
 
 ## Future plans
-Version 2.02: 
+Version 2.03: 
      - update packages to the latest version
-     - ???
+     - Replace Validators with request
+     - add Resource & Collection for all models
         
 
 
 Undetermined futere plans
+    - game statistics for player over the groups
     - Game detailed scores: if you play games like 7 wonders you will notices the score fiche will exist out of several  lines(points for blue cards, points for wonders, ?) . It should be a nice feature to have this present.
     - Turn order drawer: Our group usually draws who is first, second and so on. 
     - Game drawer:  sometimes we are undecided on which game to play, so a program that could do it for us would be welcome

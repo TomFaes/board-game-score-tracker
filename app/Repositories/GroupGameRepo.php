@@ -17,7 +17,7 @@ class GroupGameRepo extends Repository implements Contracts\IGroupGame
     {
         return GroupGame::all();
     }
-   
+
     public function getGroupGame($id)
     {
         return GroupGame::with('game', 'group', 'links')->find($id);

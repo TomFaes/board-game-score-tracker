@@ -3,6 +3,8 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\AuthenticationController;
 
+use App\Http\Controllers\Game\GameController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -32,6 +34,9 @@ Route::get('login', [HomeController::class, 'index']);
 Route::get('/logout', [AuthenticationController::class, 'logout']);
 Route::get('/login/{social}', [AuthenticationController::class, 'getSocialRedirect'])->middleware('guest');;
 Route::get('/login/{social}/callback', [AuthenticationController::class, 'getSocialCallback'])->middleware('guest');;
+
+
+//Route::get('game', [GameController::class, 'view']);
 
 //vue router will handle all routing
 Route::get('/{any}', function () {

@@ -48,8 +48,6 @@ class GameRepo extends Repository implements Contracts\IGame
         return Game::with(['expansions', 'baseGame'])->OrderBy('name', 'asc')->where('base_game_id', null)->where('approved_by_admin', 1)->get();
     }
 
-
-
     /**
      * Get all the expansion games
      *
@@ -190,13 +188,4 @@ class GameRepo extends Repository implements Contracts\IGame
         $game = $this->getGame($gameId);
         return $game->delete();
     }
-
-
-
-
-
-
-
-
-
 }

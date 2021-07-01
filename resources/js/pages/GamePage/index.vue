@@ -8,13 +8,12 @@
 
         <div class="row"  v-show="display == 'Create'">
             <div class="container">
-                <inputForm  v-if="display == 'Create'" :submitOption="'Create'"></inputForm>
+                <inputForm :submitOption="'Create'"></inputForm>
             </div>
         </div>
 
-        <div>
-            <list></list>
-        </div>
+        <list></list>
+
     </div>
 </template>
 

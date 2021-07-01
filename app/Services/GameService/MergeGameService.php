@@ -40,7 +40,7 @@ class MergeGameService
         //delete the game
         $this->game->delete($this->gameId);
 
-        return "The games have been merged";
+        return true;
     }
 
     protected function updateBaseGames()

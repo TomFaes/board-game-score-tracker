@@ -69,10 +69,9 @@ class GameRouteTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertEquals(200, $response->status());
-
         $response_data = $response->getData();
 
-        $this->assertEquals($this->recordCount, count($response_data));
+        $this->assertEquals($this->recordCount, count($response_data->data));
         echo PHP_EOL.'[42m OK  [0m GameController: test index';
     }
 
@@ -91,9 +90,9 @@ class GameRouteTest extends TestCase
         $response = $this->postJson('/api/game/', $data);
         $response_data = $response->getData();
 
-        $response->assertStatus(200);
-        $this->assertEquals(200, $response->status());
-        $this->dataTests($data, $response_data);
+        $response->assertStatus(201);
+        $this->assertEquals(201, $response->status());
+        $this->dataTests($data, $response_data->data);
         echo PHP_EOL.'[42m OK  [0m GameController: test store';
     }
 
@@ -112,9 +111,9 @@ class GameRouteTest extends TestCase
         $response = $this->postJson('/api/game/'. $this->testData[0]->id, $data);
         $response_data = $response->getData();
 
-        $response->assertStatus(201);
-        $this->assertEquals(201, $response->status());
-        $this->dataTests($data, $response_data);
+        $response->assertStatus(200);
+        $this->assertEquals(200, $response->status());
+        $this->dataTests($data, $response_data->data);
         echo PHP_EOL.'[42m OK  [0m GameController: test update';
     }
 
@@ -127,7 +126,8 @@ class GameRouteTest extends TestCase
 
         $response->assertStatus(204);
         $this->assertEquals(204, $response->status());
-        $this->assertEquals("Game is deleted", $response_data);
+
+        $this->assertEquals(true, $response_data);
         echo PHP_EOL.'[42m OK  [0m GameController: test delete';
     }
 
@@ -150,7 +150,7 @@ class GameRouteTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertEquals(200, $response->status());
-        $this->assertEquals(($this->recordCount - 3), count($response_data));
+        $this->assertEquals(($this->recordCount - 3), count($response_data->data));
         echo PHP_EOL.'[42m OK  [0m BaseGameController: test index';
     }
 
@@ -161,8 +161,8 @@ class GameRouteTest extends TestCase
         $response = $this->postJson('/api/unapprovedgames/'. $this->testData[0]->id);
         $response_data = $response->getData();
 
-        $response->assertStatus(201);
-        $this->assertEquals(201, $response->status());
+        $response->assertStatus(200);
+        $this->assertEquals(200, $response->status());
         echo PHP_EOL.'[42m OK  [0m UnapprovedGameController: test update';
     }
 

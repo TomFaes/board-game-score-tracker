@@ -29,14 +29,16 @@
                             </div>
                         </td>
                         <td v-if="group.typeMember == 'Admin'">
-                            {{data.code}}
+
+                             <a class="mailtoui"
+                                    :href="createLink(data.code)"
+                                    v-if="data.code != null"
+                                    >{{data.code}}</a>
                         </td>
                         <td v-if="group.typeMember == 'Admin'" class="options-column">
                             <button class="btn btn-primary"  v-if="!data.user_id" @click.prevent="updateGroupUser(data)"> <i class="fa fa-edit" style="heigth:14px; width:14px"></i></button>
                             <button class="btn btn-danger" @click.prevent="deleteGroupUser(data)" ><i class="fas fa-trash-alt" style="heigth:14px; width:14px" ></i></button>
                             <button class="btn btn-secondary" v-if="!data.user_id" @click.prevent="regenerateCode(data)" ><i class="fas fa-sync" style="heigth:14px; width:14px" ></i></button>
-
-
                         </td>
                     </tr>
             </tbody>
@@ -130,6 +132,22 @@
                         console.log('handle server error from here');
                     });
                 }
+            },
+
+            createLink(code){
+                var subject = "Your invitation code for the boardgametracker";
+                subject = subject.replace(/\s/g, '%20');
+
+                var body = "%0D%0A You have been invited to join " + this.group.name
+                + ". After logging in you can enter this code to join the group: " + code;
+
+                body = body.replace(/\s/g, '%20');
+
+                var maillink = "mailto:?" +
+                    "subject=" + subject +
+                    "&body=" + body
+                    ;
+                return maillink;
             }
         },
 
