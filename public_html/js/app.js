@@ -3600,10 +3600,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
 
 
 
@@ -3645,6 +3641,8 @@ __webpack_require__.r(__webpack_exports__);
         _this.dataList = response;
         _this.selectedGroupGameLinkAdd = 0;
         _this.selectedGroupGameLinkCreate = 0;
+
+        _this.loadNonGroupGames();
       })["catch"](function () {
         console.log('handle server error from here');
       });
@@ -3675,8 +3673,9 @@ __webpack_require__.r(__webpack_exports__);
     loadNonGroupGames: function loadNonGroupGames() {
       var _this2 = this;
 
+      console.log("group id: " + this.group.id);
       _services_ApiCall_js__WEBPACK_IMPORTED_MODULE_0__.default.getData('group/' + this.group.id + '/search-non-group-games').then(function (response) {
-        _this2.nonGroupGames = response;
+        _this2.nonGroupGames = response['data'];
       })["catch"](function () {
         console.log('handle server error from here');
       });
@@ -3710,7 +3709,6 @@ __webpack_require__.r(__webpack_exports__);
     var _this4 = this;
 
     this.loadList();
-    this.loadNonGroupGames();
     this.$bus.$on('reloadGroupGames', function () {
       _this4.loadList();
 
@@ -6584,7 +6582,7 @@ if (true) {
       state.errorMessage = message;
     },
     setUserGroups: function setUserGroups(state, userGroups) {
-      state.userGroups = userGroups;
+      state.userGroups = userGroups['data'];
     },
     setSelectedGroup: function setSelectedGroup(state, selectedGroup) {
       state.selectedGroup = selectedGroup;
@@ -11180,7 +11178,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.title[data-v-5c1a6aa6]{\n    width: 90%;\n    text-align: center;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.title[data-v-5c1a6aa6]{\r\n    width: 90%;\r\n    text-align: center;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -11204,7 +11202,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\nbutton[data-v-25967828] {\r\n    margin: 3px;\n}\n.button-row[data-v-25967828]{\r\n    width: 100%;\r\n    text-align: center;\n}\r\n\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\nbutton[data-v-25967828] {\n    margin: 3px;\n}\n.button-row[data-v-25967828]{\n    width: 100%;\n    text-align: center;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -68337,7 +68335,7 @@ var render = function() {
               _c("td", [_vm._v(_vm._s(link.description))]),
               _vm._v(" "),
               _c("td", { staticClass: "options-column" }, [
-                _vm.group.typeMember == "Admin"
+                _vm.group.type_member == "Admin"
                   ? _c("span", [
                       _c(
                         "button",
@@ -68534,7 +68532,7 @@ var render = function() {
       _c(
         "div",
         [
-          _vm.group.typeMember == "Admin"
+          _vm.group.type_member == "Admin"
             ? _c("add-game", {
                 attrs: { group: _vm.group, nonGroupGames: _vm.nonGroupGames }
               })
@@ -68588,7 +68586,7 @@ var render = function() {
                       )
                     : _vm._e(),
                   _vm._v(" "),
-                  _vm.group.typeMember == "Admin" && data.links.length == 0
+                  _vm.group.type_member == "Admin" && data.links.length == 0
                     ? _c(
                         "button",
                         {
@@ -68604,7 +68602,7 @@ var render = function() {
                       )
                     : _vm._e(),
                   _vm._v(" "),
-                  _vm.group.typeMember == "Admin"
+                  _vm.group.type_member == "Admin"
                     ? _c(
                         "button",
                         {
@@ -68679,7 +68677,7 @@ var render = function() {
         }
       }),
       _vm._v(" "),
-      _vm.group.typeMember == "Admin"
+      _vm.group.type_member == "Admin"
         ? _c(
             "button",
             {
@@ -68857,7 +68855,7 @@ var render = function() {
           [_c("i", { staticClass: "fas fa-chart-pie fa-1x" })]
         ),
         _vm._v(" "),
-        _vm.group.typeMember == "Admin"
+        _vm.group.type_member == "Admin"
           ? _c(
               "button",
               {
@@ -69349,7 +69347,7 @@ var render = function() {
     { staticClass: "container" },
     [
       _c("center", [
-        _vm.group.typeMember == "Admin"
+        _vm.group.type_member == "Admin"
           ? _c(
               "button",
               {
@@ -69419,7 +69417,7 @@ var render = function() {
                       ])
                 ]),
                 _vm._v(" "),
-                _vm.group.typeMember == "Admin"
+                _vm.group.type_member == "Admin"
                   ? _c("td", [
                       data.code != null
                         ? _c(
@@ -69434,7 +69432,7 @@ var render = function() {
                     ])
                   : _vm._e(),
                 _vm._v(" "),
-                _vm.group.typeMember == "Admin"
+                _vm.group.type_member == "Admin"
                   ? _c("td", { staticClass: "options-column" }, [
                       !data.user_id
                         ? _c(
@@ -70561,7 +70559,7 @@ var render = function() {
                     ]
                   ),
                   _vm._v(" "),
-                  _vm.group.typeMember == "Admin" ||
+                  _vm.group.type_member == "Admin" ||
                   data.creator_id == _vm.user.id
                     ? _c(
                         "button",
@@ -70583,7 +70581,7 @@ var render = function() {
                       )
                     : _vm._e(),
                   _vm._v(" "),
-                  _vm.group.typeMember == "Admin"
+                  _vm.group.type_member == "Admin"
                     ? _c(
                         "button",
                         {

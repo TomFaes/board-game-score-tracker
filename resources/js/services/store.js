@@ -41,7 +41,7 @@ export default new Vuex.Store({
     },
 
     setUserGroups(state, userGroups){
-      state.userGroups = userGroups;
+      state.userGroups = userGroups['data'];
     },
 
     setSelectedGroup(state, selectedGroup){

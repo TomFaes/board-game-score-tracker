@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Repositories\Contracts\IUser;
-use App\Validators\UserValidation;
 
+use App\Http\Requests\ProfileRequest;
+use App\Http\Resources\UserResource;
 use Auth;
 
 class ProfileController extends Controller
@@ -15,11 +16,10 @@ class ProfileController extends Controller
      /** @var App\Repositories\Contracts\IUser */
      protected $user;
 
-     public function __construct(UserValidation $userValidation, Iuser $user) {
+     public function __construct(Iuser $user) {
          $this->middleware('auth')->only('view');
          $this->middleware('auth:api')->except('view');
 
-         $this->userValidation = $userValidation;
          $this->user = $user;
      }
 
@@ -30,7 +30,7 @@ class ProfileController extends Controller
      */
     public function index()
     {
-        return response()->json($this->user->getUser(auth()->user()->id), 200);
+        return response()->json(new UserResource($this->user->getUser(auth()->user()->id)), 200);
     }
 
     /**
@@ -39,12 +39,11 @@ class ProfileController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function update(ProfileRequest $request)
     {
         $userId = auth()->user()->id;
-        $this->userValidation->validateUser($request, $userId);
         $user = $this->user->update($request->all(), $userId);
-        return response()->json($user, 201);
+        return response()->json(new UserResource($user), 200);
     }
 
     /**

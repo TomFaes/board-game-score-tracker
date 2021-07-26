@@ -70,8 +70,8 @@ class UserRouteTest extends TestCase
         $response = $this->postJson('/api/profile/', $data);
         $response_data = $response->decodeResponseJson();
 
-        $response->assertStatus(201);
-        $this->assertEquals(201, $response->status());
+        $response->assertStatus(200);
+        $this->assertEquals(200, $response->status());
         $this->dataTests($data, $response_data);
 
         echo PHP_EOL.'[42m OK  [0m test update method in the ProfileController';

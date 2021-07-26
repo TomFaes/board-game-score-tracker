@@ -39,8 +39,8 @@
                          <td  class="d-none d-sm-table-cell">{{data['remarks']}}</td>
                          <td class="options-column">
                             <button class="btn btn-info" @click.prevent="viewPlayedGame(data.id)"><i class="fa fa-info" style="heigth:14px; width:14px" ></i></button>
-                            <button class="btn btn-primary"  v-if="group.typeMember == 'Admin' || data.creator_id == user.id" @click.prevent="editPlayedGame(data.id)"><i class="fa fa-edit" style="heigth:14px; width:14px"></i></button>
-                            <button class="btn btn-danger" v-if="group.typeMember == 'Admin'" @click.prevent="deletePlayedGame(data)" ><i class="fas fa-trash fa-1x" ></i></button>
+                            <button class="btn btn-primary"  v-if="group.type_member == 'Admin' || data.creator_id == user.id" @click.prevent="editPlayedGame(data.id)"><i class="fa fa-edit" style="heigth:14px; width:14px"></i></button>
+                            <button class="btn btn-danger" v-if="group.type_member == 'Admin'" @click.prevent="deletePlayedGame(data)" ><i class="fas fa-trash fa-1x" ></i></button>
                         </td>
                     </tr>
                     <tr v-if="selectedPlayedGameId == data.id">

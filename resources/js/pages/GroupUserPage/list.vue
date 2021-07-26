@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <center>
-            <button class="btn btn-primary" v-if="group.typeMember == 'Admin'" @click.prevent="addGroupUser" > <i class="fa fa-user-plus"></i></button><br><br>
+            <button class="btn btn-primary" v-if="group.type_member == 'Admin'" @click.prevent="addGroupUser" > <i class="fa fa-user-plus"></i></button><br><br>
         </center>
 
         <!-- Add user input -->
@@ -28,14 +28,14 @@
                                 {{data.firstname}} {{data.name}}
                             </div>
                         </td>
-                        <td v-if="group.typeMember == 'Admin'">
+                        <td v-if="group.type_member == 'Admin'">
 
                              <a class="mailtoui"
                                     :href="createLink(data.code)"
                                     v-if="data.code != null"
                                     >{{data.code}}</a>
                         </td>
-                        <td v-if="group.typeMember == 'Admin'" class="options-column">
+                        <td v-if="group.type_member == 'Admin'" class="options-column">
                             <button class="btn btn-primary"  v-if="!data.user_id" @click.prevent="updateGroupUser(data)"> <i class="fa fa-edit" style="heigth:14px; width:14px"></i></button>
                             <button class="btn btn-danger" @click.prevent="deleteGroupUser(data)" ><i class="fas fa-trash-alt" style="heigth:14px; width:14px" ></i></button>
                             <button class="btn btn-secondary" v-if="!data.user_id" @click.prevent="regenerateCode(data)" ><i class="fas fa-sync" style="heigth:14px; width:14px" ></i></button>

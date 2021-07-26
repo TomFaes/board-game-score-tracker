@@ -48,7 +48,8 @@ class GameController extends Controller
     public function index(Request $request)
     {
         $pageItems = $request->page_items ?? 0;
-        return new GameCollection($this->game->getGames($pageItems));
+        return response()->json(new GameCollection($this->game->getGames($pageItems)), 200);
+        //return new GameCollection($this->game->getGames($pageItems));
     }
 
     /**
@@ -63,7 +64,8 @@ class GameController extends Controller
         if(auth()->user()->role == 'Admin'){
             $game = $this->game->approveGame($game);
         }
-        return new GameResource($game);
+        return response()->json(new GameResource($game), 200);
+        //return new GameResource($game);
     }
 
     /**
@@ -76,7 +78,8 @@ class GameController extends Controller
     public function update(GamesRequest $request, $id)
     {
         $game = $this->game->update($request->all(), $id);
-        return new GameResource($game);
+        return response()->json(new GameResource($game), 200);
+        //return new GameResource($game);
     }
 
 

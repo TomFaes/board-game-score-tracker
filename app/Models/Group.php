@@ -26,6 +26,7 @@ class Group extends Model
      */
     public function admin()
     {
+        return $this->belongsTo(User::class, 'admin_id', 'id')->withDefault();
         return $this->belongsTo(User::class, 'admin_id', 'id')->select(['id', 'firstname', 'name'])->withDefault();
     }
 

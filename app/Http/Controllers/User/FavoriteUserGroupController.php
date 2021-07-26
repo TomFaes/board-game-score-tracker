@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 use App\Repositories\Contracts\IUser;
 
+use App\Http\Resources\UserResource;
+
 use Auth;
 
 class FavoriteUserGroupController extends Controller
@@ -31,6 +33,6 @@ class FavoriteUserGroupController extends Controller
     {
         $userId = auth()->user()->id;
         $user = $this->user->changeFavoriteGroup($userId, $groupId);
-        return response()->json($user, 201);
+        return response()->json(new UserResource($user), 200);
     }
 }

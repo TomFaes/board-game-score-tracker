@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Group;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\GroupRequest;
 
-use App\Group;
 use Illuminate\Http\Request;
 
 use App\Repositories\Contracts\IGroup;
 use App\Repositories\Contracts\IGroupUser;
 
-
-use App\Validators\GroupValidation;
+use App\Http\Resources\GroupResource;
+use App\Http\Resources\GroupCollection;
 
 use Auth;
 
@@ -18,20 +18,17 @@ class GroupController extends Controller
 {
     /** @var App\Repositories\Contracts\IGroup */
     protected $group;
-    /** @var App\Validators\GroupValidation */
-    protected $groupValidation;
     /** repo App\Repositories\Contracts\IGroupUser */
     protected $groupUser;
 
 
-    public function __construct(GroupValidation $groupValidation, IGroup $group, IGroupUser $groupUser) {
+    public function __construct(IGroup $group, IGroupUser $groupUser) {
         $this->middleware('auth')->only('view');
         $this->middleware('auth:api')->except('view');
 
         $this->middleware('group:normal')->only('view');
         $this->middleware('group')->except('store');
 
-        $this->groupValidation = $groupValidation;
         $this->group = $group;
 
         $this->groupUser = $groupUser;
@@ -42,9 +39,10 @@ class GroupController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json($this->group->getGroups(20), 200);
+        $pageItems = $request->page_items ?? 0;
+        return response()->json(new GroupCollection($this->group->getGroups($pageItems)), 200);
     }
 
     /**
@@ -53,12 +51,11 @@ class GroupController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(GroupRequest $request)
     {
         //when creating the admin of the group is always the logged in user
         $userId = auth()->user()->id;
 
-        $this->groupValidation->validateGroup($request);
         $group = $this->group->create($request->all(), $userId);
 
         $data['firstname'] = auth()->user()->firstname;
@@ -69,7 +66,7 @@ class GroupController extends Controller
         $groupUser = $this->groupUser->create($data);
         $groupUser = $this->groupUser->joinGroup($groupUser->code, $userId);
 
-        return response()->json($group, 200);
+        return response()->json(new GroupResource($group), 200);
     }
 
     /**
@@ -80,7 +77,8 @@ class GroupController extends Controller
      */
     public function show($id)
     {
-        return response()->json($this->group->getGroup($id), 200);
+        $group = $this->group->getGroup($id);
+        return response()->json(new GroupResource($group), 200);
     }
 
     /**
@@ -90,11 +88,10 @@ class GroupController extends Controller
      * @param  \App\Group  $group
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(GroupRequest $request, $id)
     {
-        $this->groupValidation->validategroup($request);
         $group = $this->group->update($request->all(), $id);
-        return response()->json($group, 201);
+        return response()->json(new GroupResource($group), 201);
     }
 
     /**

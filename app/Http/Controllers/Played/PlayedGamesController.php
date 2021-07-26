@@ -3,37 +3,36 @@
 namespace App\Http\Controllers\Played;
 use App\Http\Controllers\Controller;
 
-use App\Models\PlayedGame;
 use Illuminate\Http\Request;
 
 use App\Repositories\Contracts\IPlayedGame;
 use App\Repositories\Contracts\IPlayedGameScore;
-use App\Validators\PlayedGameValidation;
+
+use App\Http\Requests\PlayedGameRequest;
+
+use App\Http\Resources\PlayedGamePaginationCollection;
+use App\Http\Resources\PlayedGameResource;
 
 class PlayedGamesController extends Controller
 {
     protected $playedGame;
-    protected $validation;
 
-    public function __construct(IPlayedGame $playedGame, PlayedGameValidation $playedGameValidation, IPlayedGameScore $playedGameScore) {
+    public function __construct(IPlayedGame $playedGame, IPlayedGameScore $playedGameScore) {
         $this->middleware('auth:api')->except('view');
         $this->middleware('playedgame')->except('store');
 
         $this->playedGame = $playedGame;
         $this->playedGameScore = $playedGameScore;
-        $this->validation = $playedGameValidation;
     }
 
     public function index($groupId)
     {
         $played = $this->playedGame->getPlayedGroupGames($groupId, 20);
-        return response()->json($played, 200);
+        return response()->json(new PlayedGamePaginationCollection($played), 200);
     }
 
-    public function store($groupId, Request $request)
+    public function store($groupId, PlayedGameRequest $request)
     {
-
-        $this->validation->validatePlayedGame($request);
         $playedGame = $this->playedGame->create($request->all(), auth()->user()->id);
         if($request['expansions'] != ""){
             $this->playedGame->addExpansions(explode(',', $request['expansions']), $playedGame->id);
@@ -41,12 +40,11 @@ class PlayedGamesController extends Controller
         $winnerId = $this->playedGameScore->createSetScores($request['player'], $playedGame->id);
         $playedGame = $this->playedGame->setWinner($winnerId, $playedGame->id);
 
-        return response()->json($playedGame, 200);
+        return response()->json(new PlayedGameResource($playedGame), 200);
     }
 
-    public function update(Request $request, $group, $id)
+    public function update(PlayedGameRequest $request, $group, $id)
     {
-        $this->validation->validatePlayedGame($request);
         $playedGame = $this->playedGame->update($request->all(), $id);
         if($request['expansions'] != ""){
             $this->playedGame->addExpansions(explode(',', $request['expansions']), $playedGame->id);
@@ -59,7 +57,7 @@ class PlayedGamesController extends Controller
 
         $playedGame = $this->playedGame->setWinner($winnerId, $playedGame->id);
 
-        return response()->json($playedGame, 200);
+        return response()->json(new PlayedGameResource($playedGame), 200);
     }
 
     public function destroy($group, $id)

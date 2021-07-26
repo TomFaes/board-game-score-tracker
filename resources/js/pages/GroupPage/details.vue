@@ -9,7 +9,7 @@
             <button class="btn btn-primary" @click="navigation('addPlayedGame')"><i class="fas fa-plus fa-1x" ></i></button>
             <button class="btn btn-primary" @click="navigation('allPlayedGames')"><i class="fas fa-list-ul fa-1x" ></i></button>
             <button class="btn btn-primary" @click="navigation('groupStats')"><i class="fas fa-chart-pie fa-1x" ></i></button>
-            <button class="btn btn-primary" @click="navigation('editGroup')" v-if="group.typeMember == 'Admin'"><i class="fas fa-pencil-alt fa-1x" ></i></button>
+            <button class="btn btn-primary" @click="navigation('editGroup')" v-if="group.type_member == 'Admin'"><i class="fas fa-pencil-alt fa-1x" ></i></button>
             <button class="btn btn-primary" @click="navigation('groupUsers')"><i class="fas fa-users fa-1x" ></i></button>
             <button class="btn btn-primary" @click="navigation('groupGames')"><i class="fas fa-dice fa-1x" ></i></button>
         </div>

@@ -90,9 +90,9 @@ class GameRouteTest extends TestCase
         $response = $this->postJson('/api/game/', $data);
         $response_data = $response->getData();
 
-        $response->assertStatus(201);
-        $this->assertEquals(201, $response->status());
-        $this->dataTests($data, $response_data->data);
+        $response->assertStatus(200);
+        $this->assertEquals(200, $response->status());
+        $this->dataTests($data, $response_data);
         echo PHP_EOL.'[42m OK  [0m GameController: test store';
     }
 
@@ -113,7 +113,7 @@ class GameRouteTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertEquals(200, $response->status());
-        $this->dataTests($data, $response_data->data);
+        $this->dataTests($data, $response_data);
         echo PHP_EOL.'[42m OK  [0m GameController: test update';
     }
 

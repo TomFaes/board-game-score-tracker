@@ -14,7 +14,7 @@
                     <td><a v-bind:href="link.link" target="_blank"> {{link.name}} </a></td>
                     <td>{{ link.description }}</td>
                     <td class="options-column">
-                        <span v-if="group.typeMember == 'Admin'">
+                        <span v-if="group.type_member == 'Admin'">
                             <button class="btn btn-primary" @click.prevent="editLink(link.id)"><img :src="getImageUrl('images/layout/edit_link_icon.png')"  style="heigth:14px; width:14px"></button>
                             <button class="btn btn-danger" @click.prevent="deleteLink(link.id, link.group_game_id)"><img :src="getImageUrl('images/layout/delete_link_icon.png')"  style="heigth:14px; width:14px"></button>
                         </span>

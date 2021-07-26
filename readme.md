@@ -27,7 +27,6 @@ All members of a group will be able to add game scores and update them. The admi
     - update to Larevel to version 8
     - update & add phpunit testing
     - bugfixes
-
 # Version 2.01: 15/05/2021
     - laravel version: 8.40.0
     - update packages to the latest version
@@ -38,18 +37,28 @@ All members of a group will be able to add game scores and update them. The admi
     - bugfixes
         - if you are in a group and go back to the home page you get an 500 error
         - faker text option didn't work anymore
-# Version 2.02: 
+# Version 2.02: 01/07/2021
     - update packages to the latest version
     - add mailto at the group user to invite a user to a group. 
     - replace Validator with Request
     - add GameResource & GameCollection
+# Version 2.03: 
+    - Replace Validators with request
+    - add Resource & Collection for all models
+    - bugfixes
+        - user validation changed to profile validation
 
 
 ## Future plans
-Version 2.03: 
+Version 2.04: 
      - update packages to the latest version
-     - Replace Validators with request
-     - add Resource & Collection for all models
+     - rework front-end
+        - rework split up API data return (group api call only returns groupdata with creator data, new call for group users, played games, groupgames)
+        - update Resources to make better use of this return data. 
+
+     
+     
+     
         
 
 

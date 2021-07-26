@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Group;
 use App\Http\Controllers\Controller;
 
-use App\Group\GroupGame;
+
+use App\Http\Resources\GameCollection;
+use App\Http\Resources\GroupGamePaginationCollection;
+use App\Http\Resources\GroupGameResource;
 use App\Repositories\Contracts\IGame;
 use App\Repositories\Contracts\IGroupGame;
 use Illuminate\Http\Request;
@@ -25,7 +28,8 @@ class GroupGameController extends Controller
     public function index($groupId)
     {
         $groupGames = $this->groupGame->getGamesOfGroup($groupId, 20);
-        return response()->json($groupGames, 200);
+
+        return response()->json(new GroupGamePaginationCollection($groupGames), 200);
     }
 
     /**
@@ -37,7 +41,7 @@ class GroupGameController extends Controller
     public function store(Request $request)
     {
         $groupGame = $this->groupGame->create($request->all());
-        return response()->json($groupGame, 200);
+        return response()->json(new GroupGameResource($groupGame), 200);
     }
 
     /**
@@ -55,6 +59,6 @@ class GroupGameController extends Controller
     public function searchNonGroupGames($groupId, Request $request){
         $groupGames = $this->groupGame->getGroupGameIds($groupId);
         $games = $this->game->searchGamesNotInGroup($groupGames);
-        return response()->json($games, 200);
+        return response()->json(new GameCollection($games), 200);
     }
 }

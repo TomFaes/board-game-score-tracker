@@ -2,7 +2,7 @@
     <div class="container">
         <hr>
         <div>
-            <add-game :group=group :nonGroupGames="nonGroupGames" v-if="group.typeMember == 'Admin'" ></add-game>
+            <add-game :group=group :nonGroupGames="nonGroupGames" v-if="group.type_member == 'Admin'" ></add-game>
         </div>
         <br>
 
@@ -20,12 +20,8 @@
                         </td>
                         <td class="options-column">
                             <button class="btn btn-info" @click.prevent="showLink(data.id)" v-if="data.links.length > 0"><img :src="getImageUrl('images/layout/link_icon.png')"  style="heigth:14px; width:14px"></button>
-                            <button class="btn btn-danger" @click.prevent="deleteGame(data)" v-if="group.typeMember == 'Admin' && data.links.length == 0"><i class="fas fa-trash fa-1x" ></i></button>
-                            <button class="btn btn-info" @click.prevent="addLink(data.id)" v-if="group.typeMember == 'Admin'"><img :src="getImageUrl('images/layout/add_link_icon.png')" style="heigth:14px; width:14px"></button>
-
-
-
-                            
+                            <button class="btn btn-danger" @click.prevent="deleteGame(data)" v-if="group.type_member == 'Admin' && data.links.length == 0"><i class="fas fa-trash fa-1x" ></i></button>
+                            <button class="btn btn-info" @click.prevent="addLink(data.id)" v-if="group.type_member == 'Admin'"><img :src="getImageUrl('images/layout/add_link_icon.png')" style="heigth:14px; width:14px"></button>
                         </td>
                     </tr>
                     <tr v-if="selectedGroupGameLinkCreate == data.id">
@@ -45,7 +41,7 @@
         <vue-pagination  :pagination="dataList" @paginate="loadList()" :offset="4"></vue-pagination>
 
 
-        <button class="btn btn-primary" @click.prevent="showAddNewGameForm" v-if="group.typeMember == 'Admin'">Add new game</button>
+        <button class="btn btn-primary" @click.prevent="showAddNewGameForm" v-if="group.type_member == 'Admin'">Add new game</button>
         <add-new-game :submitOption="'CreateFromGroup'" v-if="displayNewGame != ''"></add-new-game>
     </div>
 </template>
@@ -97,6 +93,7 @@
                     this.dataList = response;
                     this.selectedGroupGameLinkAdd = 0;
                     this.selectedGroupGameLinkCreate = 0;
+                    this.loadNonGroupGames();
                 }).catch(() => {
                     console.log('handle server error from here');
                 });
@@ -129,9 +126,10 @@
             },
 
             loadNonGroupGames(){
+                console.log("group id: " + this.group.id);
                 apiCall.getData('group/' + this.group.id + '/search-non-group-games')
                 .then(response =>{
-                    this.nonGroupGames = response;
+                    this.nonGroupGames = response['data'];
                 }).catch(() => {
                     console.log('handle server error from here');
                 });
@@ -160,7 +158,6 @@
 
         mounted(){
             this.loadList();
-            this.loadNonGroupGames();
             this.$bus.$on('reloadGroupGames', () => {
                     this.loadList();
                     this.loadNonGroupGames();

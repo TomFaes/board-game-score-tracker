@@ -101,7 +101,7 @@ class GroupRouteTest extends TestCase
 
         $data = [
             'group_id' => $groupId,
-            'game_id' => $response_data[0]->id,
+            'game_id' => $response_data->data[0]->id,
         ];
 
         $response = $this->postJson('/api/group/'.$groupId.'/group-game', $data);
@@ -116,6 +116,7 @@ class GroupRouteTest extends TestCase
         $this->be($this->authenticatedUser('Admin'));
 
         $response = $this->get('/api/group');
+
         $response_data = $response->getData();
 
         $response->assertStatus(200);
@@ -197,7 +198,7 @@ class GroupRouteTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertEquals(200, $response->status());
-        $this->assertEquals($this->countUserInGroup, count($response_data));
+        $this->assertEquals($this->countUserInGroup, count($response_data->data));
         echo PHP_EOL.'[42m OK  [0m UserGroupsController: test index';
     }
 
@@ -334,8 +335,8 @@ class GroupRouteTest extends TestCase
 
 
 
-        $response->assertStatus(201);
-        $this->assertEquals(201, $response->status());
+        $response->assertStatus(200);
+        $this->assertEquals(200, $response->status());
 
         $this->assertEquals($this->testData[0]->id, $response_data->favorite_group_id);
 
@@ -364,7 +365,7 @@ class GroupRouteTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertEquals(200, $response->status());
-        $this->assertEquals($countGamesNotInGroup, count($response_data));
+        $this->assertEquals($countGamesNotInGroup, count($response_data->data));
 
         echo PHP_EOL.'[42m OK  [0m GroupGameController: test searchNonGroupGames';
     }
@@ -395,7 +396,7 @@ class GroupRouteTest extends TestCase
 
         $data = [
             'group_id' => $newGroup->id,
-            'game_id' => $response_data[0]->id,
+            'game_id' => $response_data->data[0]->id,
         ];
 
         $response = $this->postJson('/api/group/'.$newGroup->id.'/group-game', $data);

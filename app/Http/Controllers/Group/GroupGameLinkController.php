@@ -3,21 +3,22 @@
 namespace App\Http\Controllers\Group;
 use App\Http\Controllers\Controller;
 use App\Repositories\Contracts\IGroupGameLink;
-use App\Validators\GroupGameLinkValidation;
+
 use Illuminate\Http\Request;
+
+use App\Http\Requests\GroupGameLinkRequest;
+use App\Http\Resources\GroupGameLinkResource;
 
 class GroupGameLinkController extends Controller
 {
     protected $groupGameLink;
-    protected $groupGameLinkValidation;
 
-    public function __construct(IGroupGameLink $groupGameLink, GroupGameLinkValidation $groupGameLinkValidation)
+    public function __construct(IGroupGameLink $groupGameLink)
     {
         $this->middleware('auth:api');
         $this->middleware('groupgamelink');
 
         $this->groupGameLink = $groupGameLink;
-        $this->groupGameLinkValidation = $groupGameLinkValidation;
     }
 
     /**
@@ -26,10 +27,10 @@ class GroupGameLinkController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, $groupGameId)
+    public function store(GroupGameLinkRequest $request, $groupGameId)
     {
-        $this->groupGameLinkValidation->validateGroupGameLink($request);
         $groupGameLink = $this->groupGameLink->create($request->all());
+        return response()->json(new GroupGameLinkResource($groupGameLink), 200);
         return response()->json($groupGameLink, 200);
     }
 
@@ -40,10 +41,10 @@ class GroupGameLinkController extends Controller
      * @param  \App\GroupGameLink  $groupGameLink
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $groupGameId, $id)
+    public function update(GroupGameLinkRequest $request, $groupGameId, $id)
     {
-        $this->groupGameLinkValidation->validateGroupGameLink($request);
         $groupGameLink = $this->groupGameLink->update($request->all(), $id);
+        return response()->json(new GroupGameLinkResource($groupGameLink), 201);
         return response()->json($groupGameLink, 201);
     }
 
