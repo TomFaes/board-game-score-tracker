@@ -20,7 +20,8 @@ class GroupGameResource extends JsonResource
             'game_id' => $this->game_id,
             'group' => $this->group,
             'game' => $this->game,
-            'links' => $this->links
+            'name' => $this->game->name,
+            'links' => new GroupGameLinkCollection($this->whenLoaded('links')),
         ];
     }
 }

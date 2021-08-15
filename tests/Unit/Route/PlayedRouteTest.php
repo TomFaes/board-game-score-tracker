@@ -88,7 +88,7 @@ class PlayedRouteTest extends TestCase
         }
     }
 
-    protected function createPlayedGameRequest($group){
+    protected function createPlayedGameRequest($group, $groupUsers){
         $data['group_id'] = $group->id;
         $data['game_id'] = $this->testData[0]->game_id;
         $data['date'] = '2021-04-26';
@@ -96,29 +96,29 @@ class PlayedRouteTest extends TestCase
         $data['remarks'] = 'AAA';
         //$scoreData['expansion'] = null;
 
-        $groupUserId = $group->group_users[1]->id;
+        $groupUserId = $groupUsers->data[1]->id;
         $data['player'][$groupUserId]['group_user_id'] = $groupUserId;
         $data['player'][$groupUserId]['place'] = "";
         $data['player'][$groupUserId]['score'] = 101;
-        $data['player'][$groupUserId]['remarks'] = "Group user id: ".$group->group_users[1]->fullName;
+        $data['player'][$groupUserId]['remarks'] = "Group user id: ".$groupUsers->data[1]->full_name;
 
-        $groupUserId = $group->group_users[2]->id;
+        $groupUserId = $groupUsers->data[2]->id;
         $data['player'][$groupUserId]['group_user_id'] = $groupUserId;
         $data['player'][$groupUserId]['place'] = "";
         $data['player'][$groupUserId]['score'] = 130;
-        $data['player'][$groupUserId]['remarks'] = "Group user id: ".$group->group_users[2]->fullName;
+        $data['player'][$groupUserId]['remarks'] = "Group user id: ".$groupUsers->data[2]->full_name;
 
-        $groupUserId = $group->group_users[3]->id;
+        $groupUserId = $groupUsers->data[3]->id;
         $data['player'][$groupUserId]['group_user_id'] = $groupUserId;
         $data['player'][$groupUserId]['place'] = "";
         $data['player'][$groupUserId]['score'] = 114;
-        $data['player'][$groupUserId]['remarks'] = "Group user id: ".$group->group_users[2]->fullName;
+        $data['player'][$groupUserId]['remarks'] = "Group user id: ".$groupUsers->data[3]->full_name;
 
-        $groupUserId = $group->group_users[4]->id;
+        $groupUserId = $groupUsers->data[4]->id;
         $data['player'][$groupUserId]['group_user_id'] = $groupUserId;
         $data['player'][$groupUserId]['place'] = "";
         $data['player'][$groupUserId]['score'] = 99;
-        $data['player'][$groupUserId]['remarks'] = "Group user id: ".$group->group_users[2]->fullName;
+        $data['player'][$groupUserId]['remarks'] = "Group user id: ".$groupUsers->data[4]->full_name;
         return $data;
     }
 
@@ -140,6 +140,18 @@ class PlayedRouteTest extends TestCase
         echo PHP_EOL.'[42m OK  [0m PlayedGamesController: test index';
     }
 
+    public function test_PlayedGameController_show(){
+        $this->be($this->authenticatedUser('Admin'));
+
+        $response = $this->get('/api/group/'.$this->testData[0]->group_id.'/played/'.$this->testData[0]->id);
+        $response_data = $response->getData();
+
+        $response->assertStatus(200);
+        $this->assertEquals(200, $response->status());
+
+        echo PHP_EOL.'[42m OK  [0m PlayedGamesController: test show';
+    }
+
     public function test_PlayedGamesController_store()
     {
         $this->be($this->authenticatedUser('Admin'));
@@ -150,14 +162,17 @@ class PlayedRouteTest extends TestCase
         $response = $this->get('/api/group/'.$newGroup->id);
         $group = $response->getData();
 
-        $data = $this->createPlayedGameRequest($group);
+        $groupUsers =  $this->get('/api/group/'.$newGroup->id.'/users');
+        $groupUsers = $groupUsers->getData();
+
+        $data = $this->createPlayedGameRequest($group, $groupUsers);
 
         $response = $this->postJson('/api/group/'.$group->id.'/played', $data);
         $response_data = $response->getData();
 
         $response->assertStatus(200);
         $this->assertEquals(200, $response->status());
-        $this->assertEquals($group->group_users[2]->id, $response_data->winner_id);
+        $this->assertEquals($groupUsers->data[2]->id, $response_data->winner_id);
 
         echo PHP_EOL.'[42m OK  [0m PlayedGamesController: test store';
     }
@@ -172,17 +187,20 @@ class PlayedRouteTest extends TestCase
         $response = $this->get('/api/group/'.$newGroup->id);
         $group = $response->getData();
 
-        $data = $this->createPlayedGameRequest($group);
+        $groupUsers =  $this->get('/api/group/'.$newGroup->id.'/users');
+        $groupUsers = $groupUsers->getData();
+
+        $data = $this->createPlayedGameRequest($group, $groupUsers);
 
         $response = $this->postJson('/api/group/'.$group->id.'/played', $data);
         $response_data = $response->getData();
 
         $response->assertStatus(200);
         $this->assertEquals(200, $response->status());
-        $this->assertEquals($group->group_users[2]->id, $response_data->winner_id);
+        $this->assertEquals($groupUsers->data[2]->id, $response_data->winner_id);
 
         //write update test
-        $nextWinner = $group->group_users[3]->id;
+        $nextWinner = $groupUsers->data[3]->id;
 
         $playedGame = $this->repo->getPlayedGame($response_data->id);
 
@@ -199,7 +217,6 @@ class PlayedRouteTest extends TestCase
             $groupUserId = $playerScore->group_user_id;
             $dataUpdate['player'][$groupUserId]['id'] = $playerScore->id;
             $dataUpdate['player'][$groupUserId]['group_user_id'] = $groupUserId;
-           // $dataUpdate['player'][$groupUserId]['place'] = $playerScore->place;
            $dataUpdate['player'][$groupUserId]['place'] = 0;
             $dataUpdate['player'][$groupUserId]['score'] = $playerScore->score;
             $dataUpdate['player'][$groupUserId]['remarks'] = $playerScore->remarks;
@@ -227,7 +244,10 @@ class PlayedRouteTest extends TestCase
         $response = $this->get('/api/group/'.$newGroup->id);
         $group = $response->getData();
 
-        $data = $this->createPlayedGameRequest($group);
+        $groupUsers =  $this->get('/api/group/'.$newGroup->id.'/users');
+        $groupUsers = $groupUsers->getData();
+
+        $data = $this->createPlayedGameRequest($group, $groupUsers);
 
         $response = $this->postJson('/api/group/'.$group->id.'/played', $data);
         $response_data = $response->getData();

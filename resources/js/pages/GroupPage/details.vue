@@ -5,7 +5,7 @@
             <i class="far fa-star" @click.prevent="changeFavorite()" v-else></i>
         </h1>
         <div class="button-row">
-             <button class="btn btn-primary" @click="navigation('home')"><i class="fas fa-home fa-1x" ></i></button>
+            <button class="btn btn-primary" @click="navigation('home')"><i class="fas fa-home fa-1x" ></i></button>
             <button class="btn btn-primary" @click="navigation('addPlayedGame')"><i class="fas fa-plus fa-1x" ></i></button>
             <button class="btn btn-primary" @click="navigation('allPlayedGames')"><i class="fas fa-list-ul fa-1x" ></i></button>
             <button class="btn btn-primary" @click="navigation('groupStats')"><i class="fas fa-chart-pie fa-1x" ></i></button>
@@ -18,8 +18,8 @@
 </template>
 
 <script>
-
     import apiCall from '../../services/ApiCall.js';
+
     export default {
         components: {
 
@@ -88,13 +88,12 @@
 </script>
 
 <style scoped>
-button {
-    margin: 3px;
-}
+    button {
+        margin: 3px;
+    }
 
-.button-row{
-    width: 100%;
-    text-align: center;
-}
-
+    .button-row{
+        width: 100%;
+        text-align: center;
+    }
 </style>

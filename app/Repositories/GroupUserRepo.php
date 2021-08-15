@@ -18,6 +18,14 @@ class GroupUserRepo extends Repository implements IGroupUser
         return GroupUser::with(['group', 'user'])->OrderBy('name', 'asc', 'firstname', 'asc')->get();
     }
 
+    public function getGroupUsers($groupId, $itemsPerPage = 0)
+    {
+        if($itemsPerPage > 0){
+            return GroupUser::where('group_id', $groupId)->with(['group', 'user'])->paginate($itemsPerPage);
+        }
+        return GroupUser::where('group_id', $groupId)->with(['group', 'user'])->get();
+    }
+
     public function getGroupUser($id)
     {
         return GroupUser::with(['group', 'user'])->find($id);

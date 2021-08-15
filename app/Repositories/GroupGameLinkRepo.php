@@ -50,7 +50,9 @@ class GroupGameLinkRepo extends Repository implements Contracts\IGroupGameLink
         isset($data['group_game_id']) === true ? $groupGameLink->group_game_id = $data['group_game_id'] : "";
         isset($data['name']) === true ? $groupGameLink->name = $data['name'] : "";
         isset($data['link']) === true ? $groupGameLink->link = $data['link'] : "";
-        isset($data['description']) === true ? $groupGameLink->description = $data['description'] : "";
+        $groupGameLink->description = $data['description'] ?? "";
+        //$groupGameLink->description = isset($data['description']) === true ? $data['description'] : "";
+        //isset($data['description']) === true ? $groupGameLink->description = $data['description'] : "";
         return $groupGameLink;
     }
 

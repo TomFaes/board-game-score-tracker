@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 
 
 use App\Http\Resources\GameCollection;
+use App\Http\Resources\GroupGameCollection;
 use App\Http\Resources\GroupGamePaginationCollection;
 use App\Http\Resources\GroupGameResource;
 use App\Repositories\Contracts\IGame;
@@ -25,11 +26,15 @@ class GroupGameController extends Controller
         $this->groupGame = $groupGame;
     }
 
-    public function index($groupId)
+    public function index($groupId, Request $request)
     {
-        $groupGames = $this->groupGame->getGamesOfGroup($groupId, 20);
+        $pageItems = $request->page_items ?? 0;
+        $groupGames = $this->groupGame->getGamesOfGroup($groupId, $pageItems);
 
-        return response()->json(new GroupGamePaginationCollection($groupGames), 200);
+        if($pageItems > 0){
+            return response()->json(new GroupGamePaginationCollection($groupGames), 200);
+        }
+        return response()->json(new GroupGameCollection($groupGames), 200);
     }
 
     /**

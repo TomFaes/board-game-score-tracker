@@ -4,9 +4,6 @@
             <global-layout>
                 <nav-bar :user=user></nav-bar><br>
                 <message-box></message-box>
-                <!--
-                <join-group></join-group>
-                -->
                 <router-view :key="$route.path" :user=user></router-view>
             </global-layout>
         </div>
@@ -14,7 +11,6 @@
 </template>
 
 <script>
-    import apiCall from '../../services/ApiCall.js';
     import navBar from '../IndexPage/navBar.vue';
     import login from '../IndexPage/login.vue';
 
@@ -36,10 +32,7 @@
 
         data () {
             return {
-                //user: {},
-                selectedGroup: {},
-                displayNav: "",
-                display: "",
+
             }
         },
 
@@ -54,7 +47,7 @@
         },
 
         mounted(){
-            //this.$bus.$emit('showMessage', 'Welcome back, remove this message after testing', 'orange', '1000' );
+
         },
     }
 </script>

@@ -42,27 +42,22 @@ All members of a group will be able to add game scores and update them. The admi
     - add mailto at the group user to invite a user to a group. 
     - replace Validator with Request
     - add GameResource & GameCollection
-# Version 2.03: 
+# Version 2.03: 26/07/2021
     - Replace Validators with request
     - add Resource & Collection for all models
     - bugfixes
         - user validation changed to profile validation
-
-
-## Future plans
-Version 2.04: 
+# Version 2.04: 15/08/2021
      - update packages to the latest version
      - rework front-end
         - rework split up API data return (group api call only returns groupdata with creator data, new call for group users, played games, groupgames)
         - update Resources to make better use of this return data. 
 
-     
-     
-     
-        
+
+## Future plans
 
 
-Undetermined futere plans
+# Undetermined futere plans
     - game statistics for player over the groups
     - Game detailed scores: if you play games like 7 wonders you will notices the score fiche will exist out of several  lines(points for blue cards, points for wonders, ?) . It should be a nice feature to have this present.
     - Turn order drawer: Our group usually draws who is first, second and so on. 

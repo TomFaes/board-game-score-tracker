@@ -1,8 +1,5 @@
 <template>
     <div class="container">
-        <!--
-        <div v-if="display == ''">
-            -->
         <div>
             <div class="row">
                 <div class="col-2"></div>
@@ -49,7 +46,7 @@
                         <h3>Group game Stats</h3>
                         <multiselect
                             :multiple="false"
-                            :options="group.base_group_games"
+                            :options="groupGames.data"
                             :close-on-select="true"
                             :clear-on-select="true"
                             placeholder="Choose a game"
@@ -64,7 +61,7 @@
              </div>
         </div>
 
-        <group-stats :dataList=statsList :group="group"></group-stats>
+        <group-stats :dataList=statsList :group="group" :groupUsers="groupUsers" :groupGames="groupGames"></group-stats>
     </div>
 </template>
 
@@ -86,7 +83,31 @@
         },
 
         props: {
-            'group': {}
+            'group': {},
+        },
+
+        computed: {
+            groupGames(){
+                if(this.group.id === undefined){
+                    return;
+                }
+
+                if(this.$store.state.selectedGroupGames.data == undefined){
+                    this.$store.dispatch('getSelectedGroupGames', {groupId: this.group.id});
+                }
+                return this.$store.state.selectedGroupGames;
+            },
+
+            groupUsers(){
+                if(this.group.id === undefined){
+                    return;
+                }
+
+                if(this.$store.state.selectedGroupUsers.data == undefined){
+                    this.$store.dispatch('getSelectedGroupUsers', {groupId: this.group.id});
+                }
+                return this.$store.state.selectedGroupUsers;
+            }
         },
 
         data () {
@@ -121,7 +142,7 @@
 
             loadGameData(game){
                 if(game){
-                    apiCall.getData('stats/group/' + this.group.id + '/game/' + game['id'])
+                    apiCall.getData('stats/group/' + this.group.id + '/game/' + game.game_id)
                     .then(response =>{
                         this.statsList = response;
                         this.showStat('game');
@@ -158,13 +179,5 @@
 </script>
 
 <style scoped>
-button{
-    /*width: 75px;*/
-}
 
-
-.calendar{
-    display: inline-block;
-    /*width: 100px;*/
-}
 </style>

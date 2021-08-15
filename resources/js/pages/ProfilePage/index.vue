@@ -1,6 +1,5 @@
 <template>
     <div>
-
         <div class="row">
                 <h2>Profile</h2>
         </div>
@@ -9,7 +8,7 @@
             <text-input inputName="firstname" inputId="firstname" tekstLabel="firstname: " v-model="fields.firstname" :errors="errors.firstname" :value='fields.firstname'></text-input>
             <text-input inputName="name" inputId="name" tekstLabel="name: " v-model="fields.name" :errors="errors.name" :value='fields.name'></text-input>
             <text-input inputName="email" inputId="email" tekstLabel="email: " v-model="fields.email" :errors="errors.email" :value='fields.email'></text-input>
-            <button-input btnClass="btn btn-primary">Save profile</button-input>
+            <button class="btn btn-primary">Safe profile</button>
 
             <div class="form-group">
                 <div class="row">
@@ -27,19 +26,14 @@
 
 <script>
     import apiCall from '../../services/ApiCall.js';
-    //import navBar from '../IndexPage/navBar.vue'
 
     import TextInput from '../../components/ui/form/TextInput.vue';
     import DropdownInput from '../../components/ui/form/DropdownInput.vue';
-    import ButtonInput from '../../components/ui/form/ButtonInput.vue';
-
 
     export default {
         components: {
-            //navBar,
             TextInput,
             DropdownInput,
-            ButtonInput
         },
 
          data () {

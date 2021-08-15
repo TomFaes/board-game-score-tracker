@@ -2,7 +2,7 @@
     <div>
         <list-unapproved></list-unapproved>
 
-        <div class="row" >
+        <div class="button-row">
             <button class="btn btn-primary" @click.prevent="CreateShow"><i class="fas fa-plus fa-1x" ></i></button>
         </div><br>
 
@@ -54,8 +54,8 @@
 </script>
 
 <style scoped>
-.title{
-    width: 90%;
+.button-row{
+    width: 100%;
     text-align: center;
 }
 </style>

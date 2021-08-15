@@ -1,9 +1,6 @@
 <template>
     <div>
-        <table class="table table-hover table-sm ">
-            <!--
-            <table class="table table-striped table-bordered ">
--->
+        <table class="table table-hover table-sm " v-if="dataList">
             <thead>
                 <tr>
                     <th>Date</th>
@@ -17,40 +14,35 @@
             </thead>
             <tbody  v-for="data in dataList.data"  :key="data.id" >
                     <tr>
-                        <td nowrap>{{convertDate(data['date'])}}</td>
-                        <td  class="d-none d-sm-table-cell">{{convertTime(data['time_played'])}}</td>
-                        <td>{{data['game']['name']}}  </td>
+                        <td nowrap>{{convertDate(data.date)}}</td>
+                        <td  class="d-none d-sm-table-cell">{{convertTime(data.time_played)}}</td>
+                        <td>{{data.game.name}}  </td>
                          <td  class="d-none d-sm-table-cell">
-                            <span  v-if="data.expansion != ''">
-                                <span v-for="expansion in data.expansions"  :key="expansion.id">
+                            <span  v-if="data.played_expansions != ''">
+                                <span v-for="expansion in data.played_expansions"  :key="expansion.id">
                                     - {{ expansion.name }}<br>
                                 </span>
                             </span>
                         </td>
                         <td>
-                            <span v-if="data['winner']['user_id'] > 0">
-                                    {{data['winner']['user']['firstname']}}  {{data['winner']['user']['name']}}
-                                </span>
-                                <span v-else>
-                                    {{data['winner']['firstname']}} {{data['winner']['name']}}
-                                </span>
+                            {{ data.winner.full_name }}
                         </td>
 
-                         <td  class="d-none d-sm-table-cell">{{data['remarks']}}</td>
+                         <td  class="d-none d-sm-table-cell">{{data.remarks}}</td>
                          <td class="options-column">
-                            <button class="btn btn-info" @click.prevent="viewPlayedGame(data.id)"><i class="fa fa-info" style="heigth:14px; width:14px" ></i></button>
-                            <button class="btn btn-primary"  v-if="group.type_member == 'Admin' || data.creator_id == user.id" @click.prevent="editPlayedGame(data.id)"><i class="fa fa-edit" style="heigth:14px; width:14px"></i></button>
+                            <button class="btn btn-info" @click.prevent="setViewInput(data.id, 'View')"><i class="fa fa-info" style="heigth:14px; width:14px" ></i></button>
+                            <button class="btn btn-primary"  v-if="group.type_member == 'Admin' || data.creator_id == user.id" @click.prevent="setViewInput(data.id, 'Update')"><i class="fa fa-edit" style="heigth:14px; width:14px"></i></button>
                             <button class="btn btn-danger" v-if="group.type_member == 'Admin'" @click.prevent="deletePlayedGame(data)" ><i class="fas fa-trash fa-1x" ></i></button>
                         </td>
                     </tr>
-                    <tr v-if="selectedPlayedGameId == data.id">
+                    <tr v-if="playedGame.id == data.id">
                         <td colspan="100">
-                            <edit-played-game  v-if="selectedPlayedGameId == data.id" :group=group :playedGame=data :submitOption="view"></edit-played-game>
+                            <edit-played-game :group=group :playedGame=playedGame :groupGames="groupGames" :groupUsers="groupUsers" :submitOption="view"></edit-played-game>
                         </td>
                     </tr>
             </tbody>
         </table>
-        <vue-pagination  :pagination="dataList" @paginate="loadList()" :offset="4"></vue-pagination>
+        <vue-pagination  :pagination="dataList" @paginate="loadList()" :offset="4" v-if="dataList"></vue-pagination>
     </div>
 </template>
 
@@ -58,46 +50,47 @@
     import EditPlayedGame from '../PlayedGamePage/input.vue';
     import apiCall from '../../services/ApiCall.js';
     import VuePagination from '../../components/ui/pagination.vue';
-    import ButtonInput from '../../components/ui/form/ButtonInput.vue';
     import Moment from 'moment';
 
     export default {
         data () {
             return {
-                'selectedPlayedGameId': "",
-                fields: [
-                    { 'field': 'date'},
-                     { 'field': 'time_played'},
-                    { 'field': 'game_id'},
-                    { 'field': 'expansion'},
-                    { 'field': 'winner_id'},
-                    { 'field': 'remarks'},
-                ],
                 'view': "",
             }
         },
 
-        props: {
-            'group': {},
-            'user': {},
-        },
-
-        watch:{
+         computed: {
             group(){
-                this.loadList();
-            }
-         },
+                return this.$store.state.selectedGroup;
+             },
 
-          computed: {
             dataList(){
+                if(this.group.id == undefined){
+                    return;
+                }
+                if(this.$store.state.playedGames.data == undefined ){
+                    this.$store.dispatch('getPlayedGames', {id: this.group.id, current_page: '1'});
+                }
                 return this.$store.state.playedGames;
             },
+
+            playedGame(){
+                return this.$store.state.selectedPlayedGame;
+            },
+
+            groupGames(){
+                return this.$store.state.selectedGroupGames;
+
+            },
+
+            groupUsers(){
+                return this.$store.state.selectedGroupUsers;
+            }
         },
 
         components: {
             EditPlayedGame,
             VuePagination,
-            ButtonInput,
             Moment
         },
 
@@ -106,28 +99,39 @@
                 if(this.group.id == undefined){
                     return;
                 }
-                this.$store.dispatch('getPlayedGames', {id: this.group.id, current_page: this.dataList.current_page ?? '1'});
-                return;
+                this.view = "";
+                this.$store.dispatch('resetPlayedGame',);
+                return this.$store.dispatch('getPlayedGames', {id: this.group.id, current_page: this.dataList.current_page ?? '1'});
+
             },
 
-            viewPlayedGame(id){
-                if(this.selectedPlayedGameId == id && this.view == "View"){
-                    this.selectedPlayedGameId = id = "";
+            setSelectedGame(id){
+                this.$store.dispatch('getSelectedPlayedGame', {groupId: this.group.id,  id: id});
+                if(this.$store.state.selectedGroupGames.data == undefined){
+                    this.$store.dispatch('getSelectedGroupGames', {groupId: this.group.id});
+                }
+                if(this.$store.state.selectedGroupUsers.data == undefined){
+                    this.$store.dispatch('getSelectedGroupUsers', {groupId: this.group.id});
+                }
+            },
+
+            setViewInput(id, view = ""){
+                if(this.view == view && this.playedGame.id == id){
                     this.view = "";
-                }else{
-                    this.selectedPlayedGameId = id;
-                    this.view = "View";
+                    return this.$store.dispatch('resetPlayedGame');
                 }
-            },
 
-            editPlayedGame(id){
-                if(this.selectedPlayedGameId == id && this.view == "Update"){
-                    this.selectedPlayedGameId = id = "";
-                   this.view = "";
-                }else{
-                    this.selectedPlayedGameId = id;
-                    this.view = "Update";
+                this.view = view;
+                if(this.playedGame.id == undefined){
+                    this.setSelectedGame(id);
+                    return;
                 }
+
+                if(this.playedGame.id != id){
+                    this.setSelectedGame(id);
+                    return;
+                }
+                return;
             },
 
             convertDate(value){
@@ -135,10 +139,10 @@
             },
 
             convertTime(value){
-                if(value != null){
-                     return Moment(value, "hh:mm:ss").format('hh:mm');
+                if(value == null){
+                    return;
                 }
-                return "";
+                return Moment(value, "hh:mm:ss").format('hh:mm');
             },
 
             deletePlayedGame(data){
@@ -154,19 +158,10 @@
         },
 
         mounted(){
-            //this.loadList();
             this.$bus.$on('reloadPlayedGameList', () => {
-                this.selectedPlayedGameId = "";
                 this.loadList();
             });
         },
-
-        created(){
-            if(this.group.id != undefined && this.dataList.data == undefined){
-                this.loadList();
-            }
-        }
-
     }
 </script>
 

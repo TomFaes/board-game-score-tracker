@@ -22,8 +22,6 @@ $cyan: #6cb2eb;
     cursor: pointer;
 }
 
-
-
 h1, h2, h3{
     width: 100%;
     text-align: center;
@@ -81,3 +79,11 @@ h1, h2, h3{
 .blue {
     background: #0275d8;
 }
+
+/* Font awesome changes */
+
+.fas, .fa, .btn-primary{
+    color: whitesmoke !important;
+}
+
+

@@ -16,13 +16,18 @@ class PlayedGameScoreResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'played_game_id' => $this->group_id,
-            'played_game' => $this->playedGame,
-            'group_user_id' => $this->group_user_id,
-            'group_user' => $this->groupUser,
-            'score' => $this->score,
-            'place' => $this->place,
+            'group_id' => $this->group_id,
+            'game_id' => $this->game_id,
+            'game' => $this->game,
+            'winner_id' => $this->winner_id,
+            'winner' => new UserPublicResource($this->winner),
+            'creator_id' => $this->creator_id,
+            'creator' => new UserPublicResource($this->creator),
+            'date' => $this->date,
+            'time_played' => $this->time_played,
             'remarks' => $this->remarks,
+            'played_expansions' => $this->expansions,
+            'scores' => $this->scores,
         ];
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Repositories\Contracts\IGroupUser;
 use App\Services\GroupService;
 use App\Http\Requests\GroupUserRequest;
+use App\Http\Resources\GroupUserCollection;
 use App\Http\Resources\GroupUserResource;
 
 class GroupUsersController extends Controller
@@ -26,6 +27,11 @@ class GroupUsersController extends Controller
 
         //Check if the user is already added to a group
         $this->groupService = resolve(GroupService::class);
+     }
+
+     public function index($groupId){
+         $groupUser = $this->groupUser->getGroupUsers($groupId);
+         return response()->json(new GroupUserCollection($groupUser), 200);
      }
 
     public function store(GroupUserRequest $request)

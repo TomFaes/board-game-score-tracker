@@ -13,7 +13,7 @@ class GroupGame extends Model
 
     public function game()
     {
-        return $this->belongsTo(Game::class)->select(['id', 'name', 'full_name', 'players_max', 'players_min', 'base_game_id'])->withDefault();
+        return $this->belongsTo(Game::class)->select(['id', 'name', 'full_name', 'players_max', 'players_min', 'base_game_id'])->with('expansions')->withDefault();
     }
 
     public function group()

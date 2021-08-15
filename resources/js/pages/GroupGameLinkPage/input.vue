@@ -7,9 +7,8 @@
             <text-input inputName="link" inputId="link" tekstLabel="Link: " v-model="fields.link" :errors="errors.link" :value='fields.link'></text-input>
             <text-area inputName="description" inputId="description" tekstLabel="Description: " v-model="fields.description" :errors="errors.description" :value='fields.description'></text-area>
             <center>
-                <button-input btnClass="btn btn-primary">Save link</button-input>
+                <button class="btn btn-primary">Save link</button>
             </center>
-
         </form>
         <hr>
     </div>
@@ -19,13 +18,11 @@
     import apiCall from '../../services/ApiCall.js';
     import TextArea from '../../components/ui/form/TextAreaInput.vue';
     import TextInput from '../../components/ui/form/TextInput.vue';
-    import ButtonInput from '../../components/ui/form/ButtonInput.vue';
 
     export default {
         components: {
             TextInput,
             TextArea,
-            ButtonInput,
         },
 
          data () {

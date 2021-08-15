@@ -16,13 +16,6 @@ class GroupGameCollection extends ResourceCollection
     {
         return [
             'data' =>  GroupGameResource::collection($this->collection),
-            'test' => function_exists('currentPage'),
-
-            /*
-            'current_page' => $this->currentPage() ?? null,
-            'last_page' => $this->lastPage() ?? null,
-            'to' => $this->perPage() ?? null,
-            */
         ];
     }
 }

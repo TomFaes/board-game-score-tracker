@@ -1,0 +1,62 @@
+<template>
+    <div>
+       <create-played-game :group=group :groupGames="groupGames" :groupUsers="groupUsers" :submitOption="'Create'"></create-played-game>
+    </div>
+</template>
+
+<script>
+    import createPlayedGame from '../PlayedGamePage/input.vue';
+
+    export default {
+        data () {
+            return {
+                'view': "",
+            }
+        },
+
+        props: {
+            'group': {},
+         },
+
+         computed: {
+            groupGames(){
+                if(this.group.id === undefined){
+                    return;
+                }
+
+                if(this.$store.state.selectedGroupGames.data == undefined){
+                    this.$store.dispatch('getSelectedGroupGames', {groupId: this.group.id});
+                }
+                return this.$store.state.selectedGroupGames;
+            },
+
+            groupUsers(){
+                if(this.group.id === undefined){
+                    return;
+                }
+
+                if(this.$store.state.selectedGroupUsers.data == undefined){
+                    this.$store.dispatch('getSelectedGroupUsers', {groupId: this.group.id});
+                }
+                return this.$store.state.selectedGroupUsers;
+            }
+        },
+
+        components: {
+            createPlayedGame,
+        },
+
+        methods: {
+
+        },
+
+        mounted(){
+
+        },
+    }
+</script>
+
+<style scoped>
+
+</style>
+

@@ -39,17 +39,12 @@
             </tbody>
         </table>
          <vue-pagination  :pagination="dataList" @paginate="loadList()" :offset="4"></vue-pagination>
-
     </div>
 </template>
 
 <script>
     import apiCall from '../../services/ApiCall.js';
     import VuePagination from '../../components/ui/pagination.vue';
-
-    import ButtonInput from '../../components/ui/form/ButtonInput.vue';
-
-    import inputForm from '../GamePage/input';
     import mergeGame from '../GamePage/merge.vue'
 
     export default {
@@ -81,8 +76,6 @@
 
         components: {
             VuePagination,
-            inputForm,
-            ButtonInput,
             mergeGame
         },
 

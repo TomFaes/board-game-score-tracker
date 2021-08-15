@@ -6,7 +6,7 @@
             <text-area inputName="description" inputId="description" tekstLabel="Description: " v-model="fields.description" :errors="errors.description" :value='fields.description'></text-area>
 
             <!-- Admin multiselect -->
-            <div class="row" v-if="this.group != undefined">
+            <div class="row" v-if="this.groupUsers != undefined">
                 <div class="col-lg-2 col-md-2 col-sm-0"></div>
                 <div class="col-lg-8 col-md-8 col-sm-12">
                     <label>Admin: </label>
@@ -17,8 +17,8 @@
                         :close-on-select="true"
                         :clear-on-select="true"
                         placeholder="Select admin"
-                        label="fullName"
-                        track-by="fullName"
+                        label="full_name"
+                        track-by="full_name"
                     >
                     </multiselect>
                 </div>
@@ -42,10 +42,6 @@
                     You can delete your group, your group wont be displayed in your list, the games played wont be deleted
                     <center>
                         <button class="btn btn-danger" @click.prevent="deleteGroup"><i class="fas fa-trash fa-1x" ></i></button>
-
-                        <!--
-                        <delete-group :group="group"></delete-group>
-                        -->
                     </center>
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-0"></div>
@@ -61,13 +57,10 @@
     import TextArea from '../../components/ui/form/TextAreaInput.vue';
     import Multiselect from 'vue-multiselect';
 
-    import DeleteGroup from '../GroupPage/delete.vue';
-
     export default {
         components: {
             TextInput,
             TextArea,
-            DeleteGroup,
             Multiselect
         },
 
@@ -79,7 +72,6 @@
                     admin_id: '',
                 },
                 'errors' : {},
-                'action': '',
                 'response': {},
                 'selectedUser': [],
                 'multigroupUsers': [],
@@ -90,30 +82,48 @@
         },
 
         props: {
-            'group': {}, 
+            'group': {},
          },
 
 
         watch:{
             group(){
                 this.loadList();
-            }
+            },
+
+         },
+
+         computed: {
+             groupUsers(){
+                if(this.group == undefined){
+                    return;
+                }
+                if(this.group.id == undefined){
+                    return;
+                }
+                this.setMultiGroupUsers();
+                return this.$store.state.selectedGroupUsers;
+            },
          },
 
         methods: {
-            loadList(){
-                if(this.group != undefined){
-                     if(this.group.id != undefined){
-                        for(var item in this.group.group_users){
-                            if(this.group.group_users[item]['user_id'] > 0){
-                                this.multigroupUsers.push(this.group.group_users[item]);
-                            }
-                        }
-                        this.setData();
+            setData(){
+                this.fields.name = this.group.name;
+                this.fields.description = this.group.description;
+            },
+
+            setMultiGroupUsers(){
+                for(var item in this.$store.state.selectedGroupUsers.data){
+                    if(this.$store.state.selectedGroupUsers.data[item].user_id <= 0){
+                        return
+                    }
+
+                    this.multigroupUsers.push(this.$store.state.selectedGroupUsers.data[item]);
+                    if(this.group.admin.id == this.$store.state.selectedGroupUsers.data[item].user_id){
+                        this.selectedUser = this.$store.state.selectedGroupUsers.data[item];
                     }
                 }
             },
-
 
             setFormData(){
                 if(this.fields.name != undefined){
@@ -125,6 +135,19 @@
                 if(this.selectedUser != undefined){
                     this.formData.set('admin_id', this.selectedUser.user_id);
                 }
+            },
+
+            loadList(){
+                if(this.group == undefined){
+                    return;
+                }
+                if(this.group.id == undefined){
+                    return;
+                }
+                if(this.$store.state.selectedGroupUsers.data == undefined){
+                    this.$store.dispatch('getSelectedGroupUsers', {groupId: this.group.id});
+                }
+                this.setData();
             },
 
             submit(){
@@ -143,14 +166,11 @@
 
             create(){
                 this.setFormData();
-                this.action = "group";
 
-                apiCall.postData(this.action, this.formData)
+                apiCall.postData('group', this.formData)
                 .then(response =>{
-                    //this.$bus.$emit('reloadGroups');
-                    //this.$bus.$emit('display');
                     this.resetFormData();
-                    this.message = "Your group " + this.response.name + " has been created";
+                    this.message = "Your group " + response.name + " has been created";
                     this.$bus.$emit('showMessage', this.message,  'green', '2000' );
                     this.$store.dispatch('getUserGroups');
                     this.$router.push({name: "home"});
@@ -161,13 +181,11 @@
 
             update(){
                 this.setFormData();
-                this.action =  'group/' + this.group.id;
 
-                apiCall.updateData(this.action, this.formData)
+                apiCall.updateData('group/' + this.group.id, this.formData)
                 .then(response =>{
-                    this.message = "Your group " + this.response.name + " has been changed";
+                    this.message = "Your group " + response.name + " has been changed";
                     this.$bus.$emit('showMessage', this.message,  'green', '2000' );
-                    //console.log(this.group.id)
                     this.$store.dispatch('getSelectedGroup', {id: this.group.id});
                     this.$router.push({name: "allPlayedGames", params: { id: this.group.id },});
                 }).catch(error => {
@@ -189,20 +207,6 @@
                         console.log('handle server error from here');
                     });
                 }
-            },
-
-            setData(){
-                this.fields.name = this.group.name;
-                this.fields.description = this.group.description;
-
-                var adminUser = "";
-                var adminId = this.group.admin.id;
-                this.group.group_users.forEach(function(item, index){
-                    if(adminId == item.user_id){
-                        adminUser = index;
-                    }
-                });
-                this.selectedUser = this.group.group_users[adminUser];
             }
         },
 
@@ -213,12 +217,7 @@
         },
 
         created(){
-            if(this.group != undefined){
-                if(this.group.id != undefined){
-                    this.loadList();
-                }
-            }
-            
+            this.loadList();
         }
     }
 </script>

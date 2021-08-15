@@ -10,7 +10,7 @@
         </div>
 
         <!-- list of all users -->
-        <table class="table table-hover table-sm">
+        <table class="table table-hover table-sm" v-if="groupUsers">
             <thead>
                 <tr>
                     <th>Name</th>
@@ -18,33 +18,32 @@
                     <th>Options</th>
                 </tr>
             </thead>
-            <tbody  v-for="data in group.group_users"  :key="data.id" >
-                    <tr>
-                        <td>
-                            <div v-if="data.user_id > 0">
-                                {{ data.user.firstname }} {{ data.user.name }}
-                            </div>
-                            <div v-else>
-                                {{data.firstname}} {{data.name}}
-                            </div>
-                        </td>
-                        <td v-if="group.type_member == 'Admin'">
-
-                             <a class="mailtoui"
-                                    :href="createLink(data.code)"
-                                    v-if="data.code != null"
-                                    >{{data.code}}</a>
-                        </td>
-                        <td v-if="group.type_member == 'Admin'" class="options-column">
-                            <button class="btn btn-primary"  v-if="!data.user_id" @click.prevent="updateGroupUser(data)"> <i class="fa fa-edit" style="heigth:14px; width:14px"></i></button>
-                            <button class="btn btn-danger" @click.prevent="deleteGroupUser(data)" ><i class="fas fa-trash-alt" style="heigth:14px; width:14px" ></i></button>
-                            <button class="btn btn-secondary" v-if="!data.user_id" @click.prevent="regenerateCode(data)" ><i class="fas fa-sync" style="heigth:14px; width:14px" ></i></button>
-                        </td>
-                    </tr>
+            <tbody  v-for="data in groupUsers.data"  :key="data.id" >
+                <tr>
+                    <td>
+                        <div v-if="data.user_id > 0">
+                            {{ data.user.full_name  }}
+                        </div>
+                        <div v-else>
+                            {{ data.full_name }}
+                        </div>
+                    </td>
+                    <td v-if="group.type_member == 'Admin'">
+                            <a class="mailtoui"
+                                :href="createLink(data.code)"
+                                v-if="data.code != null"
+                                >{{data.code}}</a>
+                    </td>
+                    <td v-if="group.type_member == 'Admin'" class="options-column">
+                        <button class="btn btn-primary"  v-if="!data.user_id" @click.prevent="updateGroupUser(data)"> <i class="fa fa-edit" style="heigth:14px; width:14px"></i></button>
+                        <button class="btn btn-danger" @click.prevent="deleteGroupUser(data)" ><i class="fas fa-trash-alt" style="heigth:14px; width:14px" ></i></button>
+                        <button class="btn btn-secondary" v-if="!data.user_id" @click.prevent="regenerateCode(data)" ><i class="fas fa-sync" style="heigth:14px; width:14px" ></i></button>
+                    </td>
+                </tr>
             </tbody>
         </table>
 
-        <div v-show="display == 'showEditGroupUser'">
+        <div v-if="selectedGroupUser">
             <addUserToGroup v-if="selectedGroupUser.id > 0" :group=group :groupUser=selectedGroupUser :submitOption="'Update'" :key=selectedGroupUser.id></addUserToGroup>
         </div>
     </div>
@@ -53,45 +52,41 @@
 <script>
     import apiCall from '../../services/ApiCall.js';
     import addUserToGroup from '../GroupUserPage/input.vue';
-    import ButtonInput from '../../components/ui/form/ButtonInput.vue';
 
     export default {
         data () {
             return {
                 display: "",
                 selectedGroupUser: 0,
-                'groupUsers': {},
             }
         },
 
         components: {
             addUserToGroup,
-            ButtonInput
         },
 
         computed: {
             group(){
                 return this.$store.state.selectedGroup;
             },
+
+            groupUsers(){
+                if(this.group.id === undefined){
+                    return;
+                }
+
+                if(this.$store.state.selectedGroupUsers.data == undefined){
+                    this.$store.dispatch('getSelectedGroupUsers', {groupId: this.group.id});
+                }
+                return this.$store.state.selectedGroupUsers;
+            }
         },
 
         methods: {
-            setGroupUsers(){
-                this.groupUsers = this.group.group_users;
-                this.display = "";
-            },
-
             updateGroupUser(groupUser){
-                if(this.display == 'showEditGroupUser'){
-                    if(this.selectedGroupUser.id == groupUser.id){
-                        this.display = '';
-                    }else if(this.selectedGroupUser.id != groupUser.id){
-                        this.selectedGroupUser = groupUser;
-                    }else{
-                        this.display = '';
-                    }
+                if(this.selectedGroupUser.id == groupUser.id){
+                    this.selectedGroupUser = 0;
                 }else{
-                    this.display = 'showEditGroupUser';
                     this.selectedGroupUser = groupUser;
                 }
             },
@@ -107,10 +102,9 @@
             regenerateCode(data){
                 apiCall.postData('group/' + this.group.id + '/user/' + data.id + '/regenerate_code')
                     .then(response =>{
-                         this.message = "code is regenerated";
-
+                        this.message = "code is regenerated";
                         this.$bus.$emit('showMessage', this.message,  'green', '2000' );
-                        this.$store.dispatch('getSelectedGroup', {id: this.group.id});
+                        this.$store.dispatch('getSelectedGroupUsers', {groupId: this.group.id});
                     }).catch(() => {
                         console.log('handle server error from here');
                     });
@@ -123,11 +117,10 @@
                         if(response.status == 403){
                             this.message = "This user couldn't be delete from this group";
                         }else{
-                            this.message = data.fullName + " is deleted from this group";
-                            this.$bus.$emit('reloadGroups');
+                            this.message = data.full_name + " is deleted from this group";
                         }
                         this.$bus.$emit('showMessage', this.message,  'red', '2000' );
-                        this.$store.dispatch('getSelectedGroup', {id: this.group.id});
+                        this.$store.dispatch('getSelectedGroupUsers', {groupId: this.group.id});
                     }).catch(() => {
                         console.log('handle server error from here');
                     });
@@ -152,9 +145,10 @@
         },
 
         mounted(){
-            this.setGroupUsers();
+            this.$store.dispatch('getSelectedGroupUsers', {groupId: this.group.id});
             this.$bus.$on('reloadList', () => {
                 this.display = "";
+                this.selectedGroupUser = 0;
             });
         }
     }

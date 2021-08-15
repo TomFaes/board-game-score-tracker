@@ -7,9 +7,10 @@ if(process.env.NODE_ENV == 'development'){
 }
 
 export default {
-    getData(action) {
+    getData(action, pageItems = 0) {
         return axios({
             method: 'get',
+            params: { page_items: pageItems },
             url : localPath +  '/api/' + action,
         })
         .then(function (response) {

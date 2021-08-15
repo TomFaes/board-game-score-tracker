@@ -34,14 +34,12 @@
                     </router-link>
                 </div>
             </div>
-        </div>
 
+        </div>
     </div>
 </template>
 
 <script>
-
-
 
     export default {
         components: {
@@ -50,7 +48,7 @@
 
         data () {
             return {
-                display: "",
+
             }
         },
 
@@ -70,23 +68,11 @@
                     return;
                 }
                 this.$store.dispatch('getUserGroups');
-                /*
-                    if(this.groupIndex >= 0){
-                        this.selectedGroup = this.userGroups[this.groupIndex];
-                    }
-                */
             },
         },
 
         mounted(){
             this.getGroups();
-/*
-            if(this.$store.state.selectedGroup.id == undefined){
-                this.$router.push({name: 'groupDetail', params: { id: this.$store.state.LoggedInUser.favorite_group_id },})
-            }
-            */
-
-
         }
     }
 </script>

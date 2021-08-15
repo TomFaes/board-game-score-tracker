@@ -9,7 +9,7 @@
                      <th>Options</th>
                 </tr>
             </thead>
-            <tbody v-for="link in group_game.links" :key="link.id" >
+            <tbody v-for="link in links.data" :key="link.id" >
                 <tr>
                     <td><a v-bind:href="link.link" target="_blank"> {{link.name}} </a></td>
                     <td>{{ link.description }}</td>
@@ -65,10 +65,10 @@
                 if(confirm('are you sure you want to delete this link?')){
                     apiCall.updateData('group/game/' + group_game_id +'/link/' + id + '/delete')
                     .then(response =>{
-                        console.log("console convertion delete worked");
                         this.$bus.$emit('reloadGroupGames');
                         this.message = "You've deleted a link from " + this.group_game.game.name;
                         this.$bus.$emit('showMessage', this.message,  'red', '2000' );
+                        this.selectedGroupGameLink = 0;
                     }).catch(() => {
                         console.log('handle server error from here');
                     });

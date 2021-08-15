@@ -21,6 +21,7 @@ use App\Http\Controllers\Played\PlayedGamesController;
 
 use App\Http\Controllers\Statistics\StatisticsController;
 
+
 //All routes for profiles
 Route::get('profile', [ProfileController::class, 'index']);
 Route::post('profile', [ProfileController::class, 'update']);
@@ -43,6 +44,8 @@ Route::post('group/{id}', [GroupController::class, 'update']);
 
 Route::get('user-group', [UserGroupsController::class, 'index']);
 
+Route::get('group/{group_id}/users', [GroupUsersController::class, 'index']);
+
 Route::post('group/{group_id}/user', [GroupUsersController::class, 'store']);
 Route::post('group/{group_id}/user/{id}', [GroupUsersController::class, 'update']);
 Route::post('join_group', [GroupUsersController::class, 'joinGroup']);
@@ -61,6 +64,7 @@ Route::post('group/game/{group_game_id}/link/{id}', [GroupGameLinkController::cl
 
 //PlayedGamesController
 Route::get('group/{group_id}/played', [PlayedGamesController::class, 'index']);
+Route::get('group/{group_id}/played/{id}', [PlayedGamesController::class, 'show']);
 Route::post('group/{group_id}/played', [PlayedGamesController::class, 'store']);
 Route::post('group/{group_id}/played/{id}', [PlayedGamesController::class, 'update']);
 

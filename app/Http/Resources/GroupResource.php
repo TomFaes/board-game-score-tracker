@@ -20,9 +20,9 @@ class GroupResource extends JsonResource
             'description' => $this->description,
             'admin_id' => $this->admin_id,
             'admin' => new UserPublicResource($this->admin),
-            'group_users' => $this->groupUsers,
-            'group_games' => $this->groupGames,
-            'base_group_games' => $this->baseGroupGames,
+            //'group_users' => $this->groupUsers,
+            //'group_games' => $this->groupGames,
+            //'base_group_games' => $this->baseGroupGames,
             'type_member' => $this->typeMember,
         ];
     }

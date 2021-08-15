@@ -13,7 +13,6 @@
                     :preserve-search="true"
                     placeholder="Add the selected game"
                     label="full_name"
-
                     track-by="full_name"
                     @select="addGame"
                 >
@@ -27,7 +26,6 @@
 
 <script>
     import apiCall from '../../services/ApiCall.js';
-
 
     //https://vue-multiselect.js.org/v1/index.html#props
     import Multiselect from 'vue-multiselect';
@@ -51,10 +49,6 @@
          },
 
         methods: {
-            test(){
-                console.log("TEST");
-            },
-
             addGame(selectedGame){
                 this.formData.set('group_id', this.group.id);
                 this.formData.set('game_id', selectedGame.id);
@@ -77,13 +71,12 @@
 
             removeGameFromMultiselect(selectedGame){
                 var gameToRemove = "";
-
-                    this.nonGroupGames.forEach(function(item, index){
-                        if(selectedGame['id'] == item.id){
-                            gameToRemove = index;
-                        }
-                    });
-                    this.nonGroupGames.splice(gameToRemove, 1);
+                this.nonGroupGames.forEach(function(item, index){
+                    if(selectedGame['id'] == item.id){
+                        gameToRemove = index;
+                    }
+                });
+                this.nonGroupGames.splice(gameToRemove, 1);
             }
         },
 

@@ -14,6 +14,9 @@ export default new Vuex.Store({
     LoggedInUser: "",
     userGroups: {},
     selectedGroup: {},
+    selectedGroupUsers: {},
+    selectedGroupGames: {},
+    selectedPlayedGame: {},
     playedGames: {},
     firstLoad: 0,
 
@@ -48,14 +51,25 @@ export default new Vuex.Store({
       state.selectedGroup = selectedGroup;
     },
 
+    setSelectedGroupUsers(state, selectedGroupUsers){
+        state.selectedGroupUsers = selectedGroupUsers;
+    },
+
+    setSelectedGroupGames(state, selectedGroupGames){
+        state.selectedGroupGames = selectedGroupGames;
+    },
+
     setPlayedGames(state, playedGames){
       state.playedGames = playedGames;
+    },
+
+    setSelectedPlayedGame(state, selectedPlayedGame){
+        state.selectedPlayedGame = selectedPlayedGame;
     },
 
     setFirstLoad(state){
       state.firstLoad = 1;
     },
-
   },
 
   actions: {
@@ -64,7 +78,6 @@ export default new Vuex.Store({
     },
 
     getUserGroups({commit}) {
-      // fetch the groups of a user
       axios.get( localPath +  '/api/user-group')
           .then((response) => {
               commit('setUserGroups', response.data);
@@ -73,12 +86,31 @@ export default new Vuex.Store({
     },
 
     getSelectedGroup({commit}, {id}) {
-      // fetch the selected group
-      axios.get( localPath +  '/api/group/' + id)
+        axios.get( localPath +  '/api/group/' + id)
           .then((response) => {
               commit('setSelectedGroup', response.data);
           })
           .catch((error) => console.error(error));
+    },
+
+    getSelectedGroupUsers({commit}, {groupId}){
+        axios.get( localPath +  '/api/group/' + groupId + '/users')
+          .then((response) => {
+              commit('setSelectedGroupUsers', response.data);
+          })
+          .catch((error) => console.error(error));
+    },
+
+    getSelectedGroupGames({commit}, {groupId, pageItems = 0, currentPage = 0}){
+        axios({
+            method: 'get',
+            params: { page_items: pageItems },
+            url : localPath +  '/api/group/' + groupId + '/group-game?page=' + currentPage,
+        })
+        .then((response) => {
+            commit('setSelectedGroupGames', response.data);
+        })
+        .catch((error) => console.error(error));
     },
 
     getPlayedGames({commit}, {id, current_page}) {
@@ -89,10 +121,17 @@ export default new Vuex.Store({
           .catch((error) => console.error(error));
     },
 
+    getSelectedPlayedGame({commit}, {groupId, id}){
+        //setSelectedPlayedGame
+        axios.get( localPath +  '/api/group/' + groupId + '/played/' + id)
+          .then((response) => {
+              commit('setSelectedPlayedGame', response.data);
+          })
+          .catch((error) => console.error(error));
+    },
 
 
     getLoggedInUser({commit}){
-       // fetch the selected group
        axios.get( localPath +  '/api/profile')
        .then((response) => {
            commit('setLoggedInUser', response.data);
@@ -103,6 +142,12 @@ export default new Vuex.Store({
     resetToDefault({commit}){
       commit('setSelectedGroup', {});
       commit('setPlayedGames', {});
+      commit('setSelectedGroupUsers', {});
+      commit('setSelectedGroupGames', {});
+    },
+
+    resetPlayedGame({commit}){
+        commit('setSelectedPlayedGame', {});
     },
 
   },

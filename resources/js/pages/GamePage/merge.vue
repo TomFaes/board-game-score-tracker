@@ -23,7 +23,7 @@
                     </div>
                 <div class="col-lg-2 col-md-2 col-sm-0"></div>
             </div><br>
-            <button-input btnClass="btn btn-primary">Merge game</button-input>
+            <button class="btn btn-primary">Merge game</button>
         </form>
         <hr>
     </div>
@@ -31,14 +31,10 @@
 
 <script>
     import apiCall from '../../services/ApiCall.js';
-    import DropdownInput from '../../components/ui/form/DropdownInput.vue';
-    import ButtonInput from '../../components/ui/form/ButtonInput.vue';
     import Multiselect from 'vue-multiselect';
 
     export default {
         components: {
-            DropdownInput,
-            ButtonInput,
             Multiselect,
         },
 

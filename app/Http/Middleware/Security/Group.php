@@ -28,7 +28,7 @@ class Group
         if($request->route('id') > 0){
             $groupRepo = app('App\Repositories\Contracts\IGroup');
             $group = $groupRepo->getGroup($request->route('id'));
-            $playedGames = $groupRepo->getPlayedGames($request->route('id'));
+            //$playedGames = $groupRepo->getPlayedGames($request->route('id'));
 
             //A group can only be delete if there are no users or group games or played games
             if($group->admin_id == $user->id){

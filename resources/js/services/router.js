@@ -17,7 +17,7 @@ import JoinGroup from '../pages/GroupUserPage/joinGroup.vue';
 
 import GroupDetail from '../pages/GroupPage/details.vue';
 import groupStats from '../pages/StatisticPage/index.vue';
-import addPlayedGame from '../pages/PlayedGamePage/input.vue';
+import addPlayedGame from '../pages/PlayedGamePage/create.vue';
 import allPlayedGames from '../pages/PlayedGamePage/list.vue';
 import editGroup from '../pages/GroupPage/input.vue';
 import groupUsers from '../pages/GroupUserPage/list.vue';
@@ -199,7 +199,7 @@ router.beforeEach((to, from, next) => {
             }else{
                var user = store.state.LoggedInUser;
             }
-            resolve(user)  // Yay! Everything went well!
+            resolve(user)
         }, 250) ;
 
         getUser.then((user) =>{

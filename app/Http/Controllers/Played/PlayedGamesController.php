@@ -12,6 +12,7 @@ use App\Http\Requests\PlayedGameRequest;
 
 use App\Http\Resources\PlayedGamePaginationCollection;
 use App\Http\Resources\PlayedGameResource;
+use App\Http\Resources\PlayedGameScoreResource;
 
 class PlayedGamesController extends Controller
 {
@@ -29,6 +30,11 @@ class PlayedGamesController extends Controller
     {
         $played = $this->playedGame->getPlayedGroupGames($groupId, 20);
         return response()->json(new PlayedGamePaginationCollection($played), 200);
+    }
+
+    public function show($groupId, $id){
+        $playedGame = $this->playedGame->getPlayedGame($id);
+        return response()->json(new PlayedGameScoreResource($playedGame), 200);
     }
 
     public function store($groupId, PlayedGameRequest $request)

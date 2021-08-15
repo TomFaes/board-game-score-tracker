@@ -44,8 +44,6 @@
     import apiCall from '../../services/ApiCall.js';
     import VuePagination from '../../components/ui/pagination.vue';
 
-    import ButtonInput from '../../components/ui/form/ButtonInput.vue';
-
     import inputForm from '../GamePage/input';
     import mergeGame from '../GamePage/merge.vue'
 
@@ -79,8 +77,7 @@
         components: {
             VuePagination,
             inputForm,
-            mergeGame,
-            ButtonInput
+            mergeGame
         },
 
         methods: {
