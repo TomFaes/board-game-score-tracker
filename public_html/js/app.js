@@ -7367,8 +7367,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    TextInput: _components_ui_form_TextInput_vue__WEBPACK_IMPORTED_MODULE_1__.default,
-    ButtonInput: ButtonInput
+    TextInput: _components_ui_form_TextInput_vue__WEBPACK_IMPORTED_MODULE_1__.default
   },
   data: function data() {
     return {
@@ -25628,7 +25627,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.button-row[data-v-5c1a6aa6]{\n    width: 100%;\n    text-align: center;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.button-row[data-v-5c1a6aa6]{\r\n    width: 100%;\r\n    text-align: center;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -25676,7 +25675,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\na[data-v-12d86b04] {\n    text-decoration: none;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\na[data-v-12d86b04] {\r\n    text-decoration: none;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -25700,7 +25699,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\nbutton[data-v-d08c716a] {\n    margin: 5px;\n}\n.button-row[data-v-d08c716a]{\n    width: 100%;\n    text-align: center;\n}\n.group[data-v-d08c716a] {\n    background-color: orange;\n    margin: 5px;\n}\nbutton[data-v-d08c716a]{\n    width: 10%;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\nbutton[data-v-d08c716a] {\r\n    margin: 5px;\n}\n.button-row[data-v-d08c716a]{\r\n    width: 100%;\r\n    text-align: center;\n}\n.group[data-v-d08c716a] {\r\n    background-color: orange;\r\n    margin: 5px;\n}\nbutton[data-v-d08c716a]{\r\n    width: 10%;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -25724,7 +25723,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_laravel_mix_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\na[data-v-e7a45472] {\n    color: rgba(255, 255, 255, 0.5);\n    padding-right: 0,5rem;\n    padding-left: 0,5rem;\n}\na[data-v-e7a45472] :hover{\n    filter: brightness(50%);\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\na[data-v-e7a45472] {\r\n    color: rgba(255, 255, 255, 0.5);\r\n    padding-right: 0,5rem;\r\n    padding-left: 0,5rem;\n}\na[data-v-e7a45472] :hover{\r\n    filter: brightness(50%);\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

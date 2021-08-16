@@ -18,7 +18,6 @@
     export default {
         components: {
             TextInput,
-            ButtonInput,
         },
 
          data () {
