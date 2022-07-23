@@ -22,9 +22,10 @@ class GameResource extends JsonResource
             'players_max' => $this->players_max,
             'full_name' => $this->full_name,
             'approved_by_admin' => $this->approved_by_admin,
-            'base_game' => new GameResource($this->baseGame),
-            'expansions' => GameResource::collection($this->whenLoaded('expansions')),
+            'base_game' => new GameBaseResource($this->baseGame),
+            'expansions' => GameBaseResource::collection($this->expansions),
+            'total_expansions' => $this->totalExpansions,
+            'total_games_in_group_games' => $this->totalGamesInGroupGames,
         ];
-        //return parent::toArray($request);
     }
 }

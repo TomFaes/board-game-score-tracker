@@ -27,7 +27,7 @@ class Group extends Model
     public function admin()
     {
         return $this->belongsTo(User::class, 'admin_id', 'id')->withDefault();
-        return $this->belongsTo(User::class, 'admin_id', 'id')->select(['id', 'firstname', 'name'])->withDefault();
+        //return $this->belongsTo(User::class, 'admin_id', 'id')->select(['id', 'firstname', 'name'])->withDefault();
     }
 
     public function groupUsers()
@@ -46,13 +46,10 @@ class Group extends Model
     {
         $groupgames =  $this->hasMany(GroupGame::class)->whereHas('game', function(Builder $query){
             $query->where('base_game_id', '=', null);
-        }
-    )
-    ->with('game', 'game.expansions');
-
+        })->with('game', 'game.expansions');
 
         $groupgames = $groupgames->join('games' , 'group_games.game_id', '=', 'games.id')
-        ->orderBy('games.full_name');
+                                                        ->orderBy('games.full_name');
         return $groupgames;
     }
 
@@ -73,11 +70,19 @@ class Group extends Model
 
     public function getTypeMemberAttribute()
     {
-        if(isset(Auth::user()->id) === true){
-            if($this->admin_id == Auth::user()->id){
-                return "Admin";
+        $userId = Auth::user()->id;
+        if($this->admin_id == $userId)
+        {
+            return "Admin";
+        }
+
+        foreach($this->groupUsers AS $groupUser)
+        {
+            if($groupUser->user_id == $userId)
+            {
+                return "User";
             }
         }
-        return "User";
+        return false;
     }
 }

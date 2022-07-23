@@ -14,10 +14,10 @@ export default {
             url : localPath +  '/api/' + action,
         })
         .then(function (response) {
-            return response.data;
+            return response;
         })
         .catch(function (error) {
-            console.log(error);
+            return Promise.reject(error.response || {});
         });
     },
 
@@ -31,12 +31,13 @@ export default {
             },
         })
         .then(function (response) {
-            return response.data;
+            return response;
         })
         .catch(error => {
             if (error.response.status === 422) {
                return Promise.reject(error.response.data.errors || {})
             };
+            return Promise.reject(error.response || {});
         });
     },
 
@@ -50,12 +51,13 @@ export default {
             },
         })
         .then(function (response) {
-            return response.data;
+            return response;
         })
         .catch(error => {
             if (error.response.status === 422) {
                return Promise.reject(error.response.data.errors || {})
             };
+            return Promise.reject(error.response || {});
         });
     },
 
@@ -66,25 +68,13 @@ export default {
             data: id,
         })
         .then(function (response) {
-            console.log("A" + response.status);
-            /*
-            if (response.status === 403) {
-                return response;
-            }else{
-                return response.data;
-            }
-            */
-           return response.data;
-
+            return response;
         })
         .catch(error => {
-            if (error.response.status === 403) {
-                return error.response;
-
-
-            }else if (error.response.status === 422) {
+            if (error.response.status === 422) {
                return Promise.reject(error.response.data.errors || {})
             };
+            return Promise.reject(error.response || {});
         });
     },
 }

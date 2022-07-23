@@ -2,7 +2,7 @@
     <div class="container">
         <hr>
         <div>
-            <add-game :group=group :nonGroupGames="nonGroupGames" v-if="group.type_member == 'Admin'" ></add-game>
+            <add-game :group=group :currentPage="groupGames.current_page" v-if="group.type_member == 'Admin'" ></add-game>
         </div>
         <br>
 
@@ -19,23 +19,27 @@
                             {{ data.game.full_name }}
                         </td>
                         <td class="options-column">
-                            <button class="btn btn-info" @click.prevent="showLink(data.id)" v-if="data.links.data.length > 0"><img :src="getImageUrl('images/layout/link_icon.png')"  style="heigth:14px; width:14px"></button>
-                            <button class="btn btn-info" @click.prevent="addLink(data.id)" v-if="group.type_member == 'Admin'"><img :src="getImageUrl('images/layout/add_link_icon.png')" style="heigth:14px; width:14px"></button>
+                                <button class="btn btn-info" @click.prevent="showLink(data.id)" v-if="data.links.data.length > 0"><img :src="getImageUrl('images/layout/link_icon.png')"  style="heigth:14px; width:14px"></button>
+                                <button class="btn btn-info" @click.prevent="addLink(data.id)" v-if="group.type_member == 'Admin'"><img :src="getImageUrl('images/layout/add_link_icon.png')" style="heigth:14px; width:14px"></button>
                             <button class="btn btn-danger" @click.prevent="deleteGame(data)" v-if="group.type_member == 'Admin' && data.links.data.length == 0"><i class="fas fa-trash fa-1x" ></i></button>
                         </td>
                     </tr>
+
                     <tr v-if="selectedGroupGameLinkCreate == data.id">
                         <td colspan="2">
-                            <add-link   :group_game="data" :submitOption="'Create'"></add-link>
+                            <add-link  :group_game="data" :currentPage="groupGames.current_page" :submitOption="'Create'"></add-link>
                         </td>
 
                     </tr>
-                    <tr v-if="selectedGroupGameLinkAdd == data.id">
+
+
+                        <tr v-if="selectedGroupGameLinkAdd == data.id">
                         <td colspan="100">
-                            <links-list    :group_game="data" :links="data.links" :group="group"></links-list>
+                            <links-list    :group_game="data" :links="data.links" :group="group" :currentPage="groupGames.current_page" ></links-list>
                         </td>
-
                     </tr>
+
+
             </tbody>
 
         </table>
@@ -60,7 +64,6 @@
                 'dataList' : { },
                 'selectedGroupGameLinkAdd': 0,
                 'selectedGroupGameLinkCreate': 0,
-                'nonGroupGames': [],
                 'displayNewGame': "",
             }
         },
@@ -78,7 +81,6 @@
                 if(this.$store.state.selectedGroupGames.data == undefined){
                     this.$store.dispatch('getSelectedGroupGames', {groupId: this.group.id, pageItems: 20});
                 }
-                this.loadNonGroupGames();
 
                 return this.$store.state.selectedGroupGames;
             }
@@ -97,7 +99,6 @@
                 this.$store.dispatch('getSelectedGroupGames', {groupId: this.group.id, pageItems: 20, currentPage: this.groupGames.current_page});
                 this.selectedGroupGameLinkAdd = 0;
                 this.selectedGroupGameLinkCreate = 0;
-                this.loadNonGroupGames();
             },
 
             showAddNewGameForm(){
@@ -126,41 +127,30 @@
                 }
             },
 
-            loadNonGroupGames(){
-                apiCall.getData('group/' + this.group.id + '/search-non-group-games')
-                .then(response =>{
-                    this.nonGroupGames = response['data'];
-                }).catch(() => {
-                    console.log('handle server error from here');
-                });
-            },
-
             deleteGame(groupGame){
                  apiCall.postData('group/' + this.group.id + '/group-game/' + groupGame.id + '/delete')
                 .then(response =>{
                     this.loadList();
-                    this.loadNonGroupGames();
-                    this.message = "You've deleted " + groupGame.game.name + " from " + this.group.name;
-                    this.$bus.$emit('showMessage', this.message,  'red', '2000' );
-                }).catch(() => {
+                    this.$store.dispatch('getGamesNotInGroup', {groupId: this.group.id});
+                    var message = "You've deleted " + groupGame.game.name + " from " + this.group.name;
+                    this.$store.dispatch('getMessage', {message: message, color: 'red', time: 5000});
+                }).catch(error => {
                     console.log('handle server error from here');
+                    console.log(error);
                 });
             },
 
             getImageUrl(urlName){
                 var localPath = "";
                 if(process.env.NODE_ENV == 'development'){
-                    localPath = "/boardgametracker/public_html"
+                    localPath = "/boardgametracker/public_html";
                 }
                 return localPath + '/' + urlName;
             }
         },
 
         mounted(){
-            this.$bus.$on('reloadGroupGames', () => {
-                    this.loadList();
-                     this.displayNewGame = "";
-            });
+
         }
     }
 </script>

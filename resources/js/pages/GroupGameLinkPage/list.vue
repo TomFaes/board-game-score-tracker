@@ -22,7 +22,7 @@
                 </tr>
                 <tr v-if="selectedGroupGameLink == link.id">
                     <td colspan="100">
-                        <update-link :group_game_link="link" :group_game="group_game" :submitOption="'Update'"></update-link>
+                        <update-link :group_game_link="link" :group_game="group_game" :currentPage="currentPage" :submitOption="'Update'"></update-link>
                     </td>
                 </tr>
             </tbody>
@@ -46,6 +46,7 @@
             'links': {},
             'group': {},
             'group_game': {},
+            'currentPage': '',
          },
 
         components: {
@@ -65,9 +66,9 @@
                 if(confirm('are you sure you want to delete this link?')){
                     apiCall.updateData('group/game/' + group_game_id +'/link/' + id + '/delete')
                     .then(response =>{
-                        this.$bus.$emit('reloadGroupGames');
-                        this.message = "You've deleted a link from " + this.group_game.game.name;
-                        this.$bus.$emit('showMessage', this.message,  'red', '2000' );
+                        this.$store.dispatch('getSelectedGroupGames', {groupId: this.group.id, pageItems: 20, currentPage: this.currentPage});
+                        var message = "You've deleted a link from " + this.group_game.game.name;
+                        this.$store.dispatch('getMessage', {message: message, color: 'red', time: 5000});
                         this.selectedGroupGameLink = 0;
                     }).catch(() => {
                         console.log('handle server error from here');
@@ -76,18 +77,14 @@
             },
 
             getImageUrl(urlName){
-                var localPath = "";
                 if(process.env.NODE_ENV == 'development'){
-                    localPath = "/boardgametracker/public_html"
+                    return "/boardgametracker/public_html/" + urlName;
                 }
-                return localPath + '/' + urlName;
+                return '/' + urlName;
             }
         },
 
         mounted(){
-            this.$bus.$on('hideLinkList', () => {
-                    this.display = "";
-            });
 
         }
     }

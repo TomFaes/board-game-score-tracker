@@ -1,6 +1,6 @@
 <template>
     <div>
-        <table class="table table-hover table-sm " v-if="dataList">
+        <table class="table table-hover table-sm " v-if="listPlayedGames">
             <thead>
                 <tr>
                     <th>Date</th>
@@ -12,37 +12,37 @@
                     <th>Options</th>
                 </tr>
             </thead>
-            <tbody  v-for="data in dataList.data"  :key="data.id" >
+            <tbody  v-for="game in listPlayedGames.data"  :key="game.id" >
                     <tr>
-                        <td nowrap>{{convertDate(data.date)}}</td>
-                        <td  class="d-none d-sm-table-cell">{{convertTime(data.time_played)}}</td>
-                        <td>{{data.game.name}}  </td>
+                        <td nowrap>{{convertDate(game.date)}}</td>
+                        <td  class="d-none d-sm-table-cell">{{convertTime(game.time_played)}}</td>
+                        <td>{{game.game.name}}  </td>
                          <td  class="d-none d-sm-table-cell">
-                            <span  v-if="data.played_expansions != ''">
-                                <span v-for="expansion in data.played_expansions"  :key="expansion.id">
+                            <span  v-if="game.played_expansions != ''">
+                                <span v-for="expansion in game.played_expansions"  :key="expansion.id">
                                     - {{ expansion.name }}<br>
                                 </span>
                             </span>
                         </td>
                         <td>
-                            {{ data.winner.full_name }}
+                            {{ game.winner.full_name }}
                         </td>
 
-                         <td  class="d-none d-sm-table-cell">{{data.remarks}}</td>
+                         <td  class="d-none d-sm-table-cell">{{game.remarks}}</td>
                          <td class="options-column">
-                            <button class="btn btn-info" @click.prevent="setViewInput(data.id, 'View')"><i class="fa fa-info" style="heigth:14px; width:14px" ></i></button>
-                            <button class="btn btn-primary"  v-if="group.type_member == 'Admin' || data.creator_id == user.id" @click.prevent="setViewInput(data.id, 'Update')"><i class="fa fa-edit" style="heigth:14px; width:14px"></i></button>
-                            <button class="btn btn-danger" v-if="group.type_member == 'Admin'" @click.prevent="deletePlayedGame(data)" ><i class="fas fa-trash fa-1x" ></i></button>
+                            <button class="btn btn-info" @click.prevent="setViewInput(game.id, 'View')"><i class="fa fa-info" style="heigth:14px; width:14px" ></i></button>
+                            <button class="btn btn-primary"  v-if="group.type_member == 'Admin' || game.creator_id == user.id" @click.prevent="setViewInput(game.id, 'Update')"><i class="fa fa-edit" style="heigth:14px; width:14px"></i></button>
+                            <button class="btn btn-danger" v-if="group.type_member == 'Admin'" @click.prevent="deletePlayedGame(game)" ><i class="fas fa-trash fa-1x" ></i></button>
                         </td>
                     </tr>
-                    <tr v-if="playedGame.id == data.id">
+                    <tr v-if="playedGame.id == game.id">
                         <td colspan="100">
-                            <edit-played-game :group=group :playedGame=playedGame :groupGames="groupGames" :groupUsers="groupUsers" :submitOption="view"></edit-played-game>
+                            <edit-played-game :group=group :playedGame=playedGame :groupGames="groupGames" :groupUsers="groupUsers" :submitOption="view" :currentPage="listPlayedGames.current_page"></edit-played-game>
                         </td>
                     </tr>
             </tbody>
         </table>
-        <vue-pagination  :pagination="dataList" @paginate="loadList()" :offset="4" v-if="dataList"></vue-pagination>
+        <vue-pagination  :pagination="listPlayedGames" @paginate="loadList()" :offset="4" v-if="listPlayedGames"></vue-pagination>
     </div>
 </template>
 
@@ -53,6 +53,12 @@
     import Moment from 'moment';
 
     export default {
+        components: {
+            EditPlayedGame,
+            VuePagination,
+            Moment
+        },
+
         data () {
             return {
                 'view': "",
@@ -64,13 +70,19 @@
                 return this.$store.state.selectedGroup;
              },
 
-            dataList(){
+            user(){
+                return this.$store.state.loggedInUser;
+            },
+
+            listPlayedGames(){
                 if(this.group.id == undefined){
                     return;
                 }
                 if(this.$store.state.playedGames.data == undefined ){
                     this.$store.dispatch('getPlayedGames', {id: this.group.id, current_page: '1'});
                 }
+                this.$store.dispatch('resetPlayedGame');
+
                 return this.$store.state.playedGames;
             },
 
@@ -88,12 +100,6 @@
             }
         },
 
-        components: {
-            EditPlayedGame,
-            VuePagination,
-            Moment
-        },
-
         methods: {
             loadList(){
                 if(this.group.id == undefined){
@@ -101,7 +107,7 @@
                 }
                 this.view = "";
                 this.$store.dispatch('resetPlayedGame',);
-                return this.$store.dispatch('getPlayedGames', {id: this.group.id, current_page: this.dataList.current_page ?? '1'});
+                return this.$store.dispatch('getPlayedGames', {id: this.group.id, current_page: this.listPlayedGames.current_page ?? '1'});
 
             },
 
@@ -150,17 +156,17 @@
                     apiCall.postData('group/' + this.group.id + '/played/' + data.id + '/delete')
                     .then(response =>{
                         this.loadList();
-                    }).catch(() => {
-                        console.log('handle server error from here');
+                    }).catch(error => {
+                        if(error.status === 401){
+                            this.$store.dispatch('getMessage', {message: error.data});
+                        }
                     });
                 }
             }
         },
 
         mounted(){
-            this.$bus.$on('reloadPlayedGameList', () => {
-                this.loadList();
-            });
+
         },
     }
 </script>

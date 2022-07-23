@@ -1,5 +1,5 @@
 <template>
-    <div v-if="dataList.data != ''">
+    <div v-if="unapprovedGames.data != ''">
         <h1>Unaproved Games</h1>
 
         <table class="table table-hover table-sm">
@@ -15,108 +15,89 @@
                     <th>Options</th>
                 </tr>
             </thead>
-            <tbody  v-for="data in dataList.data"  :key="data.id" >
+            <tbody  v-for="game in unapprovedGames.data"  :key="game.id" >
                 <tr>
-                    <td>{{ data.id }}</td>
-                    <td>{{ data.name }}</td>
-                    <td>{{ data.year }}</td>
-                    <td class="d-none d-sm-table-cell">{{ data.approved_by_admin }}</td>
-                    <td class="d-none d-sm-table-cell">{{ data.players_min }}</td>
-                    <td class="d-none d-sm-table-cell">{{ data.players_max }}</td>
-                    <td ><span v-if="data.base_game">{{ data.base_game.name}}</span></td>
+                    <td>{{ game.id }}</td>
+                    <td>{{ game.name }}</td>
+                    <td>{{ game.year }}</td>
+                    <td class="d-none d-sm-table-cell">{{ game.approved_by_admin }}</td>
+                    <td class="d-none d-sm-table-cell">{{ game.players_min }}</td>
+                    <td class="d-none d-sm-table-cell">{{ game.players_max }}</td>
+                    <td ><span v-if="game.base_game">{{ game.base_game.name}}</span></td>
                     <td class="options-column">
-                        <button class="btn btn-primary" @click.prevent="ApproveGame(data.id)"><i class="fas fa-check"></i></button>
-                        <button class="btn btn-primary" @click.prevent="mergeGame(data.id)"><img :src="'images/layout/merge_icon.png'" style="heigth:16px; width:16px"  ></button>
+                        <button class="btn btn-primary" @click.prevent="ApproveGame(game.id)"><i class="fas fa-check"></i></button>
+                        <button class="btn btn-primary" @click.prevent="mergeGame(game.id)"><img :src="'images/layout/merge_icon.png'" style="heigth:16px; width:16px"  ></button>
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="100" v-if="display == 'mergeGame' && selectedId == data.id">
+                    <td colspan="100" v-if="showForm == 'mergeGame' && selectedGameId == game.id">
                         <span>
-                            <merge-game :gameId="selectedId" ></merge-game>
+                            <merge-game :selectedGame="game" ></merge-game>
                         </span>
                     </td>
                 </tr>
             </tbody>
         </table>
-         <vue-pagination  :pagination="dataList" @paginate="loadList()" :offset="4"></vue-pagination>
     </div>
 </template>
 
 <script>
     import apiCall from '../../services/ApiCall.js';
-    import VuePagination from '../../components/ui/pagination.vue';
     import mergeGame from '../GamePage/merge.vue'
 
     export default {
         data () {
             return {
-                'dataList' : { },
-                headers: [
-                    { 'header': 'Id'},
-                    { 'header': 'Name'},
-                    { 'header': 'Year'},
-                    { 'header': 'Approved by admin'},
-                    { 'header': 'Min'},
-                    { 'header': 'Max'},
-                    { 'header': 'Base game'},
-                    { 'header': 'Options'},
-                ],
-                fields: [
-                    { 'field': 'id'},
-                    { 'field': 'name'},
-                    { 'field': 'year'},
-                    { 'field': 'approved_by_admin'},
-                    { 'field': 'players_min'},
-                    { 'field': 'players_max'},
-                ],
-                'selectedId': 0,
-                'display': '',
+                'selectedGameId': 0,
+                'showForm': '',
             }
         },
 
         components: {
-            VuePagination,
             mergeGame
+        },
+
+        computed: {
+            unapprovedGames(){
+                this.showForm = "";
+                this.selectedGameId = 0;
+
+                if(this.$store.state.unapprovedGames.data == undefined ){
+                    this.$store.dispatch('getUnapprovedGames');
+                }
+                return this.$store.state.unapprovedGames;
+            }
         },
 
         methods: {
             loadList(){
-                apiCall.getData('unapprovedgames?page=' + this.dataList.current_page)
-                .then(response =>{
-                    this.dataList = response;
-                    this.selectedId = "";
-                    this.display = "";
-                }).catch(() => {
-                    console.log('handle server error from here');
-                });
+                this.$store.dispatch('getUnapprovedGames');
             },
 
             ApproveGame(id){
                 apiCall.postData('unapprovedgames/' + id)
                 .then(response =>{
-                     this.loadList();
-                     this.$bus.$emit('reloadList');
+                    var message = "The game " + response.data.name + " has been approved";
+                    this.$store.dispatch('getMessage', {message: message});
+                    this.loadList();
                 }).catch(() => {
                     console.log('handle server error from here');
                 });
             },
 
             mergeGame(id){
-                if(this.selectedId == id && this.display == 'mergeGame'){
-                    this.selectedId = "";
-                    this.display = '';
-                }else{
-                    this.selectedId = id;
-                    this.display = 'mergeGame';
+                if(this.selectedGameId == id && this.showForm == 'mergeGame'){
+                    this.selectedGameId = "";
+                    this.showForm = '';
+                    return
                 }
+                this.selectedGameId = id;
+                this.showForm = 'mergeGame';
             },
         },
 
         mounted(){
-            this.loadList();
-            this.$bus.$on('reloadList', () => {
-                    this.loadList();
-            });
+
         }
     }
 </script>

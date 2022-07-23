@@ -44,16 +44,14 @@ class AppServiceProvider extends ServiceProvider
         {
             return base_path('public_html');
         });
-        
+
         if ($this->app->environment() !== 'production') {
             $this->app->register(IdeHelperServiceProvider::class);
         }
         Schema::defaultStringLength(191);
 
         $this->app->bind('App\Repositories\Contracts\IUser', 'App\Repositories\UserRepo');
-
         $this->app->bind('App\Repositories\Contracts\IGame', 'App\Repositories\GameRepo');
-
         $this->app->bind('App\Repositories\Contracts\IGroup', 'App\Repositories\GroupRepo');
         $this->app->bind('App\Repositories\Contracts\IGroupUser', 'App\Repositories\GroupUserRepo');
         $this->app->bind('App\Repositories\Contracts\IGroupGame', 'App\Repositories\GroupGameRepo');

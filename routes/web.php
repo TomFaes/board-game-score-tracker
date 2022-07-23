@@ -1,9 +1,7 @@
 <?php
 
-use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\AuthenticationController;
 
-use App\Http\Controllers\Game\GameController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,27 +14,10 @@ use App\Http\Controllers\Game\GameController;
 |
 */
 
-Route::get('/', function () {
-    return view('home');
-});
 
+Route::get('/login/{social}', [AuthenticationController::class, 'getSocialRedirect']);
+Route::get('/login/{social}/callback', [AuthenticationController::class, 'getSocialCallback']);
 
-//Test views
-//Route::get('/view01', '\\App\Http\Controllers\HomeController@view01')->name('view01');
-
-//TEST ROUTE Remove for Production
-//Route::get('/test', '\\App\Http\Controllers\HomeController@view')->name('test');
-
-
-Route::get('/home', [HomeController::class, 'index'])->name('home');
-Route::get('login', [HomeController::class, 'index']);
-
-Route::get('/logout', [AuthenticationController::class, 'logout']);
-Route::get('/login/{social}', [AuthenticationController::class, 'getSocialRedirect'])->middleware('guest');;
-Route::get('/login/{social}/callback', [AuthenticationController::class, 'getSocialCallback'])->middleware('guest');;
-
-
-//Route::get('game', [GameController::class, 'view']);
 
 //vue router will handle all routing
 Route::get('/{any}', function () {

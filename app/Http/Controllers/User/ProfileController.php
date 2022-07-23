@@ -13,14 +13,10 @@ use Auth;
 
 class ProfileController extends Controller
 {
-     /** @var App\Repositories\Contracts\IUser */
-     protected $user;
+     protected $userRepo;
 
      public function __construct(Iuser $user) {
-         $this->middleware('auth')->only('view');
-         $this->middleware('auth:api')->except('view');
-
-         $this->user = $user;
+         $this->userRepo = $user;
      }
 
     /**
@@ -30,7 +26,7 @@ class ProfileController extends Controller
      */
     public function index()
     {
-        return response()->json(new UserResource($this->user->getUser(auth()->user()->id)), 200);
+        return response()->json(new UserResource($this->userRepo->getUser(auth()->user()->id)), 200);
     }
 
     /**
@@ -42,7 +38,7 @@ class ProfileController extends Controller
     public function update(ProfileRequest $request)
     {
         $userId = auth()->user()->id;
-        $user = $this->user->update($request->all(), $userId);
+        $user = $this->userRepo->update($request->all(), $userId);
         return response()->json(new UserResource($user), 200);
     }
 
@@ -55,7 +51,7 @@ class ProfileController extends Controller
     public function destroy()
     {
         $userId = Auth::user()->id;
-        $this->user->forgetUser($userId);
+        $this->userRepo->forgetUser($userId);
         return response()->json("Profile is deleted", 204);
     }
 }

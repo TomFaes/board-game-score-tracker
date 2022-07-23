@@ -25,13 +25,16 @@ class GroupRequest extends FormRequest
     {
         return [
             'name' => 'required',
+            'admin_id' => 'nullable|numeric',
+            'description' => 'nullable'
         ];
     }
 
     public function messages()
     {
         return [
-            'name.required' => 'Name is required'
+            'name.required' => 'Name is required',
+            'admin_id.numeric' => ' No admin selected',
         ];
     }
 }

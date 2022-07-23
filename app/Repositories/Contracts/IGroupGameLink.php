@@ -2,12 +2,13 @@
 
 namespace App\Repositories\Contracts;
 
+use App\Models\GroupGameLink;
+
 interface IGroupGameLink {
-    public function getGroupGameLinks();
     public function getGroupGameLink($id);
     public function getLinksOfGroupGame($groupGameId);
 
     public function create(Array $data);
-    public function update(Array $data, $id);
-    public function delete($Id);
+    public function update(Array $data, GroupGameLink $link);
+    public function delete(GroupGameLink $link);
 }

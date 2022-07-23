@@ -1,74 +1,46 @@
 <template>
-    <div style="width: 100%">
-        <div class="container-fluid">
-            <global-layout>
-                <nav-bar :user=user></nav-bar><br>
-                <message-box></message-box>
-                <router-view :key="$route.path" :user=user></router-view>
-            </global-layout>
-        </div>
+    <div style="width: 100%; padding: 5px">
+        <nav-bar :user="user"></nav-bar>
+        <global-layout>
+            <message-box :message="message"></message-box>
+            <br>
+        </global-layout>
+        <global-layout>
+            <router-view :key="$route.path" :user="user"></router-view>
+        </global-layout>
     </div>
 </template>
 
 <script>
-    import navBar from '../IndexPage/navBar.vue';
     import login from '../IndexPage/login.vue';
-
-    import joinGroup from '../GroupUserPage/joinGroup.vue'
-
     import messageBox from '../../components/tools/messageBar.vue';
+    import NavBar from '../IndexPage/navBar.vue';
+    import GlobalLayout from '../../components/global/globalLayout.vue';
 
     export default {
         components: {
-            navBar,
             login,
             messageBox,
-            joinGroup
-        },
-
-        props: {
-            'auth': {},
-         },
-
-        data () {
-            return {
-
-            }
+            NavBar,
+            GlobalLayout
         },
 
         computed: {
             user(){
-                return this.$store.state.LoggedInUser;
+                return this.$store.state.loggedInUser;
+            },
+
+            message(){
+                return this.$store.state.message;
             }
         },
 
-        methods: {
-
-        },
-
         mounted(){
-
+            //this.$store.dispatch('getMessage', {message: "dit is het bericht", color: 'blue', time: 50000});
         },
     }
 </script>
 
 <style scoped>
 
-button {
-    margin: 5px;
-}
-
-.button-row{
-    width: 100%;
-    text-align: center;
-}
-
-.group {
-    background-color: orange;
-    margin: 5px;
-}
-
-button{
-    width: 10%;
-}
 </style>

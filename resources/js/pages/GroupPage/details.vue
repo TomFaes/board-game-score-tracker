@@ -1,7 +1,8 @@
 <template>
-    <div>
+    <div v-if="group.name">
+
         <h1>{{  group.name}}
-            <i class="fas fa-star" style="color:yellow;" @click.prevent="changeFavorite()" v-if="group.id == user.favorite_group_id"></i>
+            <i class="fas fa-star" style="color:yellow !important;" @click.prevent="changeFavorite()" v-if="group.id == user.favorite_group_id"></i>
             <i class="far fa-star" @click.prevent="changeFavorite()" v-else></i>
         </h1>
         <div class="button-row">
@@ -13,7 +14,7 @@
             <button class="btn btn-primary" @click="navigation('groupUsers')"><i class="fas fa-users fa-1x" ></i></button>
             <button class="btn btn-primary" @click="navigation('groupGames')"><i class="fas fa-dice fa-1x" ></i></button>
         </div>
-        <router-view v-if="group != '' " name="groupDetails" :group=group></router-view>
+        <router-view v-if="group != ''" name="groupDetails" :group="group"></router-view>
     </div>
 </template>
 
@@ -41,7 +42,7 @@
             },
 
             user(){
-                return this.$store.state.LoggedInUser;
+                return this.$store.state.loggedInUser;
             }
         },
 
@@ -73,16 +74,15 @@
                 .then(response =>{
                     this.$store.dispatch('getLoggedInUser');
                 }).catch(() => {
-                    console.log('handle server error from here');
+                    if(error.status === 401){
+                        this.$store.dispatch('getMessage', {message: error.data});
+                    }
                 });
             },
         },
 
         mounted(){
             this.getGroup();
-            this.$bus.$on('reloadGroup', () => {
-                this.getGroup();
-            });
         }
     }
 </script>

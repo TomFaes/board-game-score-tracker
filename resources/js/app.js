@@ -5,28 +5,21 @@
  */
 
 require('./bootstrap');
-require('vue-multiselect/dist/vue-multiselect.min.css');
+require('@suadelabs/vue3-multiselect/dist/vue3-multiselect.css');
 
-import Vue from 'vue';
+import { createApp } from "vue";
 import router from './services/router';
 import store from '../js/services/store';
 
 import globalLayout from '../js/components/global/globalLayout.vue';
-import globalInput from '../js/components/global/globalInput.vue'
-
-window.Vue = require('vue');
 
 //load de index page
-Vue.component('index-page', require('./pages/IndexPage/index.vue').default);
+import App from './pages/IndexPage/index.vue';
+const app = createApp(App);
 
-//Global components
-Vue.component('global-layout', globalLayout);
-Vue.component('global-input', globalInput);
+app.use(router);
+app.use(store);
 
-Vue.prototype.$bus = new Vue({});
+app.component("globalLayout", globalLayout);
 
-const app = new Vue({
-  router,
-  store,
-  el: '#app'
-});
+app.mount('#app');

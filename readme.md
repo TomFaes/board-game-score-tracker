@@ -52,9 +52,20 @@ All members of a group will be able to add game scores and update them. The admi
      - rework front-end
         - rework split up API data return (group api call only returns groupdata with creator data, new call for group users, played games, groupgames)
         - update Resources to make better use of this return data. 
+# Version 3.00: 11/08/2022
+    - update vue2 to vue3
+    - update laravel 8 to laravel 9
+    - implement Route groups
+    - update phpunit test
+    - optimise repositories to reduce the amount of queries. 
+    - rebuild front. 
 
 
 ## Future plans
+    - implement events => to send mails test with https://mailtrap.io/blog/send-email-in-laravel/
+        - mails to invite users. 
+        - mail when a new score is added
+    - add picture options to groups
 
 
 # Undetermined futere plans
@@ -62,3 +73,4 @@ All members of a group will be able to add game scores and update them. The admi
     - Game detailed scores: if you play games like 7 wonders you will notices the score fiche will exist out of several  lines(points for blue cards, points for wonders, ?) . It should be a nice feature to have this present.
     - Turn order drawer: Our group usually draws who is first, second and so on. 
     - Game drawer:  sometimes we are undecided on which game to play, so a program that could do it for us would be welcome
+    - add tool to record game moves (like chess reports)

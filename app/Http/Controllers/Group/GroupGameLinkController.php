@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Group;
 use App\Http\Controllers\Controller;
 use App\Repositories\Contracts\IGroupGameLink;
 
-use Illuminate\Http\Request;
-
 use App\Http\Requests\GroupGameLinkRequest;
+use App\Http\Resources\GroupGameLinkCollection;
 use App\Http\Resources\GroupGameLinkResource;
+use App\Models\Group;
+use App\Models\GroupGame;
+use App\Models\GroupGameLink;
 
 class GroupGameLinkController extends Controller
 {
@@ -15,48 +17,30 @@ class GroupGameLinkController extends Controller
 
     public function __construct(IGroupGameLink $groupGameLink)
     {
-        $this->middleware('auth:api');
-        $this->middleware('groupgamelink');
-
         $this->groupGameLink = $groupGameLink;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(GroupGameLinkRequest $request, $groupGameId)
+    public function index(Group $group, GroupGame $game)
     {
-        $groupGameLink = $this->groupGameLink->create($request->all());
+        $groupGameLinks = $this->groupGameLink->getLinksOfGroupGame($game->id);
+        return response()->json(new GroupGameLinkCollection($groupGameLinks));
+    }
+
+    public function store(GroupGameLinkRequest $request, Group $group,  GroupGame $game)
+    {
+        $groupGameLink = $this->groupGameLink->create($request->validated());
         return response()->json(new GroupGameLinkResource($groupGameLink), 200);
-        return response()->json($groupGameLink, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\GroupGameLink  $groupGameLink
-     * @return \Illuminate\Http\Response
-     */
-    public function update(GroupGameLinkRequest $request, $groupGameId, $id)
+    public function update(GroupGameLinkRequest $request, Group $group, GroupGame $game, GroupGameLink $link)
     {
-        $groupGameLink = $this->groupGameLink->update($request->all(), $id);
+        $groupGameLink = $this->groupGameLink->update($request->validated(), $link);
         return response()->json(new GroupGameLinkResource($groupGameLink), 201);
-        return response()->json($groupGameLink, 201);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\GroupGameLink  $groupGameLink
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($groupGameId, $id)
+    public function destroy(Group $group, GroupGame $game, GroupGameLink $link)
     {
-        $this->groupGameLink->delete($id);
+        $this->groupGameLink->delete($link);
         return response()->json("Link is deleted", 204);
     }
 }

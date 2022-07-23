@@ -3,12 +3,30 @@
         <hr>
         <form @submit.prevent="submit" method="POST" enctype="multipart/form-data">
             <!-- the form items -->
-            <text-input inputName="name" inputId="name" tekstLabel="Name: " v-model="fields.name" :errors="errors.name" :value='fields.name'></text-input>
-            <text-input inputName="link" inputId="link" tekstLabel="Link: " v-model="fields.link" :errors="errors.link" :value='fields.link'></text-input>
-            <text-area inputName="description" inputId="description" tekstLabel="Description: " v-model="fields.description" :errors="errors.description" :value='fields.description'></text-area>
-            <center>
+            <global-layout >
+                <div class="form-floating  mb-3">
+                    <input type="text" class="form-control" v-model="fields.name"/>
+                    <label>Name: </label>
+                </div>
+                <div class="text-danger" v-if="errors.name">{{ errors.name[0] }}</div>
+            </global-layout>
+            <global-layout >
+                <div class="form-floating  mb-3">
+                    <input type="text" class="form-control" v-model="fields.link"/>
+                    <label>Link: </label>
+                </div>
+                <div class="text-danger" v-if="errors.link">{{ errors.link[0] }}</div>
+            </global-layout>
+            <global-layout >
+                <div class="form-floating  mb-3">
+                    <textarea type="text" style="height: 100px" class="form-control" v-model="fields.description"/>
+                    <label>Description: </label>
+                </div>
+                <div class="text-danger" v-if="errors.description">{{ errors.description[0] }}</div>
+            </global-layout>
+            <global-layout center="center">
                 <button class="btn btn-primary">Save link</button>
-            </center>
+            </global-layout>
         </form>
         <hr>
     </div>
@@ -16,13 +34,10 @@
 
 <script>
     import apiCall from '../../services/ApiCall.js';
-    import TextArea from '../../components/ui/form/TextAreaInput.vue';
-    import TextInput from '../../components/ui/form/TextInput.vue';
 
     export default {
         components: {
-            TextInput,
-            TextArea,
+
         },
 
          data () {
@@ -41,20 +56,16 @@
         props: {
             'group_game': {},
             'group_game_link' : {},
-            'submitOption': ""
+            'submitOption': "",
+            'currentPage': ''
          },
 
         methods: {
             setFormData(){
-                if(this.fields.name != undefined){
-                    this.formData.set('name', this.fields.name);
-                }
-                if(this.fields.link != undefined){
-                    this.formData.set('link', this.fields.link);
-                }
-                if(this.fields.description != undefined){
-                    this.formData.append('description', this.fields.description);
-                }
+                this.formData.set('name', this.fields.name ?? null);
+                this.formData.set('link', this.fields.link ?? null);
+                this.formData.set('description', this.fields.description ?? null);
+                this.formData.append('group_game_id', this.group_game.id);
             },
 
             submit(){
@@ -70,14 +81,13 @@
             create(){
                 this.formData.set('group_game_id', this.group_game.id);
                 this.setFormData();
-                this.action = "group/game/" + this.group_game.id + "/link";
+                this.action = "group/" + this.group_game.group_id + "/game/" + this.group_game.id + "/link";
 
                 apiCall.postData(this.action, this.formData)
                 .then(response =>{
-                    this.$bus.$emit('reloadGroupGames');
-                    this.$bus.$emit('hideLinkList');
-                    this.message = "You've added a new link to " + this.group_game.game.name;
-                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                    this.$store.dispatch('getSelectedGroupGames', {groupId: this.group_game.group_id, pageItems: 20, currentPage: this.currentPage});
+                    var message = "You've added a new link to " + this.group_game.game.name;
+                    this.$store.dispatch('getMessage', {message: message});
                     this.formData =  new FormData();
                 }).catch(error => {
                     this.errors = error;
@@ -87,17 +97,17 @@
             update(){
                 this.formData.set('group_game_id', this.group_game_link.group_game_id);
                 this.setFormData();
-                this.action = "group/game/" + this.group_game_link.group_game_id + "/link/"+ this.group_game_link.id;
 
+                this.action = "group/" + this.group_game.group_id + "/game/" + this.group_game.id + "/link/"+ this.group_game_link.id;
                  apiCall.updateData(this.action, this.formData)
                 .then(response =>{
-                    this.$bus.$emit('reloadGroupGames');
-                    this.$bus.$emit('hideLinkList');
-                    this.message = "You've updated a link from " + this.group_game.game.name;
-                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                    this.$store.dispatch('getSelectedGroupGames', {groupId: this.group_game.group_id, pageItems: 20, currentPage: this.currentPage});
+                    var message = "You've updated a link from " + this.group_game.game.name;
+                    this.$store.dispatch('getMessage', {message: message});
                     this.formData =  new FormData();
                 }).catch(error => {
-                        this.errors = error;
+                    console.log(error);
+                    this.errors = error;
                 });
             },
 

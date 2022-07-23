@@ -40,7 +40,6 @@ class PlayedGameRepositoryTest extends TestCase
     {
         $this->assertInstanceOf(PlayedGame::class, $testData);
         $this->assertEquals($data['group_id'], $testData->group_id);
-        $this->assertEquals($data['winner_id'], $testData->winner_id);
         $this->assertEquals($data['game_id'], $testData->game_id);
         $this->assertEquals($data['date'], $testData->date);
         $this->assertEquals($data['time_played'], $testData->time_played);
@@ -55,20 +54,18 @@ class PlayedGameRepositoryTest extends TestCase
 
     public function test_get_played_games()
     {
+        echo "\n\n---------------------------------------------------------------------------------";
         echo PHP_EOL.PHP_EOL.'[44m Played Game Repository Test:   [0m';
         echo PHP_EOL.'[46m Records:   [0m'.$this->recordCount;
 
         $found = $this->repo->getPlayedGames();
         $this->assertEquals($this->recordCount, count($found));
-
-        echo PHP_EOL.'[42m OK  [0m get all played games';
     }
 
     public function test_get_played_game()
     {
         $found = $this->repo->getPlayedGame($this->testData[0]->id);
         $this->dataTests($found, $this->testData[0]);
-        echo PHP_EOL.'[42m OK  [0m get played game';
     }
 
     public function test_get_played_group_games()
@@ -76,7 +73,6 @@ class PlayedGameRepositoryTest extends TestCase
         $found = $this->repo->getPlayedGroupGames($this->testData[0]->group_id);
 
         $this->assertEquals($this->countPlayedGamesInGroup, count($found));
-        echo PHP_EOL.'[42m OK  [0m get all played games from a group';
     }
 
     public function test_get_stats_played_Group_games()
@@ -85,7 +81,6 @@ class PlayedGameRepositoryTest extends TestCase
         $found = $this->repo->getStatPlayedGroupGames($this->testData[0]->group_id);
 
         $this->assertEquals(count($found), count($playedGames));
-        echo PHP_EOL.'[42m OK  [0m get stats of played group games';
     }
 
     public function test_get_stats_played_group_year_games()
@@ -99,8 +94,6 @@ class PlayedGameRepositoryTest extends TestCase
 
         $found = $this->repo->getStatPlayedGroupYearGames($this->testData[0]->group_id, $year);
         $this->assertEquals(count($found), count($playedGames));
-
-        echo PHP_EOL.'[42m OK  [0m get stats of played group games in a choosen year';
     }
 
     public function test_get_stats_played_Group_game()
@@ -112,8 +105,6 @@ class PlayedGameRepositoryTest extends TestCase
         $found = $this->repo->getStatPlayedGame($this->testData[0]->group_id, $this->testData[0]->game_id);
 
         $this->assertEquals(count($found), count($playedGames));
-
-        echo PHP_EOL.'[42m OK  [0m get stats of a game in a group';
     }
 
     public function test_create_played_game()
@@ -121,7 +112,6 @@ class PlayedGameRepositoryTest extends TestCase
         $data = [
             'group_id' => $this->testData[0]->group_id,
             'game_id' => $this->testData[0]->game_id,
-            'winner_id' => $this->testData[0]->winner_id,
             'date' => $this->testData[0]->date,
             'time_played' => $this->testData[0]->time_played,
             'remarks' => $this->testData[0]->remarks,
@@ -129,7 +119,6 @@ class PlayedGameRepositoryTest extends TestCase
 
         $testData = $this->repo->create($data, User::first()->id);
         $this->dataTests($data, $testData);
-        echo PHP_EOL.'[42m OK  [0m create played game';
     }
 
     public function test_update_played_game()
@@ -137,24 +126,21 @@ class PlayedGameRepositoryTest extends TestCase
         $data = [
             'group_id' => $this->testData[1]->group_id,
             'game_id' => $this->testData[1]->game_id,
-            'winner_id' => $this->testData[1]->winner_id,
             'date' => $this->testData[1]->date,
             'time_played' => $this->testData[1]->time_played,
             'remarks' => $this->testData[1]->remarks,
         ];
 
-        $playedGame = $this->repo->update($data, $this->testData[0]->id);
+        $playedGame = $this->repo->update($data, $this->testData[0]);
         $this->dataTests($data, $playedGame);
-        echo PHP_EOL.'[42m OK  [0m update played game';
     }
 
     public function test_delete_game()
     {
-        $delete = $this->repo->delete( $this->testData[0]->id);
+        $delete = $this->repo->delete( $this->testData[0]);
         $found = $this->repo->getPlayedGames();
 
         $this->assertTrue($delete);
         $this->assertEquals(($this->recordCount-1), count($found));
-        echo PHP_EOL.'[42m OK  [0m delete played game';
     }
 }

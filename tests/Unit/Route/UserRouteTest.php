@@ -5,8 +5,7 @@ namespace Tests\Unit\Route;
 use Tests\TestCase;
 use App\Models\User;
 //use App\Repositories\UserRepo;
-use Laravel\Passport\Passport;
-
+use Laravel\Sanctum\Sanctum;
 
 class UserRouteTest extends TestCase
 {
@@ -22,12 +21,10 @@ class UserRouteTest extends TestCase
     /**
      *  Get authenticated user
      */
-    protected function authenticatedUser($role = "Admin"){
-        $user = Passport::actingAs(
+    protected function authenticatedUser(){
+        $user = Sanctum::actingAs(
             $this->allUsers[0],
-            ['create-servers']
         );
-        $user->role = $role;
         return $user;
     }
 
@@ -43,6 +40,7 @@ class UserRouteTest extends TestCase
 
     public function test_ProfileController_index()
     {
+        echo "\n\n---------------------------------------------------------------------------------";
         echo PHP_EOL.PHP_EOL.'[44m Profile api Test:   [0m';
 
         $this->be($this->authenticatedUser('User'));
@@ -53,8 +51,6 @@ class UserRouteTest extends TestCase
         $response->assertStatus(200);
         $this->assertEquals(200, $response->status());
         $this->dataTests($this->allUsers[0], $response_data);
-
-        echo PHP_EOL.'[42m OK  [0m test index in the ProfileController';
     }
 
     public function test_ProfileController_update()
@@ -73,8 +69,6 @@ class UserRouteTest extends TestCase
         $response->assertStatus(200);
         $this->assertEquals(200, $response->status());
         $this->dataTests($data, $response_data);
-
-        echo PHP_EOL.'[42m OK  [0m test update method in the ProfileController';
     }
 
     public function test_ProfileController_destroy()
@@ -94,7 +88,5 @@ class UserRouteTest extends TestCase
         $this->assertNotEquals($response_data['name'], $this->allUsers[0]->name);
         $this->assertEquals($response_data['role'], $this->allUsers[0]->role);
         $this->assertNotEquals($response_data, $this->allUsers[0]->email);
-
-        echo PHP_EOL.'[42m OK  [0m test destroy method in the ProfileController';
     }
 }

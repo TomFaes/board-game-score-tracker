@@ -10,20 +10,12 @@ use Illuminate\Support\Str;
 
 class GroupUserRepo extends Repository implements IGroupUser
 {
-    public function getAllGroupUsers($itemsPerPage = 0)
-    {
-        if($itemsPerPage > 0){
-            return GroupUser::with(['group', 'user'])->OrderBy('name', 'asc', 'firstname', 'asc')->paginate($itemsPerPage);
-        }
-        return GroupUser::with(['group', 'user'])->OrderBy('name', 'asc', 'firstname', 'asc')->get();
-    }
-
     public function getGroupUsers($groupId, $itemsPerPage = 0)
     {
         if($itemsPerPage > 0){
             return GroupUser::where('group_id', $groupId)->with(['group', 'user'])->paginate($itemsPerPage);
         }
-        return GroupUser::where('group_id', $groupId)->with(['group', 'user'])->get();
+        return GroupUser::with(['group', 'user'])->where('group_id', $groupId)->get();
     }
 
     public function getGroupUser($id)
@@ -32,51 +24,34 @@ class GroupUserRepo extends Repository implements IGroupUser
     }
 
     //get a groupuser with all the games he has created.
-    public function getCreatedGames($id){
-        return GroupUser::with('gameCreator')->find($id);
+    public function getGamesCreatedByGroupUser($groupUserId)
+    {
+        return GroupUser::with('gameCreator')->find($groupUserId);
     }
 
      /***************************************************************************
      Next function will create or update the user object in de database
      **************************************************************************/
-
-     /**
-     * set the data of a group user
-     * @return Object
-     */
-    protected function setGroupUser(GroupUser $groupUser, array $data)
-    {
-        isset($data['firstname']) === true ? $groupUser->firstname = $data['firstname'] : "";
-        isset($data['name']) === true ? $groupUser->name = $data['name'] : "";
-        isset($data['group_id']) === true ? $groupUser->group_id = $data['group_id'] : "";
-        isset($data['user_id']) === true ? $groupUser->user_id = $data['user_id'] : "";
-        return $groupUser;
-    }
-
     public function create(Array $data)
     {
-        $groupUser = new GroupUser();
-        $groupUser = $this->setGroupUser($groupUser, $data);
+        $groupUser = GroupUser::create($data);
         $groupUser->code = $this->createCode();
         $groupUser->save();
         return $groupUser;
     }
 
-    public function update(Array $data, $id){
-        $groupUser = $this->getGroupUser($id);
-        $groupUser = $this->setGroupUser($groupUser, $data);
-        $groupUser->save();
+    public function update(Array $data, GroupUser $groupUser){
+        $groupUser->update($data);
         return $groupUser;
     }
 
-    public function delete($id)
+    public function delete(GroupUser $groupUser)
     {
-        $groupUser = $this->getGroupUser($id);
         return $groupUser->delete();
     }
 
     /**
-     * create a unique code for a group user to join a group
+     * create a unique code for a user to join a group
      */
     public function createCode()
     {
@@ -109,11 +84,11 @@ class GroupUserRepo extends Repository implements IGroupUser
         return $groupUser;
     }
 
-    public function regenerateGroupUserCode($id){
-        $groupUser = $this->getGroupUser($id);
+    public function regenerateGroupUserCode(GroupUser $groupUser){
         if($groupUser->user_id != null){
             return "There is still a user connected to this group user";
         }
+
         $groupUser->code = $this->createCode();
         $groupUser->save();
         return $groupUser;

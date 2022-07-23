@@ -7,90 +7,53 @@ use Illuminate\Http\Request;
 
 use App\Repositories\Contracts\IGame;
 
-use App\Http\Requests\GamesRequest;
+use App\Http\Requests\GameRequest;
 use App\Http\Resources\GameResource;
 use App\Http\Resources\GameCollection;
+use App\Http\Resources\GamePaginationCollection;
+
 use App\Models\Game;
 
 class GameController extends Controller
 {
-     /** App\Repositories\Contracts\GameValidation */
     protected $gameValidation;
+    protected $gameRepo;
 
-    /** App\Repositories\Contracts\IGame */
-    protected $game;
-
-    public function __construct(IGame $game) {
-        $this->middleware('auth')->only('view');
-        $this->middleware('auth:api')->except('view');
-
-        $this->middleware('game:normal')->only('view');
-        $this->middleware('game')->except('store');
-
-        $this->game = $game;
-    }
-
-    public function view()
+    public function __construct(IGame $game)
     {
-        return "TEST";
-
-        /*
-        $pageItems = isset($request->page_items) === true ? $request->page_items : 0;
-        return new GameCollection($this->game->getGames($pageItems));
-*/
+        $this->gameRepo = $game;
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {
         $pageItems = $request->page_items ?? 0;
-        return response()->json(new GameCollection($this->game->getGames($pageItems)), 200);
-        //return new GameCollection($this->game->getGames($pageItems));
+        if($pageItems > 0){
+            return response()->json(new GamePaginationCollection($this->gameRepo->getGames($pageItems)), 200);
+        }
+        return response()->json(new GameCollection($this->gameRepo->getGames()), 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(GamesRequest $request)
+    public function store(GameRequest $request)
     {
-        $game = $this->game->create($request->all());
+        $game = $this->gameRepo->create($request->validated());
         if(auth()->user()->role == 'Admin'){
-            $game = $this->game->approveGame($game);
+            $game = $this->gameRepo->approveGame($game);
         }
         return response()->json(new GameResource($game), 200);
-        //return new GameResource($game);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Game  $game
-     * @return \Illuminate\Http\Response
-     */
-    public function update(GamesRequest $request, $id)
+    public function update(GameRequest $request, Game $game)
     {
-        $game = $this->game->update($request->all(), $id);
+        $game = $this->gameRepo->update($request->validated(), $game);
         return response()->json(new GameResource($game), 200);
-        //return new GameResource($game);
     }
 
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Game  $game
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    public function destroy(Game $game)
     {
-        return response()->json($this->game->delete($id), 204);
+        if(count($game->expansions) > 0 || count($game->groupGames) > 0){
+            $message = "This game can't be delete. There are still ".count($game->expansions)." expansions and ".count($game->groupGames)." group games connected to this game";
+            return response()->json($message, 200);
+        }
+        return response()->json($this->gameRepo->delete($game), 204);
     }
 }

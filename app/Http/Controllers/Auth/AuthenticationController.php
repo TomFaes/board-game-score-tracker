@@ -1,22 +1,29 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
-
+/*
 use App\Http\Controllers\Controller;
 
+
 use Socialite;
-use Auth;
+//use Auth;
+use App\Repositories\Contracts\IUser;
+*/
+
+use App\Http\Controllers\BaseController as BaseController;
+use Illuminate\Support\Facades\Auth;
+use Socialite;
+
 use App\Repositories\Contracts\IUser;
 use App\Services\GroupService;
 
-class AuthenticationController extends Controller
+class AuthenticationController extends BaseController
 {
-    /** @var App\Repositories\Contracts\IUser */
-   protected $user;
+   protected $userRepo;
 
    public function __construct(IUser $user)
    {
-       $this->user = $user;
+       $this->userRepo = $user;
    }
 
    /**
@@ -38,20 +45,15 @@ class AuthenticationController extends Controller
             //get account info from the user who logged in
             $socialUser = Socialite::with( $account )->user();
             //check if the user exist
-            $user = $this->user->existingUser($socialUser->email);
+            $user = $this->userRepo->existingUser($socialUser->email);
             //if user doesn't exist create one
             if($user == null){
-                $user = $this->user->createSocialUser($socialUser);
+                $user = $this->userRepo->createSocialUser($socialUser);
 
             }
-
             //if the user exist or is created login
             Auth::login($user, true);
             Auth::user()->createToken('boardgame')->accessToken;
-
-            //Check if the user is already added to a group
-            $groupService = resolve(GroupService::class);
-            $groupService->checkNewUser($user);
 
             return redirect('/');
         }

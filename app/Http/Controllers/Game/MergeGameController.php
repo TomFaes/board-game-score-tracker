@@ -1,39 +1,18 @@
 <?php
 
 namespace App\Http\Controllers\Game;
+
 use App\Http\Controllers\Controller;
-
-use Illuminate\Http\Request;
-
-use App\Repositories\Contracts\IGame;
+use App\Models\Game;
 use App\Services\GameService\MergeGameService;
-use App\Validators\GameValidation;
 use Illuminate\Container\Container;
 
 class MergeGameController extends Controller
 {
-
-    /** @var App\Repositories\Contracts\IGame */
-    protected $game;
-
-    public function __construct(IGame $game) {
-        $this->middleware('auth:api');
-        $this->middleware('admin:Admin');
-
-        $this->game = $game;
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update($id, $mergedId)
+    public function update(Game $game, Game $merge_game)
     {
         $container = Container::getInstance();
         $mergeService = $container->make(MergeGameService::class);
-        return response()->json($mergeService->mergeGame($id, $mergedId), 201);
+        return response()->json($mergeService->mergeGame($game, $merge_game), 201);
     }
 }

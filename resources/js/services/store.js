@@ -1,21 +1,23 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-
-Vue.use(Vuex);
+import { createStore } from 'vuex';
 
 var localPath = "";
 if(process.env.NODE_ENV == 'development'){
     localPath= "/boardgametracker/public_html"
 }
 
-export default new Vuex.Store({
-
+export default new createStore({
   state: {
-    LoggedInUser: "",
-    userGroups: {},
+    loggedInUser: "",
+    games: {},
+    allGames: {},
+    baseGames: {},
+    unapprovedGames: {},
+    groupsOfUser: {},
     selectedGroup: {},
+    gamesNotInGroup: {},
     selectedGroupUsers: {},
     selectedGroupGames: {},
+    selectedGroupGameLinks: {},
     selectedPlayedGame: {},
     playedGames: {},
     firstLoad: 0,
@@ -23,6 +25,7 @@ export default new Vuex.Store({
     authenticated: false,
     role: '',
     errorMessage: '',
+    message: '',
   },
 
 
@@ -31,8 +34,24 @@ export default new Vuex.Store({
       state.authenticated = status;
     },
 
+    setGames(state, games){
+        state.games = games;
+    },
+
+    setAllGames(state, games){
+        state.allGames = games;
+    },
+
+    setBaseGames(state, games){
+        state.baseGames = games;
+    },
+
+    setUnapprovedGames(state, games){
+        state.unapprovedGames = games;
+    },
+
     setLoggedInUser(state, user){
-      state.LoggedInUser = user;
+      state.loggedInUser = user;
     },
 
     setRole(state, role){
@@ -43,8 +62,8 @@ export default new Vuex.Store({
       state.errorMessage = message;
     },
 
-    setUserGroups(state, userGroups){
-      state.userGroups = userGroups['data'];
+    setGroupsOfUser(state, groupsOfUser){
+      state.groupsOfUser = groupsOfUser['data'];
     },
 
     setSelectedGroup(state, selectedGroup){
@@ -59,12 +78,24 @@ export default new Vuex.Store({
         state.selectedGroupGames = selectedGroupGames;
     },
 
+    setSelectedGroupGameLinks(state, selectedGroupGameLinks){
+        state.selectedGroupGameLinks = selectedGroupGameLinks;
+    },
+
+    setGamesNotInGroup(state, gamesNotInGroup){
+        state.gamesNotInGroup = gamesNotInGroup;
+    },
+
     setPlayedGames(state, playedGames){
       state.playedGames = playedGames;
     },
 
     setSelectedPlayedGame(state, selectedPlayedGame){
         state.selectedPlayedGame = selectedPlayedGame;
+    },
+
+    setMessage(state, message){
+        state.message = message;
     },
 
     setFirstLoad(state){
@@ -77,20 +108,72 @@ export default new Vuex.Store({
       commit('setFirstLoad');
     },
 
-    getUserGroups({commit}) {
+    getGames({commit, dispatch}, {currentPage, itemsPerPage = 0} ){
+        var link = '/api/game';
+
+        if(currentPage > 0 && itemsPerPage > 0){
+            link = '/api/game?page=' + currentPage + '&page_items=' + itemsPerPage;
+        }
+
+        axios.get( localPath +  link)
+        .then((response) => {
+          commit('setGames', response.data);
+        })
+        .catch(error => {
+            if(error.response.status == 401){
+                dispatch('getMessage', {message: error.response.data, color: 'red'});
+            }
+        });
+    },
+
+    getAllGames({commit}){
+        var link = '/api/game';
+
+        axios.get( localPath +  link)
+        .then((response) => {
+          commit('setAllGames', response.data);
+        })
+        .catch(error => {
+            if(error.response.status == 401){
+                dispatch('getMessage', {message: error.response.data, color: 'red'});
+            }
+        });
+    },
+
+    getBaseGames({commit}) {
+        axios.get( localPath +  '/api/basegame')
+        .then((response) => {
+            commit('setBaseGames', response.data);
+        })
+        .catch((error) => console.error(error));
+    },
+
+    getUnapprovedGames({commit}){
+        axios.get( localPath +  '/api/unapprovedgames')
+        .then((response) => {
+            commit('setUnapprovedGames', response.data);
+        })
+        .catch((error) => console.error(error));
+    },
+
+    getGroupsOfUser({commit}) {
       axios.get( localPath +  '/api/user-group')
           .then((response) => {
-              commit('setUserGroups', response.data);
+              commit('setGroupsOfUser', response.data);
           })
           .catch((error) => console.error(error));
     },
 
-    getSelectedGroup({commit}, {id}) {
+    getSelectedGroup({commit, dispatch}, {id}) {
         axios.get( localPath +  '/api/group/' + id)
           .then((response) => {
               commit('setSelectedGroup', response.data);
           })
-          .catch((error) => console.error(error));
+          .catch(error => {
+            if(error.response.status == 401){
+                dispatch('getMessage', {message: error.response.data, color: 'red'});
+            }
+          });
     },
 
     getSelectedGroupUsers({commit}, {groupId}){
@@ -113,6 +196,25 @@ export default new Vuex.Store({
         .catch((error) => console.error(error));
     },
 
+    getSelectedGroupGameLinks({commit}, {groupId, gameId}){
+        axios({
+            method: 'get',
+            url : localPath +  '/api/group/' + groupId + '/game/' + gameId + '/link',
+        })
+        .then((response) => {
+            commit('setSelectedGroupGameLinks', response.data);
+        })
+        .catch((error) => console.error(error));
+    },
+
+    getGamesNotInGroup({commit}, {groupId}){
+        axios.get( localPath +  '/api/group/' + groupId + '/search-non-group-games')
+          .then((response) => {
+              commit('setGamesNotInGroup', response.data);
+          })
+          .catch((error) => console.error(error));
+    },
+
     getPlayedGames({commit}, {id, current_page}) {
       axios.get( localPath +  '/api/group/' + id + '/played?page=' + current_page)
           .then((response) => {
@@ -122,7 +224,6 @@ export default new Vuex.Store({
     },
 
     getSelectedPlayedGame({commit}, {groupId, id}){
-        //setSelectedPlayedGame
         axios.get( localPath +  '/api/group/' + groupId + '/played/' + id)
           .then((response) => {
               commit('setSelectedPlayedGame', response.data);
@@ -138,6 +239,14 @@ export default new Vuex.Store({
        })
        .catch((error) => console.error(error));
     },
+
+    getMessage({commit}, {message, color = 'green', time = 5000}){
+        var response = {};
+        response['message'] = message;
+        response['color'] = color;
+        response['time'] = time;
+        commit('setMessage', response);
+      },
 
     resetToDefault({commit}){
       commit('setSelectedGroup', {});

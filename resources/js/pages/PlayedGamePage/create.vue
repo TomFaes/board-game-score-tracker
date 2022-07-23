@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="groupUsers">
        <create-played-game :group=group :groupGames="groupGames" :groupUsers="groupUsers" :submitOption="'Create'"></create-played-game>
     </div>
 </template>
@@ -8,6 +8,10 @@
     import createPlayedGame from '../PlayedGamePage/input.vue';
 
     export default {
+        components: {
+            createPlayedGame,
+        },
+
         data () {
             return {
                 'view': "",
@@ -42,15 +46,13 @@
             }
         },
 
-        components: {
-            createPlayedGame,
-        },
-
         methods: {
+
 
         },
 
         mounted(){
+            this.$store.dispatch('getSelectedGroupUsers', {groupId: this.group.id});
 
         },
     }

@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Played;
 use App\Http\Controllers\Controller;
 
-use Illuminate\Http\Request;
-
 use App\Repositories\Contracts\IPlayedGame;
 use App\Repositories\Contracts\IPlayedGameScore;
 
@@ -13,62 +11,61 @@ use App\Http\Requests\PlayedGameRequest;
 use App\Http\Resources\PlayedGamePaginationCollection;
 use App\Http\Resources\PlayedGameResource;
 use App\Http\Resources\PlayedGameScoreResource;
+use App\Models\Group;
+use App\Models\PlayedGame;
 
 class PlayedGamesController extends Controller
 {
     protected $playedGame;
 
     public function __construct(IPlayedGame $playedGame, IPlayedGameScore $playedGameScore) {
-        $this->middleware('auth:api')->except('view');
-        $this->middleware('playedgame')->except('store');
-
         $this->playedGame = $playedGame;
         $this->playedGameScore = $playedGameScore;
     }
 
-    public function index($groupId)
+    public function index(Group $group)
     {
-        $played = $this->playedGame->getPlayedGroupGames($groupId, 20);
+        $played = $this->playedGame->getPlayedGroupGames($group->id, 20);
         return response()->json(new PlayedGamePaginationCollection($played), 200);
     }
 
-    public function show($groupId, $id){
-        $playedGame = $this->playedGame->getPlayedGame($id);
+    public function show(Group $group, PlayedGame $played){
+        $playedGame = $this->playedGame->getPlayedGame($played->id);
         return response()->json(new PlayedGameScoreResource($playedGame), 200);
     }
 
-    public function store($groupId, PlayedGameRequest $request)
+    public function store(Group $group, PlayedGameRequest $request)
     {
-        $playedGame = $this->playedGame->create($request->all(), auth()->user()->id);
-        if($request['expansions'] != ""){
-            $this->playedGame->addExpansions(explode(',', $request['expansions']), $playedGame->id);
+        $playedGame = $this->playedGame->create($request->validated(), auth()->user()->id);
+
+        if($request->expansions != ""){
+            $this->playedGame->addExpansions(explode(',', $request->expansions), $playedGame);
         }
-        $winnerId = $this->playedGameScore->createSetScores($request['player'], $playedGame->id);
-        $playedGame = $this->playedGame->setWinner($winnerId, $playedGame->id);
+        $winnerId = $this->playedGameScore->createSetScores($request->players, $playedGame->id);
+        $playedGame = $this->playedGame->setWinner($winnerId, $playedGame);
 
         return response()->json(new PlayedGameResource($playedGame), 200);
     }
 
-    public function update(PlayedGameRequest $request, $group, $id)
+    public function update(PlayedGameRequest $request, Group $group,  PlayedGame $played)
     {
-        $playedGame = $this->playedGame->update($request->all(), $id);
-        if($request['expansions'] != ""){
-            $this->playedGame->addExpansions(explode(',', $request['expansions']), $playedGame->id);
+        $playedGame = $this->playedGame->update($request->validated(), $played);
+        if($request->expansions != ""){
+            $this->playedGame->addExpansions(explode(',', $request->expansions), $playedGame);
         }else{
-            //sent empty array
-            $this->playedGame->addExpansions([], $playedGame->id);
+            $this->playedGame->addExpansions([], $playedGame);
         }
 
-        $winnerId = $this->playedGameScore->updateSetScore($request['player'], $playedGame->id);
+        $winnerId = $this->playedGameScore->updateSetScore($request->players, $playedGame->id);
 
-        $playedGame = $this->playedGame->setWinner($winnerId, $playedGame->id);
+        $playedGame = $this->playedGame->setWinner($winnerId, $playedGame);
 
         return response()->json(new PlayedGameResource($playedGame), 200);
     }
 
-    public function destroy($group, $id)
+    public function destroy(Group $group,  PlayedGame $played)
     {
-        $this->playedGame->delete($id);
+        $this->playedGame->delete($played);
         return response()->json("The played game is removed", 204);
     }
 }

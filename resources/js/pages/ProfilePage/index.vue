@@ -3,22 +3,38 @@
         <div class="row">
                 <h2>Profile</h2>
         </div>
-        <form @submit.prevent="update" method="POST" enctype="multipart/form-data">
-            <!-- the form items -->
-            <text-input inputName="firstname" inputId="firstname" tekstLabel="firstname: " v-model="fields.firstname" :errors="errors.firstname" :value='fields.firstname'></text-input>
-            <text-input inputName="name" inputId="name" tekstLabel="name: " v-model="fields.name" :errors="errors.name" :value='fields.name'></text-input>
-            <text-input inputName="email" inputId="email" tekstLabel="email: " v-model="fields.email" :errors="errors.email" :value='fields.email'></text-input>
-            <button class="btn btn-primary">Safe profile</button>
 
+        <form @submit.prevent="update" method="POST" enctype="multipart/form-data">
+            <global-layout >
+                <div class="form-floating  mb-3">
+                    <input type="text" class="form-control" v-model="user.firstname"/>
+                    <label>Firstname: </label>
+                </div>
+                <div class="text-danger" v-if="errors.firstname">{{ errors.firstname[0] }}</div>
+            </global-layout>
+            <global-layout>
+                <div class="form-floating  mb-3">
+                    <input type="text" class="form-control" v-model="user.name"/>
+                    <label>Name: </label>
+                </div>
+                <div class="text-danger" v-if="errors.name">{{ errors.name[0] }}</div>
+            </global-layout>
+            <global-layout>
+                <div class="form-floating  mb-3">
+                    <input type="text" class="form-control" v-model="user.email"/>
+                    <label>Email: </label>
+                </div>
+                <div class="text-danger" v-if="errors.email">{{ errors.email[0] }}</div>
+            </global-layout>
+            <global-layout center="center">
+                <button class="btn btn-primary">Safe profile</button>
+            </global-layout>
+            <hr>
             <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-2 col-md-2"></div>
-                    <div class="col-lg-8 col-md-8">
+                <global-layout center="center">
                         If you want to remove your account click the delete button, all your data will be randomised and you wont be able to use this account again.<br>
                         <button class="btn btn-danger" @click.prevent="removeProfile()"><i class="fas fa-trash fa-1x" ></i></button>
-                    </div>
-                    <div class="col-lg-2 col-md-2"></div>
-                </div>
+                </global-layout>
             </div>
         </form>
     </div>
@@ -27,87 +43,61 @@
 <script>
     import apiCall from '../../services/ApiCall.js';
 
-    import TextInput from '../../components/ui/form/TextInput.vue';
-    import DropdownInput from '../../components/ui/form/DropdownInput.vue';
-
     export default {
         components: {
-            TextInput,
-            DropdownInput,
+
         },
 
          data () {
             return {
-                'fields' : {
-                    firstname: '',
-                    name: '',
-                    email: '',
-                },
-                'user': {},
                 'errors' : [],
-                'action': '',
                 'formData': new FormData(),
             }
         },
 
-        methods: {
-            loadProfile(){
-                apiCall.getData('profile')
-                .then(response =>{
-                    this.user = response;
-                    this.setData();
-                }).catch(() => {
-                    console.log('handle server error from here');
-                });
-            },
+        computed: {
+            user(){
+                return this.$store.state.loggedInUser;
+            }
+        },
 
+        methods: {
             setFormData(){
-                if(this.fields.firstname != undefined){
-                    this.formData.set('firstname', this.fields.firstname);
-                }
-                if(this.fields.name != undefined){
-                    this.formData.append('name', this.fields.name);
-                }
-                if(this.fields.email != undefined){
-                    this.formData.set('email', this.fields.email);
-                }
+                this.formData.set('firstname', this.user.firstname ?? null);
+                this.formData.append('name', this.user.name ?? null);
+                this.formData.set('email', this.user.email ?? null);
             },
 
             update(){
                 this.setFormData();
-                this.action =  'profile',
 
-                apiCall.postData(this.action, this.formData)
+                apiCall.postData('profile', this.formData)
                 .then(response =>{
-                    this.message = "You've updated your profile ";
-                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                    this.$store.dispatch('getMessage', {message: "You've updated your profile"});
                     this.formData =  new FormData();
-                    window.location.href = "./";
+                    this.$router.push({name: "home"});
                 }).catch(error => {
                     this.errors = error;
                 });
             },
 
             removeProfile(){
-                if(confirm('are you sure?')){
+                if(confirm('Are you sure you want to remove your profile?')){
                     apiCall.postData('profile/delete')
                     .then(response =>{
                         window.location.href = "./logout";
-                    }).catch(() => {
+                    }).catch(error  => {
+                        if(error.status === 401){
+                            this.$store.dispatch('getMessage', {message: error.data});
+                        }
                         console.log('handle server error from here');
                     });
                 }
             },
-
-            setData(){
-                this.fields.firstname = this.user.firstname;
-                this.fields.name = this.user.name;
-                this.fields.email = this.user.email;
-            }
         },
 
         mounted(){
-            this.loadProfile();
+
         }
     }
 </script>

@@ -13,7 +13,7 @@ class Game extends Model
 
 
     protected $fillable = [
-        'name' ,'players_min', 'players_max', 'base_game_id'
+        'name', 'year' ,'players_min', 'players_max', 'base_game_id'
     ];
 
     protected $hidden = [
@@ -44,19 +44,21 @@ class Game extends Model
         return $this->hasMany(GroupGame::class);
     }
 
-    protected $appends = ['display'];
-
-    /**
-     * Returns a name for dropdowns
-     */
-    public function getDisplayAttribute()
-    {
-        return $this->full_name;
-    }
-
     //Pivot table connection
     public function playedGameExpansions()
     {
         return $this->belongsToMany(PlayedGame::class, 'expansion_played_game');
+    }
+
+    protected $appends = ['totalExpansions' , 'totalGamesInGroupGames'];
+
+    public function getTotalExpansionsAttribute()
+    {
+        return count($this->expansions);
+    }
+
+    public function getTotalGamesInGroupGamesAttribute()
+    {
+        return count($this->groupGames);
     }
 }

@@ -1,21 +1,12 @@
 <template>
     <div class="container">
         <div  v-if="dataList.data" >
-           <div class="row">
-                <div class="col-1"></div>
-                <div class="col-10">
-                    <center>
-                        <div>
-                            <button  class="btn btn-primary testclass d-none d-md-inline-block" @click.prevent="showStat('all')">All</button>
-                            <button class="btn btn-primary testclass" @click.prevent="showStat('scores')">Scores</button>
-                            <button class="btn btn-primary testclass" @click.prevent="showStat('places')">Places</button>
-                            <button class="btn btn-primary testclass" @click.prevent="showStat('victories')">Vicories</button>
-                       </div>
-                    </center>
-                    <br>
-                </div>
-                <div class="col-1"></div>
-            </div>
+            <global-layout center="center">
+                <button  class="btn btn-primary testclass d-none d-md-inline-block" @click.prevent="showStat('all')">All</button>
+                <button class="btn btn-primary testclass" @click.prevent="showStat('scores')">Scores</button>
+                <button class="btn btn-primary testclass" @click.prevent="showStat('places')">Places</button>
+                <button class="btn btn-primary testclass" @click.prevent="showStat('victories')">Vicories</button>
+            </global-layout>
 
             <div class="row">
                 <table class="table table-hover table-sm">
@@ -24,15 +15,14 @@
                             <th>Date</th>
                             <th>Game</th>
                             <th class="d-none d-sm-table-cell">Expansions</th>
-
                             <template v-if="display == 'scores' || display == 'all'">
-                                <th v-for="user in  groupUsers.data" :key="user.id" style="background-color: yellow"><center>{{ user.firstname }}</center></th>
+                                <th v-for="user in  groupUsers.data" :key="user.id" style="background-color: yellow" class="center">{{ user.firstname }}</th>
                             </template>
                             <template v-if="display == 'places' || display == 'all'">
-                                <th v-for="user in  groupUsers.data" :key="user.id" style="background-color: LightGreen" ><center> {{ user.firstname }} </center></th>
+                                <th v-for="user in  groupUsers.data" :key="user.id" style="background-color: LightGreen" class="center"> {{ user.firstname }}</th>
                             </template>
                             <template v-if="display == 'victories' || display == 'all'">
-                                <th v-for="user in  groupUsers.data" :key="user.id"  style="background-color: PaleVioletRed"><center> {{ user.firstname }} </center></th>
+                                <th v-for="user in  groupUsers.data" :key="user.id"  style="background-color: PaleVioletRed" class="center"> {{ user.firstname }}</th>
                             </template>
                         </tr>
                     </thead>
@@ -49,13 +39,13 @@
                             </td>
 
                             <template v-if="display == 'scores' || display == 'all'">
-                                <td v-for="user in data.users" :key="user.id"><center>{{ user.score}}</center></td>
+                                <td v-for="user in data.users" :key="user.id" class="center">{{ user.score}}</td>
                             </template>
                             <template v-if="display == 'places' || display == 'all'">
-                                <td v-for="user in data.users" :key="user.id"><center>{{ user.place}}</center></td>
+                                <td v-for="user in data.users" :key="user.id" class="center">{{ user.place}}</td>
                             </template>
                             <template v-if="display == 'victories' || display == 'all'">
-                                <td v-for="user in data.users" :key="user.id"><center>{{ user.victory}}</center></td>
+                                <td v-for="user in data.users" :key="user.id" class="center">{{ user.victory}}</td>
                             </template>
                         </tr>
                         <tr v-if="dataList.total && display != 'scores'">
@@ -66,10 +56,10 @@
                                 <td v-for="data in dataList.total.place" :key="data.id"></td>
                             </template>
                             <template v-if="display == 'places' || display == 'all'">
-                                <td v-for="data in dataList.total.place" :key="data.id"><center>{{ data}}</center></td>
+                                <td v-for="data in dataList.total.place" :key="data.id" class="center">{{ data}}</td>
                             </template>
                             <template v-if="display == 'victories' || display == 'all'">
-                                <td v-for="data in dataList.total.victory" :key="data.id"><center>{{ data}}</center></td>
+                                <td v-for="data in dataList.total.victory" :key="data.id" class="center">{{ data}}</td>
                             </template>
                         </tr>
                     </tbody>
@@ -99,6 +89,7 @@
         components: {
             Moment,
         },
+
 
         methods: {
             convertDate(value){

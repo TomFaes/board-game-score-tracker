@@ -1,45 +1,41 @@
 <?php
 
 namespace App\Http\Controllers\Statistics;
-use Illuminate\Http\Request;
-
 
 use App\Http\Controllers\Controller;
-use App\Repositories\PlayedGameRepo;
+use App\Models\Game;
+use App\Models\Group;
+use App\Repositories\Contracts\IPlayedGame;
 use App\Services\StatisticsService\StatisticsFactory;
 
 class StatisticsController extends Controller
 {
+    protected $statisticsGenerator;
+    protected $playedGameRepo;
 
-    public function groupStats($groupId)
+    public function __construct(IPlayedGame $playedGameeRepo)
     {
-        $repo = new PlayedGameRepo();
-        $playedGames = $repo->getStatPlayedGroupGames($groupId);
+        $this->playedGameRepo = $playedGameeRepo;
+        $this->statisticsGenerator = StatisticsFactory::generate("GroupStatistics");
+    }
 
-        $statisticsGenerator = StatisticsFactory::generate("GroupStatistics");
-        $data = $statisticsGenerator->getAll($playedGames);
-
+    public function groupStats(Group $group)
+    {
+        $playedGames = $this->playedGameRepo->getStatPlayedGroupGames($group->id);
+        $data = $this->statisticsGenerator->getAll($playedGames);
         return response()->json($data, 200);
     }
 
-    public function groupYearStats($groupId, $year)
+    public function groupYearStats(Group $group, $year)
     {
-        $repo = new PlayedGameRepo();
-
-        $playedGames = $repo->getStatPlayedGroupYearGames($groupId, $year);
-
-        $statisticsGenerator = StatisticsFactory::generate("GroupStatistics");
-        $data = $statisticsGenerator->getAll($playedGames);
-
+        $playedGames = $this->playedGameRepo->getStatPlayedGroupYearGames($group->id, $year);
+        $data = $this->statisticsGenerator->getAll($playedGames);
         return response()->json($data, 200);
     }
 
-    public function groupGameStats($groupId, $gameId){
-        $repo = new PlayedGameRepo();
-        $playedGames = $repo->getStatPlayedGame($groupId, $gameId);
-
-        $statisticsGenerator = StatisticsFactory::generate("GroupStatistics");
-        $data = $statisticsGenerator->getAll($playedGames);
+    public function groupGameStats(Group $group, Game $game){
+        $playedGames = $this->playedGameRepo->getStatPlayedGame($group->id, $game->id);
+        $data = $this->statisticsGenerator->getAll($playedGames);
         return response()->json($data, 200);
     }
 }

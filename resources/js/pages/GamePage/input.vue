@@ -3,32 +3,65 @@
         <hr>
         <form @submit.prevent="submit" method="POST" enctype="multipart/form-data">
             <!-- the form items -->
-            <text-input inputName="name" inputId="name" tekstLabel="Name: " v-model="fields.name" :errors="errors.name" :value='fields.name'></text-input>
-            <number-input inputName="year" inputId="year" tekstLabel="Year: " v-model="fields.year" :errors="errors.year" :value='fields.year'></number-input>
-            <number-input inputName="players_min" inputId="players_min" tekstLabel="Players min: " v-model="fields.players_min" :errors="errors.players_min" :value='fields.players_min'></number-input>
-            <number-input inputName="players_max" inputId="players_max" tekstLabel="Players max: " v-model="fields.players_max" :errors="errors.players_max" :value='fields.players_max'></number-input>
-            <div class="row" >
-                <div class="col-lg-2 col-md-2 col-sm-0"></div>
-                    <div class="col-lg-8 col-md-8 col-sm-12">
-                        <label>Select game: </label>
-                        <multiselect
-                            v-model="chosenGame"
-                            :multiple="false"
-                            :options="basegame"
-                            :close-on-select="true"
-                            :clear-on-select="true"
-                            placeholder="Add the selected game"
-                            label="name"
-                            track-by="name"
-                            id="game"
-                        >
-                        </multiselect>
-                    </div>
-                <div class="col-lg-2 col-md-2 col-sm-0"></div>
-            </div><br>
-            <center>
-                <button class="btn btn-primary">Save Game</button>
-            </center>
+            <global-layout >
+                <div class="form-floating  mb-3">
+                    <input type="text" class="form-control" v-model="fields.name"/>
+                    <label>Name: </label>
+                </div>
+                <div class="text-danger" v-if="errors.name">{{ errors.name[0] }}</div>
+            </global-layout>
+
+            <global-layout >
+                <div class="form-floating  mb-3">
+                    <input type="text" class="form-control" v-model="fields.year"/>
+                    <label>Year: </label>
+                </div>
+                <div class="text-danger" v-if="errors.year">{{ errors.year[0] }}</div>
+            </global-layout>
+
+            <global-layout >
+                <div class="form-floating  mb-3">
+                    <input type="number" class="form-control" v-model="fields.players_min"/>
+                    <label>Minimum players: </label>
+                </div>
+                <div class="text-danger" v-if="errors.players_min">{{ errors.players_min[0] }}</div>
+            </global-layout>
+            <global-layout >
+                <div class="form-floating  mb-3">
+                    <input type="number" class="form-control" v-model="fields.players_max"/>
+                    <label>Maximum players: </label>
+                </div>
+                <div class="text-danger" v-if="errors.players_max">{{ errors.players_max[0] }}</div>
+            </global-layout>
+            <global-layout >
+                <div class="form-floating  mb-3">
+                    <input type="number" class="form-control" v-model="fields.players_max"/>
+                    <label>Maximum players: </label>
+                </div>
+                <div class="text-danger" v-if="errors.players_max">{{ errors.players_max[0] }}</div>
+            </global-layout>
+
+             <global-layout  v-if="baseGames.data">
+                <div class="form-floating  mb-3">
+                    <multi-select class="form-control"
+                        v-model="chosenGame"
+                        :multiple="false"
+                        :options="baseGames.data"
+                        :close-on-select="true"
+                        :clear-on-select="true"
+                        placeholder="Select the base game"
+                        label="name"
+                        track-by="name"
+                        id="game"
+                    >
+                    </multi-select>
+                    <label>Select the base game: </label>
+                </div>
+            </global-layout>
+            <br>
+            <global-layout center="center">
+                <button class="btn btn-primary">Save game</button>
+            </global-layout>
         </form>
         <hr>
     </div>
@@ -36,15 +69,11 @@
 
 <script>
     import apiCall from '../../services/ApiCall.js';
-    import TextInput from '../../components/ui/form/TextInput.vue';
-    import NumberInput from '../../components/ui/form/NumberInput.vue';
-    import Multiselect from 'vue-multiselect';
+    import multiSelect from '@suadelabs/vue3-multiselect';
 
     export default {
         components: {
-            TextInput,
-            NumberInput,
-            Multiselect,
+            multiSelect,
         },
 
          data () {
@@ -57,16 +86,25 @@
                 },
                 'chosenGame': '',
                 'errors' : {},
-                'action': '',
                 'formData': new FormData(),
-                'basegame': [],
             }
         },
 
         props: {
             'game': {},
-            'submitOption': ""
+            'submitOption': "",
+            'currentPage': 0,
+            'itemsPerPage': 0
          },
+
+         computed: {
+            baseGames(){
+                if(this.$store.state.baseGames.data == undefined ){
+                    this.$store.dispatch('getBaseGames');
+                }
+                return this.$store.state.baseGames;
+            }
+        },
 
         methods: {
             setFormData(){
@@ -97,22 +135,25 @@
                 }
             },
 
+            resetFormData(){
+                this.fields = {}; //Clear input fields.
+                this.errors = {};
+                this.formData =  new FormData();
+            },
+
             create(){
                 this.setFormData();
-                this.action = "game";
 
-                apiCall.postData(this.action, this.formData)
+                apiCall.postData('game', this.formData)
                 .then(response =>{
-                    this.$bus.$emit('reloadGameList');
-                    this.$bus.$emit('resetGameDisplay');
                     this.formData =  new FormData();
+                    var message = response.data.name + " has been added to the list";
                      if(this.submitOption == "CreateFromGroup"){
-                        this.$bus.$emit('reloadGroupGames');
-                        this.message = response.data.name + " has been created, you can now add it to your game list";
-                    }else{
-                        this.message = response.data.name + " has been added to the list";
+                        message = response.data.name + " has been created, you can now add it to your game list";
                     }
-                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                    this.resetFormData();
+                    this.$store.dispatch('getGames', {currentPage: 1, itemsPerPage: 10});
+                    this.$store.dispatch('getMessage', {message: message});
                 }).catch(error => {
                     this.errors = error;
                 });
@@ -120,14 +161,14 @@
 
             update(){
                 this.setFormData();
-                this.action =  'game/' + this.game.id,
+                var link =  'game/' + this.game.id;
 
-                apiCall.updateData(this.action, this.formData)
+                apiCall.updateData(link, this.formData)
                 .then(response =>{
-                    this.$bus.$emit('reloadGameList');
-                    this.message = response.data.full_name + " has been updated";
-                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
-                    this.$bus.$emit('display', 'groupStats');
+                    this.resetFormData();
+                    var message = "The game " + response.data.name + " has been updated";
+                    this.$store.dispatch('getGames', {currentPage: this.currentPage, itemsPerPage: this.itemsPerPage});
+                    this.$store.dispatch('getMessage', {message: message});
                 }).catch(error => {
                     this.errors = error;
                 });
@@ -140,19 +181,9 @@
                 this.fields.players_max = this.game.players_max;
                 this.chosenGame = this.game.base_game;
             },
-
-            loadBaseGameList(){
-                apiCall.getData('basegame')
-                .then(response =>{
-                    this.basegame = response.data;
-                }).catch(() => {
-                    console.log('handle server error from here');
-                });
-            },
         },
 
         mounted(){
-            this.loadBaseGameList();
             if(this.game != undefined){
                 this.setData();
             }

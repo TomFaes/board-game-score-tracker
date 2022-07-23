@@ -3,8 +3,16 @@
         <hr>
         <form @submit.prevent="joinGroup" method="POST" enctype="multipart/form-data">
             <!-- the form items -->
-            <text-input inputName="code" inputId="code" tekstLabel="Code to join group: " v-model="fields.code" :errors="errors.code" :value='fields.code'></text-input>
-            <button class="btn btn-primary">Add code</button>
+            <global-layout >
+                <div class="form-floating  mb-3">
+                    <input type="text" class="form-control" v-model="fields.code"/>
+                    <label>Add code: </label>
+                </div>
+                <div class="text-danger" v-if="errors.code">{{ errors.code[0] }}</div>
+            </global-layout>
+            <global-layout center="center" >
+                <button class="btn btn-primary">Add code</button>
+            </global-layout>
         </form>
         <hr>
     </div>
@@ -13,11 +21,9 @@
 <script>
      import apiCall from '../../services/ApiCall.js';
 
-    import TextInput from '../../components/ui/form/TextInput.vue';
-
     export default {
         components: {
-            TextInput,
+
         },
 
          data () {
@@ -25,7 +31,7 @@
                 'fields' : {
                     code: '',
                 },
-                'errors' : [],
+                'errors' : {},
                 'formData': new FormData(),
             }
         },
@@ -43,20 +49,19 @@
                 this.formData.set('code', this.fields.code);
                 apiCall.updateData('join_group', this.formData)
                 .then(response =>{
+                    var message = "You have joined the group: " + response.data.group.name;
                     if(response == false){
-                        this.message = "No group found for that code";
-                        this.$bus.$emit('showMessage', this.message,  'red', '2000' );
+                        message = "No group found for that code";
+                        this.$store.dispatch('getMessage', {message: message, color: 'red', time: 2000});
                         return
                     }
-                    this.message = "You have joined the group: ";
-                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                    this.$store.dispatch('getMessage', {message: message});
 
                     this.formData =  new FormData();
-                     this.$store.dispatch('getUserGroups');
-
+                    this.$store.dispatch('getGroupsOfUser');
                     this.$router.push({name: "home"});
                 }).catch(error => {
-                        this.errors = error;
+                    this.errors = error;
                 });
             },
         },

@@ -21,26 +21,9 @@ class GroupGameSeeder extends Seeder
         // Disable Foreign key check for this connection before running seeders
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-
         GroupGame::factory()
             ->count(10)
             ->create();
-        /*
-        $groups = Group::all()->random(5);
-
-        foreach ($groups as $group) {
-            $games = Game::all()->random(4);
-            foreach ($games as $game) {
-                GroupGame::firstOrCreate([
-                    'group_id' => $group->id,
-                    'game_id' => $game->id,
-                ]);
-            }
-        }
-        */
-
-
-
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }

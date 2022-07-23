@@ -16,7 +16,7 @@ class StatisticsFactory
             return new $statisticsName();
         }
         else {
-            return response()->json("er is geen type generator gevonden met volgende naam:  ".$type, 200);
+            return response()->json("er is geen type statics gevonden met volgende naam:  ".$type, 200);
         }
     }
 }

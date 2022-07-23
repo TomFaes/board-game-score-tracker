@@ -1,47 +1,29 @@
 <?php
 
 namespace App\Http\Controllers\Game;
+
 use App\Http\Controllers\Controller;
 use App\Http\Resources\GameCollection;
 use App\Http\Resources\GameResource;
-use Illuminate\Http\Request;
-
+use App\Models\Game;
 use App\Repositories\Contracts\IGame;
 
 class UnapprovedGameController extends Controller
 {
-
-    /** @var App\Repositories\Contracts\IGame */
-    protected $game;
+    protected $gameRepo;
 
     public function __construct(IGame $game) {
-        $this->middleware('auth:api');
-        $this->middleware('admin:Admin');
-
-        $this->game = $game;
+        $this->gameRepo = $game;
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        return new GameCollection($this->game->getUnapprovedGames(20));
+        return new GameCollection($this->gameRepo->getUnapprovedGames(20));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update($id)
+    public function update (Game $game)
     {
-        $game = $this->game->getGame($id);
-        $game = $this->game->approveGame($game);
-        return new GameResource($game);
+        $game = $this->gameRepo->approveGame($game);
+        return response()->json(new GameResource($game), 200);
     }
 }

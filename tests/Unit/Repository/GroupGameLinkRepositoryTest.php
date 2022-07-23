@@ -45,20 +45,18 @@ class GroupGameLinkRepositoryTest extends TestCase
 
     public function test_get_group_game_links()
     {
+        echo "\n\n---------------------------------------------------------------------------------";
         echo PHP_EOL.PHP_EOL.'[44m GroupGameLink Repository Test:   [0m';
         echo PHP_EOL.'[46m Records:   [0m'.$this->recordCount;
 
-        $found = $this->repo->getGroupGameLinks();
+        $found = GroupGameLink::all();
         $this->assertEquals($this->recordCount, count($found));
-
-        echo PHP_EOL.'[42m OK  [0m get all group game links';
     }
 
     public function test_get_group_game_link()
     {
         $found = $this->repo->getGroupGameLink($this->testData[0]->id);
         $this->dataTests($this->testData[0], $found);
-        echo PHP_EOL.'[42m OK  [0m get group game link';
     }
 
     public function test_get_links_of_group_game()
@@ -68,8 +66,6 @@ class GroupGameLinkRepositoryTest extends TestCase
         $linkCount = count(GroupGameLink::with(['groupGame'])->where('group_game_id', $this->testData[0]->id)->get());
 
         $this->assertEquals($linkCount, count($found));
-
-        echo PHP_EOL.'[42m OK  [0m get all links of  a group game';
     }
 
     public function test_create_group_game_link()
@@ -84,10 +80,8 @@ class GroupGameLinkRepositoryTest extends TestCase
         $createdData = $this->repo->create($data);
         $this->dataTests($data, $createdData);
 
-        $found = $this->repo->getGroupGameLinks();
+        $found = GroupGameLink::all();
         $this->assertEquals($this->recordCount + 1, count($found));
-
-        echo PHP_EOL.'[42m OK  [0m create group game link';
     }
 
     public function test_update_group_game_link()
@@ -99,19 +93,16 @@ class GroupGameLinkRepositoryTest extends TestCase
             'description' => "een nieuwe omschrijving van wat de link inhoud",
         ];
 
-        $updatedGame = $this->repo->update($data, $this->testData[0]->id);
+        $updatedGame = $this->repo->update($data, $this->testData[0]);
         $this->dataTests($data, $updatedGame);
-
-        echo PHP_EOL.'[42m OK  [0m update group game link';
     }
 
     public function test_delete_group_game_link()
     {
-        $delete = $this->repo->delete($this->testData[0]->id);
-        $found = $this->repo->getGroupGameLinks();
+        $delete = $this->repo->delete($this->testData[0]);
+        $found = GroupGameLink::all();
 
         $this->assertTrue($delete);
         $this->assertEquals(($this->recordCount - 1), count($found));
-        echo PHP_EOL.'[42m OK  [0m delete group game link';
     }
 }

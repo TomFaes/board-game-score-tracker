@@ -3,32 +3,18 @@
 namespace App\Repositories;
 
 use App\Models\PlayedGameScore;
-
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use App\Repositories\Contracts\IPlayedGameScore;
-use Auth;
 
 class PlayedGameScoreRepo extends Repository implements IPlayedGameScore
 {
-    /**
-     * Get all the played games
-     *
-     * @return Object
-     */
     public function getPlayedGameScores($itemsPerPage = 0)
     {
-        if ($itemsPerPage > 0) {
+        if ($itemsPerPage > 0){
              return PlayedGameScore::with(['playedGame', 'groupUser', 'groupUser.user'])->paginate($itemsPerPage);
         }
         return PlayedGameScore::with(['playedGame', 'groupUser', 'groupUser.user'])->get();
     }
 
-    /**
-     * Get a played game
-     *
-     * @return Object
-     */
     public function getPlayedGameScore($id)
     {
         return PlayedGameScore::with(['playedGame', 'groupUser', 'groupUser.user'])->find($id);
@@ -36,7 +22,7 @@ class PlayedGameScoreRepo extends Repository implements IPlayedGameScore
 
     public function getUserPlayedGameScores($groupUserId, $itemsPerPage = 0)
     {
-        if ($itemsPerPage > 0) {
+        if ($itemsPerPage > 0){
              return PlayedGameScore::with(['playedGame', 'groupUser', 'groupUser.user'])->where('group_user_id', $groupUserId)->paginate($itemsPerPage);
         }
         return PlayedGameScore::with(['playedGame', 'groupUser', 'groupUser.user'])->where('group_user_id', $groupUserId)->get();
@@ -45,12 +31,6 @@ class PlayedGameScoreRepo extends Repository implements IPlayedGameScore
     /***************************************************************************
      Next function will create or update the user object in de database
      **************************************************************************/
-
-    /**
-     * set the data of a game
-     *
-     * @return Object
-     */
     protected function setPlayedGameScore(PlayedGameScore $score, array $data)
     {
         isset($data['group_user_id']) === true ? $score->group_user_id = $data['group_user_id'] : "";
@@ -64,29 +44,29 @@ class PlayedGameScoreRepo extends Repository implements IPlayedGameScore
     protected function determenPlaces(Array $gameScores)
     {
         //sort games from high to low
-        uasort($gameScores, function ($a, $b) {
+        uasort($gameScores, function ($a, $b){
             return $b['score'] <=> $a['score'];
         });
 
         $value = 0;
         $place = 1;
 
-        foreach ($gameScores AS $key => $score) {
-            if ($score['score']  == 0 && $score['place'] == 0) {
+        foreach ($gameScores AS $key => $score){
+            if ($score['score']  == 0 && $score['place'] == 0){
                 continue;
             }
 
-            if ($score['place'] == 0) {
-                if ($score['score'] < $value) {
+            if ($score['place'] == 0){
+                if ($score['score'] < $value){
                     $place++;
                     $gameScores[$key]['place'] = $place;
-                } elseif ($score['score'] == $value) {
+                } elseif ($score['score'] == $value){
                     $gameScores[$key]['place'] = $place;
-                } elseif ($score['score'] > $value) {
+                } elseif ($score['score'] > $value){
                     $gameScores[$key]['place'] = $place;
                 }
                 $value = $score['score'];
-            } else {
+            } else{
                 $place = $score['place'];
                 $value = $score['score'];
             }
@@ -94,11 +74,6 @@ class PlayedGameScoreRepo extends Repository implements IPlayedGameScore
         return $gameScores;
     }
 
-    /**
-     * Create a new game score
-     *
-     * @return Object
-     */
     public function create(Array $data)
     {
         $score = new PlayedGameScore();
@@ -107,19 +82,14 @@ class PlayedGameScoreRepo extends Repository implements IPlayedGameScore
         return $score;
     }
 
-    /**
-     * Create multiple new game scores
-     *
-     * @return integer
-     */
     public function createSetScores(Array $gameScores, $playedGameId)
     {
         $gameScores = $this->determenPlaces($gameScores);
         $winnerId = 0;
-        foreach ($gameScores AS $gamescore) {
-            if ($gamescore['score'] > 0 || $gamescore['place'] > 0) {
+        foreach ($gameScores AS $gamescore){
+            if ($gamescore['score'] > 0 || $gamescore['place'] > 0){
                 //set winner
-                if ($gamescore['place'] == 1) {
+                if ($gamescore['place'] == 1){
                     $winnerId = $gamescore['group_user_id'];
                 }
                 $gamescore['played_game_id'] = $playedGameId;
@@ -130,13 +100,6 @@ class PlayedGameScoreRepo extends Repository implements IPlayedGameScore
         return $winnerId;
     }
 
-
-
-    /**
-     * Update a game
-     *
-     * @return Object
-     */
     public function update(Array $data, $id)
     {
         $score = $this->getPlayedGameScore($id);
@@ -145,33 +108,29 @@ class PlayedGameScoreRepo extends Repository implements IPlayedGameScore
         return $score;
     }
 
-    /**
-     * Update multiple game scores
-     *
-     * @return integer
-     */
-    public function updateSetScore(Array $gameScores, $playedGameId) {
+    public function updateSetScore(Array $gameScores, $playedGameId)
+    {
         $gameScores = $this->determenPlaces($gameScores);
         $winnerId = 0;
 
-        foreach ($gameScores AS $gamescore) {
+        foreach ($gameScores AS $gamescore){
             //set winner
-            if ($gamescore['place'] == 1) {
+            if ($gamescore['place'] == 1){
                 $winnerId = $gamescore['group_user_id'];
             }
             $score = $this->getPlayedGameScore($gamescore['id']);
 
             //if score is found, update/delete the score
-            if ($score != "") {
-                if ($gamescore['score'] == 0 &&  $gamescore['place'] == 0) {
+            if ($score != ""){
+                if ($gamescore['score'] == 0 &&  $gamescore['place'] == 0){
                     $this->delete($gamescore['id']);
-                } else {
+                } else{
                     $score = $this->setPlayedGameScore($score, $gamescore);
                     $score->save();
                 }
-            } else {
+            } else{
                 //if there is a score or place create new line
-                if ($gamescore['score'] > 0 ||  $gamescore['place'] > 0) {
+                if ($gamescore['score'] > 0 ||  $gamescore['place'] > 0){
                     $gamescore['played_game_id'] = $playedGameId;
                     $this->create($gamescore);
                 }
@@ -180,11 +139,6 @@ class PlayedGameScoreRepo extends Repository implements IPlayedGameScore
         return $winnerId;
     }
 
-    /**
-     * Delete a game
-     *
-     * @return Object
-     */
     public function delete($id)
     {
         $score = $this->getPlayedGameScore($id);

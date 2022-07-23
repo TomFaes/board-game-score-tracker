@@ -12,7 +12,7 @@ class PlayedGame extends Model
     use HasFactory;
 
     protected $fillable = [
-        'group_id', 'game_id', 'winner_id', 'date', 'time_played', ' remarks', 'creator_id'
+        'group_id', 'game_id', 'date', 'time_played', 'remarks'
     ];
 
     protected $hidden = [
@@ -34,12 +34,14 @@ class PlayedGame extends Model
         return $this->belongsTo(Game::class)->with('expansions')->withDefault();
     }
 
-    public function creator(){
+    public function creator()
+    {
         return $this->belongsTo(User::class, 'creator_id', 'id')->select(['id', 'firstname', 'name'])->withDefault();
     }
 
     //Pivot table connection
-     public function expansions(){
+     public function expansions()
+     {
         return $this->belongsToMany(Game::class, 'expansion_played_game');
     }
 

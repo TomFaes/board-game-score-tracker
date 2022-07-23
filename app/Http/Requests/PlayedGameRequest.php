@@ -25,9 +25,10 @@ class PlayedGameRequest extends FormRequest
     {
         return [
             'group_id' => 'required',
-                'game_id' => 'required',
-                'date' => 'nullable|date',
-                'time' => 'nullable|regex:/(\d+\:\d+)/',
+            'game_id' => 'required',
+            'date' => 'required|date',
+            'time_played' => 'nullable|regex:/(\d+\:\d+)/',
+            'remarks' => 'nullable',
         ];
     }
 
@@ -36,7 +37,7 @@ class PlayedGameRequest extends FormRequest
             'group_id.required' => 'A group is required',
             'game_id.required' => 'A game is required',
             'date.date' => 'This is not a valid date',
-            'time.regex' => 'This is not a valid time',
+            'time_played.regex' => 'This is not a valid time',
         ];
     }
 }

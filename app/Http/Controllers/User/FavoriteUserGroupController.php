@@ -3,36 +3,23 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 
 use App\Repositories\Contracts\IUser;
-
 use App\Http\Resources\UserResource;
-
-use Auth;
+use App\Models\Group;
 
 class FavoriteUserGroupController extends Controller
 {
-     /** @var App\Repositories\Contracts\IUser */
-     protected $user;
+     protected $userRepo;
 
      public function __construct(Iuser $user) {
-         $this->middleware('auth')->only('view');
-         $this->middleware('auth:api');
-
-         $this->user = $user;
+         $this->userRepo = $user;
      }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function update($groupId)
+    public function update(Group $group)
     {
         $userId = auth()->user()->id;
-        $user = $this->user->changeFavoriteGroup($userId, $groupId);
+        $user = $this->userRepo->changeFavoriteGroup($userId, $group->id);
         return response()->json(new UserResource($user), 200);
     }
 }

@@ -1,67 +1,60 @@
 <template>
     <div class="container">
         <form @submit.prevent="submit" method="POST" enctype="multipart/form-data">
-            <!-- the form items -->
-            <text-input inputName="name" inputId="name" tekstLabel="Name: " v-model="fields.name" :errors="errors.name" :value='fields.name'></text-input>
-            <text-area inputName="description" inputId="description" tekstLabel="Description: " v-model="fields.description" :errors="errors.description" :value='fields.description'></text-area>
+            <global-layout >
+                <div class="form-floating  mb-3">
+                    <input type="text" class="form-control" v-model="fields.name"/>
+                    <label>Name: </label>
+                </div>
+                <div class="text-danger" v-if="errors.name">{{ errors.name[0] }}</div>
+            </global-layout>
 
-            <!-- Admin multiselect -->
-            <div class="row" v-if="this.groupUsers != undefined">
-                <div class="col-lg-2 col-md-2 col-sm-0"></div>
-                <div class="col-lg-8 col-md-8 col-sm-12">
-                    <label>Admin: </label>
-                    <multiselect
-                        v-model="selectedUser"
+            <global-layout >
+                <div class="form-floating  mb-3">
+                    <input type="text" class="form-control" v-model="fields.description"/>
+                    <label>Description: </label>
+                </div>
+                <div class="text-danger" v-if="errors.description">{{ errors.description[0] }}</div>
+            </global-layout>
+
+            <global-layout  v-if="multiGroupUsers">
+                <div class="form-floating  mb-3">
+                    <multi-select class="form-control"
+                        v-model="fields.admin"
                         :multiple="false"
-                        :options="multigroupUsers"
+                        :options="multiGroupUsers"
                         :close-on-select="true"
                         :clear-on-select="true"
                         placeholder="Select admin"
                         label="full_name"
                         track-by="full_name"
                     >
-                    </multiselect>
+                    </multi-select>
+                    <label>Select group admin: </label>
                 </div>
-                <div class="col-lg-2 col-md-2 col-sm-0"></div>
-            </div>
+            </global-layout>
             <br>
-            <div class="row">
-                <div class="col-lg-2 col-md-2 col-sm-0"></div>
-                <div class="col-lg-8 col-md-8 col-sm-12">
-                    <center>
-                        <button class="btn btn-primary">{{buttonText}}</button>
-                    </center>
-                    <br>
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-0"></div>
-            </div>
+            <global-layout center="center">
+                <button class="btn btn-primary">Save group</button>
+            </global-layout>
+            <hr>
 
-            <div class="row" v-if="this.group != undefined">
-                <div class="col-lg-2 col-md-2 col-sm-0"></div>
-                <div class="col-lg-8 col-md-8 col-sm-12">
-                    You can delete your group, your group wont be displayed in your list, the games played wont be deleted
-                    <center>
-                        <button class="btn btn-danger" @click.prevent="deleteGroup"><i class="fas fa-trash fa-1x" ></i></button>
-                    </center>
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-0"></div>
-            </div>
+            <global-layout center="center" v-if="this.group != undefined">
+                You can delete your group, your group wont be displayed in your list, the games played wont be deleted
+                <br>
+                <button class="btn btn-danger" @click.prevent="deleteGroup"><i class="fas fa-trash fa-1x" ></i></button>
+            </global-layout>
         </form>
     </div>
 </template>
 
 <script>
     import apiCall from '../../services/ApiCall.js';
-
-    import TextInput from '../../components/ui/form/TextInput.vue';
-    import TextArea from '../../components/ui/form/TextAreaInput.vue';
-    import Multiselect from 'vue-multiselect';
+    import multiSelect from '@suadelabs/vue3-multiselect';
 
     export default {
         components: {
-            TextInput,
-            TextArea,
-            Multiselect
+            multiSelect
         },
 
          data () {
@@ -69,15 +62,10 @@
                 'fields' : {
                     name: '',
                     description: '',
-                    admin_id: '',
+                    admin: {},
                 },
                 'errors' : {},
-                'response': {},
-                'selectedUser': [],
-                'multigroupUsers': [],
                 'formData': new FormData(),
-                'message': '',
-                'buttonText': "Save group",
             }
         },
 
@@ -85,140 +73,121 @@
             'group': {},
          },
 
-
         watch:{
-            group(){
-                this.loadList();
+            group() {
+                this.setData();
             },
-
          },
 
          computed: {
              groupUsers(){
-                if(this.group == undefined){
+                if(this.group == undefined) {
                     return;
                 }
-                if(this.group.id == undefined){
-                    return;
+                if(this.$store.state.selectedGroupUsers.data == undefined) {
+                    this.$store.dispatch('getSelectedGroupUsers', {groupId: this.group.id});
                 }
-                this.setMultiGroupUsers();
-                return this.$store.state.selectedGroupUsers;
+                return this.$store.state.selectedGroupUsers.data;
             },
+
+            multiGroupUsers(){
+                if(this.groupUsers === undefined) {
+                    return;
+                }
+                if(this.group.id != this.groupUsers[0].group_id) {
+                    this.$store.dispatch('getSelectedGroupUsers', {groupId: this.group.id});
+                }
+                var users = [];
+                for(var item in this.groupUsers) {
+                    if(this.groupUsers[item]['user_id'] > 0) {
+                         users.push(this.groupUsers[item]);
+                    }
+                }
+                return users;
+            }
          },
 
         methods: {
-            setData(){
+            setData() {
                 this.fields.name = this.group.name;
                 this.fields.description = this.group.description;
+                this.fields.admin = this.group.admin;
             },
 
-            setMultiGroupUsers(){
-                for(var item in this.$store.state.selectedGroupUsers.data){
-                    if(this.$store.state.selectedGroupUsers.data[item].user_id <= 0){
-                        return
-                    }
-
-                    this.multigroupUsers.push(this.$store.state.selectedGroupUsers.data[item]);
-                    if(this.group.admin.id == this.$store.state.selectedGroupUsers.data[item].user_id){
-                        this.selectedUser = this.$store.state.selectedGroupUsers.data[item];
-                    }
+            setFormData() {
+                this.formData.set('name', this.fields.name ?? null);
+                this.formData.set('description', this.fields.description ?? null);
+                if(this.fields.admin.id != undefined){
+                    this.formData.set('admin_id', this.fields.admin.id ?? null);
                 }
-            },
-
-            setFormData(){
-                if(this.fields.name != undefined){
-                    this.formData.set('name', this.fields.name);
-                }
-                if(this.fields.description != undefined){
-                    this.formData.append('description', this.fields.description);
-                }
-                if(this.selectedUser != undefined){
-                    this.formData.set('admin_id', this.selectedUser.user_id);
-                }
-            },
-
-            loadList(){
-                if(this.group == undefined){
-                    return;
-                }
-                if(this.group.id == undefined){
-                    return;
-                }
-                if(this.$store.state.selectedGroupUsers.data == undefined){
-                    this.$store.dispatch('getSelectedGroupUsers', {groupId: this.group.id});
-                }
-                this.setData();
             },
 
             submit(){
-                if(this.group == undefined){
+                if(this.group == undefined) {
                     this.create();
                     return
                 }
                 this.update();
             },
 
-            resetFormData(){
+            resetFormData() {
                 this.fields = {}; //Clear input fields.
                 this.errors = {};
                 this.formData =  new FormData();
             },
 
-            create(){
+            create() {
                 this.setFormData();
-
                 apiCall.postData('group', this.formData)
-                .then(response =>{
+                .then(response => {
                     this.resetFormData();
-                    this.message = "Your group " + response.name + " has been created";
-                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
-                    this.$store.dispatch('getUserGroups');
+                    this.$store.dispatch('getMessage', {
+                            message: "Your group " + response.data.name + " has been created",
+                        });
+                    this.$store.dispatch('getGroupsOfUser');
                     this.$router.push({name: "home"});
                 }).catch(error => {
-                    this.errors = error;
+                    this.$store.dispatch('getMessage', {message: error});
                 });
             },
 
-            update(){
+            update() {
                 this.setFormData();
-
                 apiCall.updateData('group/' + this.group.id, this.formData)
-                .then(response =>{
-                    this.message = "Your group " + response.name + " has been changed";
-                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                .then(response => {
+                    this.$store.dispatch('getMessage', {
+                            message: "Your group " + response.data.name + " has been changed",
+                        });
                     this.$store.dispatch('getSelectedGroup', {id: this.group.id});
-                    this.$router.push({name: "allPlayedGames", params: { id: this.group.id },});
+                    this.$router.push({name: "allPlayedGames", params: { id: this.group.id }});
                 }).catch(error => {
-                        this.errors = error;
+                    this.$store.dispatch('getMessage', {message: error});
+                    console.log(error);
                 });
             },
 
             deleteGroup(){
                 if(confirm('are you sure you want to delete this group ' + this.group.name + '?')){
                     apiCall.postData('group/' + this.group.id + '/delete')
-                    .then(response =>{
-                        this.message = "Your group " + this.group.name + " has been deleted";
-                        this.$bus.$emit('showMessage', this.message,  'red', '2000' );
-
-                        this.$store.commit('setSelectedGroup' , '{}');
-                        this.$store.dispatch('getUserGroups');
+                    .then(response => {
+                        this.$store.dispatch('getMessage', {
+                            message: "Your group " + this.group.name + " has been deleted",
+                        });
+                        this.$store.dispatch('resetToDefault');
+                        this.$store.dispatch('getGroupsOfUser');
                         this.$router.push({name: "home"});
-                    }).catch(() => {
-                        console.log('handle server error from here');
+                    }).catch(error => {
+                        this.$store.dispatch('getMessage', {message: error});
                     });
                 }
             }
         },
 
         mounted(){
-            if(this.group == undefined){
-                this.buttonText = "Create group";
+            if(this.group != undefined) {
+                this.setData();
             }
         },
-
-        created(){
-            this.loadList();
-        }
     }
 </script>
 

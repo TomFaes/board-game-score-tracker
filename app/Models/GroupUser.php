@@ -12,32 +12,23 @@ class GroupUser extends Model
     use HasFactory;
 
     protected $fillable = [
-        'firstname', 'name'
+        'firstname', 'name', 'group_id', 'user_id'
     ];
 
     protected $hidden = [
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    /**
-     * Return the group
-     */
     public function group()
     {
         return $this->belongsTo(Group::class)->select(['id', 'name', 'admin_id', 'description'])->withDefault();
     }
 
-     /**
-     * Returns the user
-     */
     public function user()
     {
         return $this->belongsTo(User::class)->select(['id', 'firstname', 'name'])->withDefault();
     }
 
-     /**
-     * Return the group
-     */
     public function gameCreator()
     {
         return $this->hasMany(PlayedGame::class, 'creator_id', 'user_id');

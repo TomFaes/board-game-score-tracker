@@ -2,6 +2,7 @@
 
 namespace App\Services\GameService;
 
+use App\Models\Game;
 use App\Repositories\Contracts\IGame;
 use App\Repositories\Contracts\IGroupGame;
 use App\Repositories\Contracts\IPlayedGame;
@@ -28,17 +29,17 @@ class MergeGameService
     /**
      * this function will merge 2 games together
      */
-    public function mergeGame($id, $mergeId)
+    public function mergeGame(Game $game, Game $toBeMergedGame)
     {
-        $this->gameId = $id;
-        $this->mergeId = $mergeId;
+        $this->gameId = $game->id;
+        $this->mergeId = $toBeMergedGame->id;
 
         $this->updateBaseGames();
         $this->updateExpansionPlayedGames();
         $this->updateGroupGames();
         $this->updatePlayedGame();
         //delete the game
-        $this->game->delete($this->gameId);
+        $this->game->delete($game);
 
         return true;
     }

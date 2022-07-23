@@ -11,6 +11,10 @@ class GroupGame extends Model
     use SoftDeletes;
     use HasFactory;
 
+    protected $fillable = [
+        'group_id', 'game_id'
+    ];
+
     public function game()
     {
         return $this->belongsTo(Game::class)->select(['id', 'name', 'full_name', 'players_max', 'players_min', 'base_game_id'])->with('expansions')->withDefault();

@@ -2,16 +2,17 @@
 
 namespace App\Repositories\Contracts;
 
+use App\Models\GroupUser;
+
 interface IGroupUser {
-    public function getAllGroupUsers($itemsPerPage = 0);
     public function getGroupUser($id);
-    public function getCreatedGames($id);
+    public function getGamesCreatedByGroupUser($groupUserId);
 
     public function create(Array $data);
-    public function update(Array $data, $id);
-    public function delete($Id);
+    public function update(Array $data, GroupUser $groupUser);
+    public function delete(GroupUser $groupUser);
 
     public function createCode();
     public function joinGroup($code, $userId);
-    public function regenerateGroupUserCode($id);
+    public function regenerateGroupUserCode(GroupUser $groupUser);
 }

@@ -18,7 +18,7 @@ class PlayedGameResource extends JsonResource
             'id' => $this->id,
             'group_id' => $this->group_id,
             'game_id' => $this->game_id,
-            'game' => $this->game,
+            'game' => new GameBaseResource($this->game),
             'winner_id' => $this->winner_id,
             'winner' => new UserPublicResource($this->winner),
             'creator_id' => $this->creator_id,
@@ -26,7 +26,7 @@ class PlayedGameResource extends JsonResource
             'date' => $this->date,
             'time_played' => $this->time_played,
             'remarks' => $this->remarks,
-            'played_expansions' => $this->expansions
+            'played_expansions' => GameBaseResource::collection($this->expansions),
         ];
     }
 }

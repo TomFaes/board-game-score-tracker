@@ -27,6 +27,7 @@ class GroupGameLinkRequest extends FormRequest
                 'group_game_id' => 'required',
                 'name' => 'required',
                 'link' => 'required',
+                'description' => 'nullable',
         ];
     }
 

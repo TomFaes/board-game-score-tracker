@@ -2,6 +2,8 @@
 
 namespace Tests\Unit;
 
+use App\Models\Game;
+use App\Models\User;
 use Tests\TestCase;
 
 
@@ -29,8 +31,13 @@ class DatabaseTest extends TestCase
      */
     public function test_get_all_users()
     {
+        /*
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+          );
+        */
+
         $this->assertEquals(10, 10);
-        echo PHP_EOL.'[42m OK  [0m get all  users';
     }
 
 

@@ -20,15 +20,23 @@
         },
 
         props: {
+            'message': '',
 
          },
 
+         watch: {
+             message(){
+                 this.showMessage();
+             }
+         },
+
         methods: {
-            showMessage(message, color, time){
+            showMessage(){
                 this.messageBarVisible = true;
-                this.displayMessage = message;
-                this.displayColor = color;
-                setTimeout(() => this.messageBarVisible = false, time)
+                this.displayMessage = this.message.message;
+                this.displayColor = this.message.color;
+                this.displayTime = this.message.time;
+                setTimeout(() => this.messageBarVisible = false, this.displayTime);
             }
         },
 
@@ -38,15 +46,15 @@
                     "padding": "10px",
                     "text-align": "center",
                     "color": "white",
-                    "background-color": this.displayColor
+                    "background-color": this.displayColor,
+                    "z-index": 1,
                 }
             }
         },
 
+
         mounted(){
-            this.$bus.$on('showMessage', (message, color='green', time = '5000') => {
-                this.showMessage(message, color, time);
-            });
+
         }
     }
 </script>

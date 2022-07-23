@@ -2,71 +2,46 @@
 
 namespace App\Repositories;
 
-use App\Http\Middleware\Security\Group;
+use App\Models\Group;
 use App\Models\GroupGame;
-
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use App\Repositories\Contracts\IGroupGame;
-use Auth;
-use Illuminate\Database\Eloquent\Builder;
 
-class GroupGameRepo extends Repository implements Contracts\IGroupGame
+
+class GroupGameRepo extends Repository implements IGroupGame
 {
-    public function getGroupGames()
-    {
-        return GroupGame::all();
-    }
-
     public function getGroupGame($id)
     {
         return GroupGame::with('game', 'group', 'links')->find($id);
     }
 
-    public function getGroupGameIds($groupId)
+    public function getIdsOfGamesOfGroup($id)
     {
-        return  GroupGame::with('groupGames')->where('group_id', $groupId)->pluck('game_id');
+        return  GroupGame::with('groupGames')->where('group_id', $id)->pluck('game_id');
     }
 
-    public function getGamesOfGroup($groupId, $itemsPerPage = 0)
+    public function getGamesOfGroup($id, $itemsPerPage = 0)
     {
         if($itemsPerPage > 0){
-            $groupgames = GroupGame::with('game', 'group','links')->where('group_id', $groupId);
+            $groupgames = GroupGame::with('game', 'group','links')->where('group_id', $id);
             $groupgames = $groupgames->join('games AS testGame' , 'group_games.game_id', '=', 'testGame.id')->orderBy('testGame.full_name')->select('group_games.*')->paginate($itemsPerPage);;
              return $groupgames;
-            //return GroupGame::with('game', 'group', 'links')->where('group_id', $groupId)->paginate($itemsPerPage);
         }
-        $groupgames = GroupGame::with('game', 'group','links')->where('group_id', $groupId)->orderBy('full_name');
+        $groupgames = GroupGame::with('game', 'group','links')->where('group_id', $id)->orderBy('full_name');
         $groupgames = $groupgames->join('games' , 'group_games.game_id', '=', 'games.id')->orderBy('games.full_name')->select('group_games.*')->get();
         return $groupgames;
     }
     /***************************************************************************
      Next function will create or update the user object in de database
      **************************************************************************/
-
-     /**
-     * set the data of a game
-     * @return Object
-     */
-    protected function setGroupGame(GroupGame $groupGame, array $data)
+    public function create(Array $data)
     {
-        isset($data['group_id']) === true ? $groupGame->group_id = $data['group_id'] : "";
-        isset($data['game_id']) === true ? $groupGame->game_id = $data['game_id'] : "";
+        $groupGame = GroupGame::create($data);
         return $groupGame;
     }
 
     /**
-     * Create a new group game
-     * @return Object
+     * after a mergen you can update the old id with the new id.
      */
-    public function create(Array $data)
-    {
-        $groupGame = new GroupGame();
-        $groupGame = $this->setGroupGame($groupGame, $data);
-        $groupGame->save();
-        return $groupGame;
-    }
-
     public function updateGroupGameIds($gameId, $newGameId)
     {
         GroupGame::where('game_id' , '=', $gameId)->update(
@@ -77,13 +52,8 @@ class GroupGameRepo extends Repository implements Contracts\IGroupGame
         return 'group games updated';
     }
 
-    /**
-     * Delete a group game
-     * @return Object
-     */
-    public function delete($groupGameId)
+    public function delete(GroupGame $game)
     {
-        $gameGroup = $this->getGroupGame($groupGameId);
-        return $gameGroup->delete();
+        return $game->delete();
     }
 }

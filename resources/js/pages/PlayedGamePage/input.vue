@@ -3,76 +3,83 @@
         <form @submit.prevent="submit" method="POST" enctype="multipart/form-data" v-if="group.id != undefined">
 
             <!-- Basic Game Details -->
-            <div class="row" v-if="groupGames.data">
-                <div class="col-lg-2 col-md-2 col-sm-0"></div>
-                    <div class="col-lg-8 col-md-8 col-sm-12">
-                        <label>Select game: </label>
-                        <multiselect
-                            v-model="selectedGame"
-                            :multiple="false"
-                            :options="groupGames.data"
-                            :close-on-select="true"
-                            :clear-on-select="true"
-                            :disabled=disabled
-                            placeholder="Add the selected game"
-                            label="name"
-                            track-by="name"
-                            @select="setSelectedGame"
-                            id="game"
-                        >
-                        </multiselect>
-                    </div>
-                <div class="col-lg-2 col-md-2 col-sm-0"></div>
-            </div>
-
-            <date-input :disabled="disabled" inputName="date" inputId="date" tekstLabel="Date: " v-model="fields.date" :errors="errors.date" :value='fields.date'></date-input>
-            <time-input :disabled="disabled" inputName="time_played" inputId="time_played" tekstLabel="Time played: " v-model="fields.time_played" :errors="errors.time_played" :value='fields.time_played'></time-input>
-            <text-area :disabled="disabled" inputName="remarks" inputId="remarks" tekstLabel="Remarks: " v-model="fields.remarks" :errors="errors.remarks" :value='fields.remarks'></text-area>
-
-            <!-- Expansion details -->
-            <div v-if="gameExpansions.expansions" class="form-group">
-                <div class="row" v-if="gameExpansions.expansions.length > 0">
-                    <div class="col-lg-2 col-md-2"></div>
-                    <div class="col-lg-8 col-md-8">
-                        <h3>Expansion</h3>
-                        <div v-for="(expansion) in gameExpansions.expansions" :key="expansion.id">
-                            <input :disabled="disabled" type="checkbox"  :id="expansion.id" :value="expansion.id" v-model="seletectedExpansions" >
-                            <label :for="expansion.id">{{ expansion.name }}</label>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 col-md-2"></div>
-                </div>
-            </div>
-
-            <!-- Score details -->
-            <div class="row">
-                <div class="col-lg-2 col-md-2"></div>
-                <div class="col-lg-8 col-md-8">
-                    <h3>add players & scores</h3>
-                </div>
-                <div class="col-lg-2 col-md-2"></div>
-            </div>
-
-            <!-- search user list -->
-            <div class="row" v-if="multigroupUsers">
-                <div class="col-2"></div>
-                    <div class="col-8">
-                        <multiselect
-                            :multiple="false"
-                            :options="multigroupUsers"
-                            :reset-after="true"
-                            :close-on-select="false"
-                            :clear-on-select="true"
-                            :disabled=disabled
-                            placeholder="Add the selected user"
-                            label="full_name"
-                            track-by="full_name"
-                            @select="showUser"
+            <global-layout  v-if="groupGames.data">
+                <div class="form-floating  mb-3">
+                    <multiselect
+                        class="form-control"
+                        v-model="selectedGame"
+                        :multiple="false"
+                        :options="groupGames.data"
+                        :close-on-select="true"
+                        :clear-on-select="true"
+                        :disabled=disabled
+                        placeholder="Add the selected game"
+                        label="name"
+                        track-by="name"
+                        @select="setSelectedGame"
+                        id="game"
                     >
                     </multiselect>
-                    </div>
-                <div class="col-2"></div>
-            </div>
+                    <label>Select game: </label>
+                </div>
+            </global-layout>
+
+            <global-layout >
+                <div class="form-floating  mb-3">
+                    <input :disabled="disabled" type="date" class="form-control" v-model="fields.date" />
+                    <label>Date: </label>
+                </div>
+                <div class="text-danger" v-if="errors.date">{{ errors.date[0] }}</div>
+            </global-layout>
+             <global-layout >
+                <div class="form-floating  mb-3">
+                    <input :disabled="disabled" type="time" class="form-control" v-model="fields.time_played" />
+                    <label>Time played: </label>
+                </div>
+                <div class="text-danger" v-if="errors.date">{{ errors.time_played[0] }}</div>
+            </global-layout>
+            <global-layout >
+                <div class="form-floating  mb-3">
+                    <textarea :disabled=disabled type="text" style="height: 100px" class="form-control" v-model="fields.remarks"/>
+                    <label>Remarks: </label>
+                </div>
+                <div class="text-danger" v-if="errors.remarks">{{ errors.remarks[0] }}</div>
+            </global-layout>
+
+            <!-- Expansion details -->
+            <global-layout v-if="gameExpansions.expansions">
+                <h3>Expansion</h3>
+                <div class="form-check" v-for="(expansion) in gameExpansions.expansions" :key="expansion.id">
+                    <input :disabled="disabled" type="checkbox" class="form-check-input" :id="expansion.id" :value="expansion.id" v-model="selectedExpansions" >
+                    <label :for="expansion.id">{{ expansion.name }}</label>
+                </div>
+            </global-layout>
+
+            <!-- Score details -->
+            <global-layout >
+                <h3>add players & scores</h3>
+            </global-layout>
+
+            <!-- search user list -->
+            <global-layout  v-if="groupGames.data">
+                <div class="form-floating  mb-3">
+                    <multiselect
+                        class="form-control"
+                        :multiple="false"
+                        :options="multigroupUsers"
+                        :reset-after="true"
+                        :close-on-select="false"
+                        :clear-on-select="true"
+                        :disabled=disabled
+                        placeholder="Add the selected user"
+                        label="full_name"
+                        track-by="full_name"
+                        @select="showUser"
+                    >
+                    </multiselect>
+                    <label>Add the selected user: </label>
+                </div>
+            </global-layout>
 
             <div v-if="groupUsers">
                 <table class="table table-borderless table-sm" v-if="groupUsers.data">
@@ -85,59 +92,46 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(groupUser) in groupUsers.data" :key="groupUser.id" v-if="groupUser.score_display == true">
-                            <th scope="row" nowrap>
+                        <tr v-for="(groupUser) in groupUsers.data" :key="groupUser.id">
+                            <th scope="row" nowrap v-if="groupUser.score_display == true">
                                 <button class="btn btn-danger"  @click="removeUser(groupUser)"  v-if="disabled == false"> <i class="fas fa-minus-circle" style="heigth:14px; width:14px"></i></button>
                                 {{ groupUser.full_name }}
                             </th>
-                            <td style="width: 20%">
-                                <input :disabled="disabled" class="form-control" type="number" name="score" value="groupUser['score_score']" v-model="groupUser['score_score']">
+                            <td style="width: 20%" v-if="groupUser.score_display == true">
+                                <input :disabled="disabled" class="form-control" type="number" name="score" v-model="groupUser['score_score']">
                             </td>
-                            <td  style="width: 20%">
-                                <input :disabled="disabled" class="form-control" type="number" name="place" value="groupUser['score_place']" v-model="groupUser['score_place']">
+                            <td  style="width: 20%" v-if="groupUser.score_display == true">
+                                <input :disabled="disabled" class="form-control" type="number" name="place" v-model="groupUser['score_place']">
                             </td>
-                            <td  style="width: 40%">
-                                <input :disabled="disabled" class="form-control" type="text" name="remarks" value="groupUser['score_remarks']" v-model="groupUser['score_remarks']">
+                            <td  style="width: 40%" v-if="groupUser.score_display == true">
+                                <input :disabled="disabled" class="form-control" type="text" name="remarks" v-model="groupUser['score_remarks']">
                             </td>
                         </tr>
                     </tbody>
                 </table>
-                <span v-if="submitOption == 'Update'">
-                    <input :disabled="disabled" type="checkbox"  :id="renewPlaces" :value="renewPlaces" v-model="renewPlaces" >
-                <label :for="renewPlaces">Recalculate scores</label>
-                </span>
+
+                <div class="form-check" v-if="submitOption == 'Update'">
+                    <input :disabled="disabled" type="checkbox" class="form-check-input" :id="renewPlaces" :value="renewPlaces" v-model="renewPlaces" >
+                    <label :for="renewPlaces">Recalculate scores</label>
+                </div>
             </div>
 
-            <div class="row">
-                <div class="col-lg-2 col-md-2 col-sm-0"></div>
-                <div class="col-lg-8 col-md-8 col-sm-12">
-                    <center>
-                        <button class="btn btn-primary" v-if="disabled == false">Add played game</button>
-                    </center>
-                    <br>
-                </div>
-                <div class="col-lg-2 col-md-2 col-sm-0"></div>
-            </div>
+            <global-layout center="center">
+                <button class="btn btn-primary" v-if="disabled == false">Save played game</button>
+            </global-layout>
         </form>
     </div>
 </template>
 
 <script>
     import apiCall from '../../services/ApiCall.js';
-
-    import TextArea from '../../components/ui/form/TextAreaInput.vue';
-    import DateInput from '../../components/ui/form/DateInput.vue';
-    import TimeInput from '../../components/ui/form/TimeInput.vue';
-    import Multiselect from 'vue-multiselect';
+    import Multiselect from '@suadelabs/vue3-multiselect';
 
     import Moment from 'moment';
 
     export default {
 
         components: {
-            TextArea,
-            DateInput,
-            TimeInput,
             Multiselect,
             Moment,
         },
@@ -145,7 +139,7 @@
          data () {
             return {
                 'selectedGame': [],
-                'seletectedExpansions': [],
+                'selectedExpansions': [],
                 'gameExpansions': {},
                 'disabled': false,
                 'errors': [],
@@ -166,6 +160,7 @@
             'submitOption': "",
             'groupGames' : {},
             'groupUsers': {},
+            'currentPage': 0,
          },
 
          watch: {
@@ -182,7 +177,6 @@
                     this.prepareGroupUsers();
                     return;
                  }
-
                 this.setData();
                 return;
              },
@@ -193,7 +187,7 @@
                 this.gameExpansions = game.game;
 
                 this.fields.game_id = game.game_id;
-                this.seletectedExpansions = [];
+                this.selectedExpansions = [];
 
                 //if there are less users then the max of the game, display all users
                 if(this.groupUsers.data.length <= game.game.players_max){
@@ -221,7 +215,6 @@
             showUser(user){
                 //remove the user from the groupuserlist
                 var userToRemove = "";
-                //this.multigroupUsers.forEach(function(item, index){
                 this.groupUsers.data.forEach(function(item, index){
                     if(user['id'] == item.id){
                         userToRemove = index;
@@ -269,21 +262,23 @@
                 //rewrite this part to avoid all these loops
                 for(var item in this.playedGame.scores){
                    for(var item2 in this.groupUsers.data){
-                       if(this.playedGame.scores[item].group_user_id == this.groupUsers.data[item2]['id']){
-                            this.groupUsers.data[item2]['score_played_game_id'] = this.playedGame.scores[item].id;
-                            this.groupUsers.data[item2]['score_display'] = true;
-                            this.groupUsers.data[item2]['score_score'] = this.playedGame.scores[item].score;
-                            this.groupUsers.data[item2]['score_place'] = this.playedGame.scores[item].place;
-                            if(this.playedGame.scores[item].remarks != null){
-                                this.groupUsers.data[item2]['score_remarks'] = this.playedGame.scores[item].remarks;
-                            }
-                            //adjust the multiselect drop down to have te users who haven't had a score
-                            for(var item3 in this.multigroupUsers){
-                                if(this.multigroupUsers[item3].id == this.groupUsers.data[item2]['id']){
-                                    this.multigroupUsers.splice(item3, 1);
-                                }
-                            }
+                       if(this.playedGame.scores[item].group_user_id != this.groupUsers.data[item2]['id']){
+                           continue;
                        }
+
+                        this.groupUsers.data[item2]['score_played_game_id'] = this.playedGame.scores[item].id;
+                        this.groupUsers.data[item2]['score_display'] = true;
+                        this.groupUsers.data[item2]['score_score'] = this.playedGame.scores[item].score;
+                        this.groupUsers.data[item2]['score_place'] = this.playedGame.scores[item].place;
+                        if(this.playedGame.scores[item].remarks != null){
+                            this.groupUsers.data[item2]['score_remarks'] = this.playedGame.scores[item].remarks;
+                        }
+                        //adjust the multiselect drop down to have te users who haven't had a score
+                        for(var item3 in this.multigroupUsers){
+                            if(this.multigroupUsers[item3].id == this.groupUsers.data[item2]['id']){
+                                this.multigroupUsers.splice(item3, 1);
+                            }
+                        }
                    }
                 }
             },
@@ -301,16 +296,15 @@
 
             create(){
                 this.setFormData();
-
                 this.action = 'group/' + this.group.id + '/played';
 
                  apiCall.postData(this.action, this.formData)
                 .then(response =>{
-                    this.$bus.$emit('reloadPlayedGameList');
-                    this.message = "You've updated the game for " + this.group.name;
-                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                    var message = "You've updated the game for " + this.group.name;
+                    this.$store.dispatch('getMessage', {message: message});
                     this.formData =  new FormData();
                     this.prepareGroupUsers();
+                    this.$store.dispatch('getPlayedGames', {id: this.group.id, current_page: 1});
                     this.$router.push({name: "allPlayedGames", params: { id: this.group.id },});
                 }).catch(error => {
                     this.errors = error;
@@ -319,44 +313,42 @@
 
             update(){
                 this.setFormData();
-
                 this.action = 'group/' + this.group.id + '/played/' + this.playedGame.id;
 
                 apiCall.updateData(this.action, this.formData)
                 .then(response =>{
-                    this.$bus.$emit('reloadPlayedGameList');
-                    this.message = "You've updated the game for " + this.group.name;
-                    this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                    console.log()
+                    var message = "You've updated the game " + this.playedGame.game.name + " in " + this.group.name;
+                    this.$store.dispatch('getMessage', {message: message})
                     this.formData =  new FormData();
+                    this.$store.dispatch('getPlayedGames', {id: this.group.id, current_page: this.currentPage ?? '1'});
                     this.prepareGroupUsers();
                 }).catch(error => {
-                        this.errors = error;
+                    if(error.status === 401){
+                        this.$store.dispatch('getMessage', {message: error.data});
+                        this.formData =  new FormData();
+                    }
+                    this.errors = error;
                 });
             },
 
             setFormData(){
                 this.formData.append('group_id',  this.group.id);
-
                 if(this.fields.game_id != undefined){
                     this.formData.set('game_id', this.fields.game_id);
                 }
-
                 if(this.fields.date != undefined){
                     this.formData.append('date', this.fields.date);
                 }
-
                 if(this.fields.time_played != undefined){
                     this.formData.append('time_played', this.fields.time_played);
                 }
-
                 if(this.fields.remarks != undefined){
                     this.formData.append('remarks', this.fields.remarks);
                 }
-
-                if(this.seletectedExpansions != undefined){
-                    this.formData.append('expansions', this.seletectedExpansions);
+                if(this.selectedExpansions != undefined){
+                    this.formData.append('expansions', this.selectedExpansions);
                 }
-
                 for(var item in this.groupUsers.data){
                     if(this.groupUsers.data[item]['score_score'] == undefined && this.groupUsers.data[item]['score_place'] == undefined){
                         continue;
@@ -364,26 +356,25 @@
 
                     var userId = this.groupUsers.data[item]['id'];
                     if(this.playedGame != undefined){
-                        this.formData.append('player[' + userId + '][id]', this.groupUsers.data[item]['score_played_game_id']);
+                        this.formData.append('players[' + userId + '][id]', this.groupUsers.data[item]['score_played_game_id']);
                     }
-                    this.formData.append('player[' + userId + '][group_user_id]', userId);
-                    this.formData.append('player[' + userId + '][score]', this.groupUsers.data[item]['score_score']);
+                    this.formData.append('players[' + userId + '][group_user_id]', userId);
+                    this.formData.append('players[' + userId + '][score]', this.groupUsers.data[item]['score_score']);
 
                     //make option so places will be recalculated
                     if(this.renewPlaces === true){
-                        //this.formData.append('player[' + userId + '][place]', 0);
-                        this.formData.append('player[' + userId + '][place]', 0);
+                        this.formData.append('players[' + userId + '][place]', 0);
                     }else{
                         if(this.groupUsers.data[item]['score_place'] == undefined || this.groupUsers.data[item]['score_place'] == ""){
                             this.groupUsers.data[item]['score_place'] = 0;
                         }
-                        this.formData.append('player[' + userId + '][place]', this.groupUsers.data[item]['score_place']);
+                        this.formData.append('players[' + userId + '][place]', this.groupUsers.data[item]['score_place']);
                     }
 
                     if(this.groupUsers.data[item]['score_remarks'] != undefined){
-                        this.formData.append('player[' + userId + '][remarks]', this.groupUsers.data[item]['score_remarks']);
+                        this.formData.append('players[' + userId + '][remarks]', this.groupUsers.data[item]['score_remarks']);
                     }else{
-                        this.formData.append('player[' + userId + '][remarks]', "");
+                        this.formData.append('players[' + userId + '][remarks]', "");
                     }
                 }
             },
@@ -398,10 +389,10 @@
                 this.selectedGame = this.playedGame.game;
                 this.gameExpansions = this.playedGame.game;
                 //set selected expansions
-                this.seletectedExpansions = [];
+                this.selectedExpansions = [];
 
                 this.playedGame.played_expansions.map((expansions) => {
-                    this.seletectedExpansions.push(expansions.id);
+                    this.selectedExpansions.push(expansions.id);
                 });
 
                 if(this.groupUsers != undefined){

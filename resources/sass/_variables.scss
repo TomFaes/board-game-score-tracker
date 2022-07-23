@@ -82,8 +82,19 @@ h1, h2, h3{
 
 /* Font awesome changes */
 
-.fas, .fa, .btn-primary{
+.btn-primary, .btn-secondary, .btn-danger {
     color: whitesmoke !important;
+    margin: 3px;
+
 }
+
+.center {
+    text-align: center;
+}
+
+.toggle-grey {
+    --toggle-bg-on: lightgrey;
+    --toggle-border-on: lightgrey;
+  }
 
 

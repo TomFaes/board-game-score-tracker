@@ -6,49 +6,46 @@
             <button class="btn btn-primary" @click.prevent="CreateShow"><i class="fas fa-plus fa-1x" ></i></button>
         </div><br>
 
-        <div class="row"  v-show="display == 'Create'">
+        <div class="row"  v-show="showForm == 'Create'">
             <div class="container">
-                <inputForm :submitOption="'Create'"></inputForm>
+                <input-form :submitOption="'Create'"></input-form>
             </div>
         </div>
 
-        <list></list>
-
+        <game-list></game-list>
     </div>
 </template>
 
 <script>
     import inputForm from '../GamePage/input.vue';
-    import list from '../GamePage/list.vue';
+    import GameList from '../GamePage/list.vue';
     import listUnapproved from '../GamePage/listUnapprovedGames.vue';
 
     export default {
         components: {
-            list,
+            GameList,
             inputForm,
             listUnapproved,
         },
 
         data () {
             return {
-                display: "",
+                showForm: "",
             }
         },
 
         methods: {
             CreateShow(){
-                if(this.display == 'Create'){
-                    this.display = "";
-                }else{
-                    this.display = 'Create';
+                if(this.showForm == 'Create'){
+                    this.showForm = "";
+                    return
                 }
+                this.showForm = 'Create';
             },
         },
 
         mounted(){
-            this.$bus.$on('resetGameDisplay', () => {
-                    this.display = '';
-            });
+
         }
     }
 </script>

@@ -12,7 +12,7 @@ interface IGame {
 
     public function create(Array $data);
     public function approveGame(Game $game);
-    public function update(Array $data, $gameId);
+    public function update(Array $data, Game $game);
     public function updateBaseGameId($gameId, $newGameId);
     public function delete($gameId);
 

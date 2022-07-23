@@ -25,7 +25,8 @@ class GroupUserRequest extends FormRequest
     {
         return [
                 'firstname' => 'required',
-                'name' => 'required'
+                'name' => 'required',
+                'group_id' => 'required|integer',
         ];
     }
 
@@ -33,7 +34,9 @@ class GroupUserRequest extends FormRequest
     {
         return [
                 'firstname.required' => 'Firstname is required',
-                'name.required' => 'Name is required'
+                'name.required' => 'Name is required',
+                'group_id.required' => 'Group is required',
+                'group_id.integer' => 'Group id is required',
         ];
     }
 }

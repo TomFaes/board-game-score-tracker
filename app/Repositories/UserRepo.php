@@ -38,21 +38,17 @@ class UserRepo extends Repository implements Contracts\IUser
         isset($data['name']) === true ? $user->name = $data['name'] : "";
         isset($data['email']) === true ? $user->email = $data['email'] : "";
 
-        if(isset($data['role']) === true)
-        {
+        if(isset($data['role']) === true){
             $user->role = $data['role'];
         }
-        if(isset($data['password']) === true)
-        {
+        if(isset($data['password']) === true){
             $user->password = bcrypt($data['password'] );
         }
         return $user;
     }
 
-    /**
-     * create a user
-     */
-    public function create(Array $data){
+    public function create(Array $data)
+    {
         $user = new User();
         //default role is User
         $user->role = 'User';
@@ -77,9 +73,6 @@ class UserRepo extends Repository implements Contracts\IUser
         return $newUser;
     }
 
-    /**
-     * update a user
-     */
     public function update(Array $data, $userId)
     {
         $user = $this->getUser($userId);
@@ -109,7 +102,6 @@ class UserRepo extends Repository implements Contracts\IUser
         }else{
             $user->favorite_group_id = $groupId;
         }
-
         $user->save();
         return $user;
     }

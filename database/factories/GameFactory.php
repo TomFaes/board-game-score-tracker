@@ -37,7 +37,7 @@ class GameFactory extends Factory
         return [
             'name' => $this->faker->name,
             'year' => rand(2000, 2020),
-            'approved_by_admin' => 0,
+            'approved_by_admin' => 1,
             'base_game_id' => null,
             'full_name' => $this->faker->name,
             'players_min' =>  rand(2, 3),

@@ -12,7 +12,7 @@ class GroupGameLink extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'link', 'description'
+        'name', 'link', 'description', 'group_game_id'
     ];
 
     public function groupGame()

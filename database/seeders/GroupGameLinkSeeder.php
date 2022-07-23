@@ -26,29 +26,7 @@ class GroupGameLinkSeeder extends Seeder
         GroupGameLink::factory()
             ->count(10)
             ->create();
-        /*
-        $groupGame = GroupGame::all();
 
-        GroupGameLink::factory()
-            ->count(10)
-            ->state(new Sequence(
-                ['group_game_id' => GroupGame::all()->random()],
-                ['group_game_id' => GroupGame::all()->random()],
-            ))
-            ->create(
-
-            );
-            */
-        /*
-         [
-                    'group_game_id' => GroupGame::all()->random(),
-                ]
-
-
-        GroupGameLink::factory()
-            ->count(10)
-            ->create();
-            */
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 

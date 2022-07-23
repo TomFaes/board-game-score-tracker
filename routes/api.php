@@ -1,86 +1,97 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Middleware\Security\Admin;
+use App\Http\Middleware\Security\GroupSecurity;
+use App\Http\Middleware\Security\PlayedGameSecurity;
 
-use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\FavoriteUserGroupController;
-
 use App\Http\Controllers\Game\GameController;
 use App\Http\Controllers\Game\BaseGameController;
 use App\Http\Controllers\Game\MergeGameController;
 use App\Http\Controllers\Game\UnapprovedGameController;
-
 use App\Http\Controllers\Group\GroupController;
 use App\Http\Controllers\Group\GroupGameController;
 use App\Http\Controllers\Group\GroupUsersController;
-use App\Http\Controllers\Group\UserGroupsController;
+use App\Http\Controllers\Group\GroupsOfUserController;
 use App\Http\Controllers\Group\GroupGameLinkController;
-
 use App\Http\Controllers\Played\PlayedGamesController;
-
 use App\Http\Controllers\Statistics\StatisticsController;
 
+//Info: //delete method doesn't work on 000webhost
+Route::middleware('auth:sanctum')->group(function () {
+    Route::controller(ProfileController::class)->prefix('profile')->group( function (){
+        Route::get('/', 'index');
+        Route::post('/', 'update');
+        Route::post('/delete', 'destroy');
+    });
 
-//All routes for profiles
-Route::get('profile', [ProfileController::class, 'index']);
-Route::post('profile', [ProfileController::class, 'update']);
+    Route::middleware(Admin::class)->group(function(){
+        Route::controller(GameController::class)->prefix('game')->group(function () {
+            Route::get('/', 'index');
+            //Route::post('/', 'store');
+            Route::post('/{game}', 'update');
+            Route::post('/{game}/delete', 'destroy');
+        });
 
-// All routes for a game
-Route::get('game', [GameController::class, 'index']);
-Route::post('game', [GameController::class, 'store']);
-Route::post('game/{id}', [GameController::class, 'update']);
+        Route::post('/merge/{game}/game/{merge_game}', [MergeGameController::class, 'update']);
 
-Route::get('basegame', [BaseGameController::class, 'index']);
+        Route::controller(UnapprovedGameController::class)->prefix('unapprovedgames')->group(function() {
+            Route::get('/', 'index');
+            Route::post('/{game}', 'update');
+        });
+    });
+    Route::post('game', [GameController::class, 'store']);
+    Route::get('/basegame', [BaseGameController::class, 'index']);
 
-Route::post('unapprovedgames/{id}', [UnapprovedGameController::class, 'update']);
-Route::get('unapprovedgames', [UnapprovedGameController::class, 'index']);
+    Route::get('/user-group', [GroupsOfUserController::class, 'index']);
+    Route::post('/join_group', [GroupUsersController::class, 'joinGroup']);
+    Route::post('/group', [GroupController::class, 'store']);
+    Route::post('group/{group}/changeFavoriteGroup', [FavoriteUserGroupController::class, 'update']);
 
-// All routes for a Groups
-Route::get('group', [GroupController::class, 'index']);
-Route::post('group', [GroupController::class, 'store']);
-Route::get('group/{id}', [GroupController::class, 'show']);
-Route::post('group/{id}', [GroupController::class, 'update']);
+    Route::middleware(GroupSecurity::class)->group(function(){
+        Route::controller(GroupController::class)->prefix('group')->group(function(){
+            Route::get('/{group}', 'show');
+            Route::post('/{group}', 'update');
+            Route::post('/{group}/delete', 'destroy');
+        });
 
-Route::get('user-group', [UserGroupsController::class, 'index']);
+        Route::controller(GroupUsersController::class)->prefix('group/{group}')->group(function (){
+            Route::get('/users', 'index');
+            Route::post('/user', 'store');
+            Route::post('/user/{group_user}', 'update');
+            Route::post('/user/{group_user}/regenerate_code', 'regenerateGroupUserCode');
+            Route::post('/user/{group_user}/delete', 'destroy');
+        });
 
-Route::get('group/{group_id}/users', [GroupUsersController::class, 'index']);
+        Route::controller(GroupGameController::class)->prefix('group/{group}')->group(function () {
+            Route::get('/search-non-group-games', 'searchNonGroupGames');
+            Route::get('/group-game', 'index');
+            Route::post('/group-game', 'store');
+            Route::post('/group-game/{game}/delete', 'destroy');
+        });
 
-Route::post('group/{group_id}/user', [GroupUsersController::class, 'store']);
-Route::post('group/{group_id}/user/{id}', [GroupUsersController::class, 'update']);
-Route::post('join_group', [GroupUsersController::class, 'joinGroup']);
-Route::post('group/{group_id}/user/{id}/regenerate_code', [GroupUsersController::class, 'regenerateGroupUserCode']);
+        Route::controller(GroupGameLinkController::class)->prefix('group/{group}/game/{game}/link')->group(function (){
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::post('/{link}', 'update');
+            Route::post('/{link}/delete', 'destroy');
+        });
 
-Route::post('group/{group_id}/changeFavoriteGroup', [FavoriteUserGroupController::class, 'update']);
+        Route::controller(StatisticsController::class)->prefix('stats/group/{group}')->group(function() {
+            Route::get('/', 'groupStats');
+            Route::get('/year/{year}', 'groupYearStats');
+            Route::get('/game/{game}', 'groupGameStats');
+        });
+    });
 
-//GroupGameController
-Route::get('group/{group_id}/search-non-group-games', [GroupGameController::class, 'searchNonGroupGames']);
-Route::get('group/{group_id}/group-game', [GroupGameController::class, 'index']);
-Route::post('group/{group_id}/group-game', [GroupGameController::class, 'store']);
-
-//GroupGameLinkController
-Route::post('group/game/{group_game_id}/link', [GroupGameLinkController::class, 'store']);
-Route::post('group/game/{group_game_id}/link/{id}', [GroupGameLinkController::class, 'update']);
-
-//PlayedGamesController
-Route::get('group/{group_id}/played', [PlayedGamesController::class, 'index']);
-Route::get('group/{group_id}/played/{id}', [PlayedGamesController::class, 'show']);
-Route::post('group/{group_id}/played', [PlayedGamesController::class, 'store']);
-Route::post('group/{group_id}/played/{id}', [PlayedGamesController::class, 'update']);
-
-//StatisticsController
-Route::get('stats/group/{group_id}', [StatisticsController::class, 'groupStats']);
-Route::get('stats/group/{group_id}/year/{year}', [StatisticsController::class, 'groupYearStats']);
-Route::get('stats/group/{group_id}/game/{game_id}', [StatisticsController::class, 'groupGameStats']);
-
-//Merge game
-Route::post('merge/{id}/game/{mergedId}', [MergeGameController::class, 'update']);
-
-//delete method doesn't work on 000webhost
-Route::post('profile/delete', [ProfileController::class, 'destroy']);
-Route::post('game/{id}/delete', [GameController::class, 'destroy']);
-Route::post('group/{id}/delete', [GroupController::class, 'destroy']);
-Route::post('group/{group_id}/user/{id}/delete', [GroupUsersController::class, 'destroy']);
-Route::post('group/{group_id}/group-game/{id}/delete', [GroupGameController::class, 'destroy']);
-Route::post('group/game/{group_game_id}/link/{id}/delete', [GroupGameLinkController::class, 'destroy']);
-Route::post('group/{group_id}/played/{id}/delete', [PlayedGamesController::class, 'destroy']);
+    Route::middleware(PlayedGameSecurity::class)->group(function(){
+        Route::controller(PlayedGamesController::class)->prefix('/group/{group}/played')->group(function(){
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::get('/{played}', 'show');
+            Route::post('/{played}', 'update');
+            Route::post('/{played}/delete', 'destroy');
+        });
+    });
+});

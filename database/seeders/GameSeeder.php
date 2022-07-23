@@ -19,9 +19,24 @@ class GameSeeder extends Seeder
         // Disable Foreign key check for this connection before running seeders
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-        Game::factory()
-            ->count(10)
+        Game::factory(4)
             ->create();
+
+        $firstGame = Game::first();
+
+        Game::factory(3)
+            ->create([
+                'base_game_id' => $firstGame->id
+            ]);
+
+        Game::factory(3)
+            ->create([
+                'approved_by_admin' => 0
+            ]);
+
+//'approved_by_admin' => 1,
+
+
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }

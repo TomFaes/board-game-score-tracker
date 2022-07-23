@@ -12,19 +12,17 @@ class Admin
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next, $role = "Admin", $method = 'API')
+    public function handle($request, Closure $next)
     {
         $user = auth()->user();
 
-        if(isset($user) === true){
-            if($user->role == $role){
-                return $next($request);
-            }
+        if(isset($user) === false){
+            return response()->json("You do not have access to this page", 401);
         }
-        if($method == 'API'){
-            return response()->json("You do not have access to this page", 200);
-        }else{
-            return redirect('/')->with('error', 'You do not have access to this page');
+
+        if($user->role != "Admin"){
+            return response()->json("You do not have access to this page", 401);
         }
+        return $next($request);
     }
 }

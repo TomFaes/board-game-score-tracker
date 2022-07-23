@@ -1,12 +1,12 @@
 <template>
     <div class="container">
-        <center>
+        <global-layout center="center">
             <button class="btn btn-primary" v-if="group.type_member == 'Admin'" @click.prevent="addGroupUser" > <i class="fa fa-user-plus"></i></button><br><br>
-        </center>
+        </global-layout>
 
-        <!-- Add user input -->
+        <!-- Add user input-->
         <div v-show="display == 'showAddUserToGroup'">
-            <addUserToGroup :submitOption="'Create'" :group=group></addUserToGroup>
+            <add-user-to-group :submitOption="'Create'" :group="group"></add-user-to-group>
         </div>
 
         <!-- list of all users -->
@@ -18,34 +18,35 @@
                     <th>Options</th>
                 </tr>
             </thead>
-            <tbody  v-for="data in groupUsers.data"  :key="data.id" >
+            <tbody  v-for="groupuser in groupUsers.data"  :key="groupuser.id" >
                 <tr>
                     <td>
-                        <div v-if="data.user_id > 0">
-                            {{ data.user.full_name  }}
+                        <div v-if="groupuser.user_id > 0">
+                            {{ groupuser.user.full_name  }}
                         </div>
                         <div v-else>
-                            {{ data.full_name }}
+                            {{ groupuser.full_name }}
                         </div>
                     </td>
                     <td v-if="group.type_member == 'Admin'">
                             <a class="mailtoui"
-                                :href="createLink(data.code)"
-                                v-if="data.code != null"
-                                >{{data.code}}</a>
+                                :href="createLink(groupuser.code)"
+                                v-if="groupuser.code != null"
+                                >{{groupuser.code}}</a>
                     </td>
                     <td v-if="group.type_member == 'Admin'" class="options-column">
-                        <button class="btn btn-primary"  v-if="!data.user_id" @click.prevent="updateGroupUser(data)"> <i class="fa fa-edit" style="heigth:14px; width:14px"></i></button>
-                        <button class="btn btn-danger" @click.prevent="deleteGroupUser(data)" ><i class="fas fa-trash-alt" style="heigth:14px; width:14px" ></i></button>
-                        <button class="btn btn-secondary" v-if="!data.user_id" @click.prevent="regenerateCode(data)" ><i class="fas fa-sync" style="heigth:14px; width:14px" ></i></button>
+                        <button class="btn btn-primary"  v-if="!groupuser.user_id" @click.prevent="updateGroupUser(groupuser)"> <i class="fa fa-edit" style="heigth:14px; width:14px"></i></button>
+                        <button class="btn btn-danger" @click.prevent="deleteGroupUser(groupuser)" ><i class="fas fa-trash-alt" style="heigth:14px; width:14px" ></i></button>
+                        <button class="btn btn-secondary" v-if="!groupuser.user_id" @click.prevent="regenerateCode(groupuser)" ><i class="fas fa-sync" style="heigth:14px; width:14px" ></i></button>
+                    </td>
+                </tr>
+                <tr v-if="selectedGroupUser.id == groupuser.id" >
+                    <td  colspan="100">
+                        <add-user-to-group v-if="selectedGroupUser.id > 0" :group=group :groupUser="selectedGroupUser" :submitOption="'Update'" :key="selectedGroupUser.id"></add-user-to-group>
                     </td>
                 </tr>
             </tbody>
         </table>
-
-        <div v-if="selectedGroupUser">
-            <addUserToGroup v-if="selectedGroupUser.id > 0" :group=group :groupUser=selectedGroupUser :submitOption="'Update'" :key=selectedGroupUser.id></addUserToGroup>
-        </div>
     </div>
 </template>
 
@@ -71,6 +72,8 @@
             },
 
             groupUsers(){
+                this.display = "";
+                this.selectedGroupUser = "";
                 if(this.group.id === undefined){
                     return;
                 }
@@ -86,40 +89,38 @@
             updateGroupUser(groupUser){
                 if(this.selectedGroupUser.id == groupUser.id){
                     this.selectedGroupUser = 0;
-                }else{
-                    this.selectedGroupUser = groupUser;
+                    return;
                 }
+                this.selectedGroupUser = groupUser;
             },
 
             addGroupUser(){
                 if(this.display == 'showAddUserToGroup'){
                     this.display = '';
-                }else{
-                    this.display = 'showAddUserToGroup';
+                    return
                 }
+                this.display = 'showAddUserToGroup';
             },
 
             regenerateCode(data){
                 apiCall.postData('group/' + this.group.id + '/user/' + data.id + '/regenerate_code')
                     .then(response =>{
-                        this.message = "code is regenerated";
-                        this.$bus.$emit('showMessage', this.message,  'green', '2000' );
+                        this.$store.dispatch('getMessage', {message: "Code is regenerated"});
                         this.$store.dispatch('getSelectedGroupUsers', {groupId: this.group.id});
                     }).catch(() => {
                         console.log('handle server error from here');
                     });
             },
 
-            deleteGroupUser(data){
+            deleteGroupUser(groupuser){
                 if(confirm('are you sure you want to remove this user from ' + this.group.name  + '?')){
-                    apiCall.postData('group/' + this.group.id + '/user/' + data.id + '/delete')
+                    apiCall.postData('group/' + this.group.id + '/user/' + groupuser.id + '/delete')
                     .then(response =>{
+                        var message = groupuser.full_name + " is deleted from this group";
                         if(response.status == 403){
-                            this.message = "This user couldn't be delete from this group";
-                        }else{
-                            this.message = data.full_name + " is deleted from this group";
+                            message = "This user couldn't be delete from this group";
                         }
-                        this.$bus.$emit('showMessage', this.message,  'red', '2000' );
+                        this.$store.dispatch('getMessage', {message: message});
                         this.$store.dispatch('getSelectedGroupUsers', {groupId: this.group.id});
                     }).catch(() => {
                         console.log('handle server error from here');
@@ -146,10 +147,6 @@
 
         mounted(){
             this.$store.dispatch('getSelectedGroupUsers', {groupId: this.group.id});
-            this.$bus.$on('reloadList', () => {
-                this.display = "";
-                this.selectedGroupUser = 0;
-            });
         }
     }
 </script>

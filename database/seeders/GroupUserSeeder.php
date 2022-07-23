@@ -28,27 +28,7 @@ class GroupUserSeeder extends Seeder
         GroupUser::factory()
             ->count(10)
             ->create();
-        //$group = Group::all();
-        //$user = User::all();
 
-        /*
-        GroupUser::factory()
-            ->count(10)
-            ->state(new Sequence(
-                ['group_id' => Group::all()->random()],
-                ['group_id' => Group::all()->random()],
-            ))
-            ->create();
-        /*
-         [
-                    'group_game_id' => GroupGame::all()->random(),
-                ]
-
-
-        GroupGameLink::factory()
-            ->count(10)
-            ->create();
-            */
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 
